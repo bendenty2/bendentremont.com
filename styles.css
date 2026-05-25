@@ -1,0 +1,640 @@
+/* ------------------------------------------------------------
+   PhotoSite — VSCO-inspired styles.
+   White canvas, black sidebar, masonry grid.
+   ------------------------------------------------------------ */
+
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #8a8a8a;
+  --rule: #ececec;
+  --topbar-bg: #000000;
+  --topbar-fg: #ffffff;
+  --topbar-height: 73px;
+  /* Gap and side padding scale with the viewport so photo proportions stay
+     consistent whether the window is fullscreen or split. clamp(min, fluid, max). */
+  --gap: clamp(4px, 0.5vw, 8px);              /* vertical gap between stacked tiles */
+  --col-gap: clamp(12px, 1.5vw, 24px);        /* horizontal gap between columns */
+  --grid-side-pad: clamp(96px, 18vw, 360px);  /* whitespace at left/right of page */
+  --max-width: none;                          /* let the grid fill available width */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+               Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Top navigation bar ---------- */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  background: var(--topbar-bg);
+  color: var(--topbar-fg);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 48px);
+}
+
+.topbar-brand {
+  font-family: 'Inter', var(--font-sans);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Pill-shaped nav buttons.
+   The ::before pseudo-element is a white fill that slides in from the top on
+   hover.  The inner <span> uses mix-blend-mode: difference so that white text
+   reads as white on the dark button and inverts to black the moment the white
+   fill sweeps over it — giving a pixel-accurate curtain reveal effect. */
+.nav-link {
+  background: var(--topbar-bg);      /* opaque so blend-mode has a defined base */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;              /* fully rounded ends — pill / stadium shape */
+  padding: 7px 20px;
+  margin: 0;
+  font-family: 'Inter', var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;               /* confines blend-mode to the button */
+}
+
+/* The white fill that animates in from the top. */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  transform: translateY(-101%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover: fill slides down.  Active: always filled to mark current section. */
+.nav-link:hover::before,
+.nav-link.is-active::before {
+  transform: translateY(0);
+}
+
+/* The text span sits above the fill.  mix-blend-mode: difference makes white
+   text appear white on black and invert to black on white — automatically, per
+   pixel, as the fill sweeps across it. */
+.nav-link span {
+  position: relative;
+  color: #ffffff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+/* ---------- Main page area (push down below the fixed topbar) ---------- */
+
+.page {
+  padding-top: var(--topbar-height);
+}
+
+/* ---------- View switching (pics / about) ---------- */
+
+.view { display: none; }
+.view.is-active { display: block; }
+
+/* ---------- About panel ---------- */
+
+.about-panel {
+  /* No max-width — the panel now uses the same horizontal footprint as the
+     photo grid (identical var(--grid-side-pad) padding on each side).
+     The old max-width: 640px was smaller than 2 × --grid-side-pad on wide
+     screens, squashing the content to near-zero width. */
+  margin: 8px 0 64px;
+  padding: 0 var(--grid-side-pad);
+  color: var(--fg);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.about-title {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin: 32px 0 28px;
+  font-weight: 500;
+}
+
+.about-block { margin: 0 0 32px; }
+.about-block:last-child { margin-bottom: 0; }
+
+.about-subhead {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+.about-text { margin: 0 0 12px; }
+.about-text:last-child { margin-bottom: 0; }
+
+.about-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+}
+
+.about-list li:last-child { border-bottom: 0; }
+
+/* Gear grid: three side-by-side device columns, each with its lenses underneath.
+   Collapses to a single column on narrow viewports (see mobile media query). */
+.gear-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.gear-col { min-width: 0; }
+
+.gear-device {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+  margin: 0 0 8px;
+}
+
+.gear-filters {
+  border-top: 1px solid var(--rule);
+  padding-top: 16px;
+}
+
+.about-link {
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  transition: border-color 120ms ease;
+}
+
+.about-link:hover { border-bottom-color: var(--fg); }
+
+/* ---------- Site footer (copyright) ---------- */
+
+.site-footer {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 28px var(--grid-side-pad) 32px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+
+/* ---------- Hero slideshow ---------- */
+
+.hero-section {
+  /* Same horizontal margins as the collage grid below. */
+  margin: 24px auto 0;
+  padding: 0 var(--grid-side-pad);
+}
+
+/* Crossfade container.
+   The first .hero-img stays in normal flow to give the container its height;
+   all subsequent .hero-img elements are stacked absolutely on top of it. */
+.hero-slideshow {
+  position: relative;
+  line-height: 0;       /* collapse any inline whitespace between images */
+  overflow: hidden;
+}
+
+.hero-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+/* 2nd+ images out of flow — stacked on top of the first. */
+.hero-img ~ .hero-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.hero-img.is-active {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* Dot row */
+.hero-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 6px;
+}
+
+.hero-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 200ms ease, background 200ms ease, border-color 200ms ease;
+}
+
+.hero-dot:hover {
+  transform: scale(1.5);
+  border-color: var(--fg);
+}
+
+.hero-dot.is-active {
+  background: var(--fg);
+  border-color: var(--fg);
+  transform: scale(1.2);
+}
+
+/* EXIF caption below the dots */
+.hero-exif {
+  padding: 2px 0 20px;
+  font-family: 'Spectral', Georgia, serif;
+  font-size: clamp(9px, 0.6vw + 3px, 12px);
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-align: center;
+  transition: opacity 250ms ease;
+}
+
+/* ---------- Masonry grid ----------
+   CSS Grid masonry simulation: grid-auto-rows is set to a fine unit (4px)
+   and each tile's grid-row-end is computed by script.js from its aspect
+   ratio, so tiles pack tightly without explicit column divs.
+   row-gap is 0 — the tile spacing is baked into each tile's row span.
+   --cols is set inline by script.js to match the breakpoint column count. */
+
+.grid {
+  max-width: var(--max-width);
+  margin: 24px auto 64px;
+  padding: 0 var(--grid-side-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), 1fr);
+  grid-auto-rows: 4px;
+  grid-auto-flow: row dense;
+  row-gap: 0;
+  column-gap: var(--col-gap);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  margin: 0;          /* override the browser's default figure margin */
+  cursor: zoom-in;
+  align-self: start;  /* top-align: tile tops at shared row boundaries are flush;
+                         photos display at natural size with spacing below */
+}
+
+.tile img {
+  width: 100%;
+  height: auto;              /* natural aspect ratio — no cropping */
+  flex: 0 0 auto;            /* don't grow/shrink; photo displays at its true size */
+  display: block;
+  background: #f4f4f4;       /* placeholder colour while loading */
+  transition: opacity 180ms ease, transform 220ms ease;
+  transform-origin: center;
+}
+
+.tile:hover img {
+  opacity: 0.88;
+  transform: scale(1.012);
+}
+
+/* Video tiles in the masonry grid.
+   Displayed at 3:2 to match the half-photo tiles — the footage is squished
+   vertically (object-fit: fill) rather than cropped, so no bars are removed. */
+
+.video-crop-wrapper {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  width: 100%;
+  background: #111;
+  overflow: hidden;
+  /* Clip the horizontal edges to eliminate the subpixel rendering artefact
+     on the right edge of the video's GPU texture.  Right side is clipped more
+     aggressively (6 px) because the artefact sits just inside 2 px. */
+  clip-path: inset(0 6px 0 2px);
+}
+
+.tile--video .video-crop-wrapper video {
+  /* Fill the wrapper height so the video extends wider than the wrapper.
+     scaleX(1.28) expands it further so the pillarbox bars (sides of the
+     16:9 frame) overflow and are clipped.  Scale = target / content =
+     1.5 / 1.24 ≈ 1.21.  Net result: bars removed, content fills 3:2.
+     will-change: transform promotes the element to its own GPU compositor
+     layer, eliminating the 1px subpixel rendering artifact at the edge. */
+  position: absolute;
+  height: 100%;
+  width: auto;
+  left: 50%;
+  transform: translateX(-50%) scaleX(1.28);
+  transform-origin: center center;
+  will-change: transform;
+  transition: opacity 180ms ease, transform 220ms ease;
+}
+
+.tile--video:hover .video-crop-wrapper video {
+  opacity: 0.88;
+  transform: translateX(-50%) scaleX(1.28) scale(1.012);
+}
+
+.tile-caption {
+  margin-top: 4px;
+  margin-bottom: 2px;
+  font-family: 'Spectral', Georgia, serif;
+  /* Scales with viewport so captions stay proportional to photo size.
+     At ~1300px+ it caps at 10.5px; at ~700px it floors at 8px. */
+  font-size: clamp(8px, 0.55vw + 3.5px, 10.5px);
+  color: var(--muted);
+  letter-spacing: 0.03em;
+  text-align: center;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: transform 220ms ease;   /* slides down to match image swell */
+}
+
+/* When the tile is hovered the photo scales up ~1.2%, growing ~3 px at its
+   bottom edge.  Nudging the caption down by the same amount keeps the gap
+   between image and text visually constant. */
+.tile:hover .tile-caption {
+  transform: translateY(3px);
+}
+
+/* Video tiles have no caption text — add bottom margin to keep the vertical
+   rhythm consistent with photo tiles (which have ~14px of caption text). */
+.tile--video .tile-caption {
+  margin-bottom: 14px;
+}
+
+/* ---------- Lightbox ---------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.94);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 32px;
+  cursor: zoom-out;
+}
+
+.lightbox.is-open { display: flex; }
+
+.lightbox-figure {
+  margin: 0;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: default;
+}
+
+.lightbox-figure img {
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  object-fit: contain;
+  display: block;
+}
+
+/* Video wrapper in the lightbox — matches the 3:2 grid tiles. */
+.lightbox-video-wrap {
+  position: relative;
+  display: none;
+  overflow: hidden;
+  /* Width: whichever is smaller — full available width, or the width that
+     would result from using the full available height at 3:2.
+     64px accounts for lightbox padding (32px × 2). */
+  width: min(calc(100vw - 64px), calc((100vh - 120px) * 1.5));
+  aspect-ratio: 3 / 2;
+}
+
+.lightbox-video-wrap.is-active { display: block; }
+
+.lightbox-video-wrap video {
+  /* Same crop-and-fill as the grid tile. */
+  position: absolute;
+  height: 100%;
+  width: auto;
+  left: 50%;
+  transform: translateX(-50%) scaleX(1.28);
+  transform-origin: center center;
+  will-change: transform;
+  display: block;
+}
+
+/* Audio toggle button — small, sits bottom-right of the video. */
+.lightbox-audio-toggle {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.lightbox-audio-toggle:hover {
+  background: rgba(0, 0, 0, 0.75);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.lightbox-caption {
+  margin-top: 14px;
+  color: #d9d9d9;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.lightbox-title {
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.lightbox-title:empty { display: none; }   /* hide gap when no title */
+
+.lightbox-exif {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #d9d9d9;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: 0;
+  color: #ffffff;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 120ms ease;
+}
+
+.lightbox-close:hover { opacity: 1; }
+
+/* Prev / next chevrons on the lightbox edges. */
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  color: #ffffff;
+  font-size: 56px;
+  line-height: 1;
+  padding: 12px 18px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 120ms ease;
+  font-family: inherit;
+  user-select: none;
+}
+
+.lightbox-nav:hover { opacity: 1; }
+.lightbox-nav:disabled,
+.lightbox-nav.is-hidden { opacity: 0; pointer-events: none; }
+
+.lightbox-nav--prev { left: 16px; }
+.lightbox-nav--next { right: 16px; }
+
+/* ---------- Mobile: compact topbar ---------- */
+
+@media (max-width: 700px) {
+  :root { --topbar-height: 62px; }
+
+  .topbar { padding: 0 16px; }
+  .topbar-brand { font-size: 13px; }
+  .nav-link { padding: 5px 14px; font-size: 11px; }
+
+  /* Collapse the three-column gear grid to a single stack on narrow screens. */
+  .gear-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* ---------- Dev mode ---------- */
+
+/* Dashed outline on every tile so allocation boxes are visible. */
+body.dev-mode .tile {
+  outline: 1px dashed rgba(0, 100, 255, 0.28);
+  cursor: ns-resize !important;
+}
+
+/* Keep pointer events reaching the tile, not getting swallowed by children. */
+body.dev-mode .tile img,
+body.dev-mode .tile .video-crop-wrapper {
+  pointer-events: none;
+}
+
+/* Highlight the tile currently being dragged. */
+body.dev-mode .tile.dev-dragging {
+  outline: 1px solid rgba(0, 100, 255, 0.7);
+  z-index: 10;
+}
+
+/* Suppress hover effects in dev mode so dragging doesn't trigger the swell. */
+body.dev-mode .tile:hover img {
+  opacity: 1 !important;
+  transform: none !important;
+}
+body.dev-mode .tile:hover .tile-caption {
+  transform: none !important;
+}
+body.dev-mode .tile--video:hover .video-crop-wrapper video {
+  opacity: 1 !important;
+  transform: translateX(-50%) scaleX(1.28) !important;
+}
+
+/* 4-px grid overlay — horizontal lines every ROW_PX pixels. */
+body.dev-mode #photo-grid::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 100, 255, 0.09) 3px,
+    rgba(0, 100, 255, 0.09) 4px
+  );
+}
+
+/* Gap handle between the reference group and its mirror. */
+.dev-gap-handle {
+  grid-column: 1 / -1;
+  cursor: ns-resize;
+  border-top: 2px dashed rgba(0, 100, 255, 0.5);
+  background: rgba(0, 100, 255, 0.04);
+  position: relative;
+  z-index: 2;
+}
+
+/* Mirror group — dimmed, non-interactive, pure visual reference. */
+.dev-copy-tile {
+  pointer-events: none;
+  opacity: 0.45;
+}
