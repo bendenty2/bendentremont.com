@@ -125,7 +125,8 @@ Run it with `python build.py` (needs **Pillow**: `pip install Pillow`). Re-run a
 photos are added or removed.
 
 **Source folder** (off-repo, on the owner's machine):
-`~/OneDrive/Desktop/PhotositeCatalogue/` by default. Override with the `PHOTOSITE_SOURCE`
+`~/Documents/PhotositeCatalogue/` by default (local storage — migrated off OneDrive on
+2026-06-14). Override with the `PHOTOSITE_SOURCE`
 environment variable. **This folder is not in the repo and is not present in every
 environment** — if you can't see it, that's expected; you can still work on the site code,
 you just can't re-run a full build without it.
@@ -304,7 +305,7 @@ derivatives, and the VSCO-inspired restraint.
 |---|---|
 | Local test | open `index.html` in a browser |
 | Rebuild assets + manifest | `python build.py` (needs Pillow) |
-| Source photos | `~/OneDrive/Desktop/PhotositeCatalogue/` (off-repo; or `PHOTOSITE_SOURCE`) |
+| Source photos | `~/Documents/PhotositeCatalogue/` (off-repo, local; or `PHOTOSITE_SOURCE`) |
 | Working branch | `dev` |
 | Production branch | `main` (GitHub Pages → bendentremont.com) |
 | Remote | `github.com/bendenty2/bendentremont.com` |
