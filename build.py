@@ -40,7 +40,7 @@ except ImportError:
 SOURCE_DIR = Path(
     os.environ.get(
         "PHOTOSITE_SOURCE",
-        str(Path.home() / "OneDrive" / "Desktop" / "PhotositeCatalogue"),
+        str(Path.home() / "Documents" / "PhotositeCatalogue"),
     )
 )
 
