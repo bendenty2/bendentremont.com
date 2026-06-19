@@ -146,10 +146,10 @@ html, body {
 }
 
 .about-title {
-  font-size: 11px;
+  font-size: 15px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #3d3d3d;
   text-align: center;
   margin: 32px 0 28px;
   font-weight: 500;
@@ -159,10 +159,10 @@ html, body {
 .about-block:last-child { margin-bottom: 0; }
 
 .about-subhead {
-  font-size: 11px;
+  font-size: 12.5px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #565656;
   font-weight: 500;
   margin: 0 0 12px;
 }
@@ -193,7 +193,7 @@ html, body {
   margin-bottom: 24px;
 }
 
-.gear-col { min-width: 0; }
+.gear-col { min-width: 0; text-align: center; }
 
 .gear-device {
   font-size: 13px;
@@ -210,7 +210,7 @@ html, body {
   display: block;
   width: 100%;
   height: auto;
-  margin-top: 12px;
+  margin: 12px auto 0;   /* centred under its (centred) title */
   -webkit-mask-image:
     linear-gradient(to right,  transparent 0, #000 3%, #000 97%, transparent 100%),
     linear-gradient(to bottom, transparent 0, #000 3%, #000 97%, transparent 100%);
@@ -221,9 +221,10 @@ html, body {
   mask-composite: intersect;
 }
 
-/* The square camera-body clips display at half width so their height roughly
-   matches the widescreen lens clip. */
-.gear-video--compact { width: 50%; }
+/* The square camera-body clips display smaller (centred) so their height
+   roughly matches the widescreen lens clip, each nudged down slightly. */
+.gear-video--r10 { width: 55%; transform: translateY(5px); }
+.gear-video--scl { width: 60%; transform: translateY(20px); }
 
 .about-link {
   color: var(--fg);
