@@ -56,8 +56,14 @@
   const lightboxPrev      = lightbox.querySelector(".lightbox-nav--prev");
   const lightboxNext      = lightbox.querySelector(".lightbox-nav--next");
 
-  // The full item array we're navigating through. Set after manifest loads.
+  // The full item array we're navigating through, in VISUAL order — used by
+  // the lightbox for prev/next. renderGrid() rewrites this to match the order
+  // tiles actually appear on screen.
   let items = [];
+  // The complete, unmodified item set (every photo + video). renderGrid() is
+  // always fed from this so re-renders (resize, leaving dev mode) never lose
+  // tiles, even though `items` above gets shrunk to the rendered subset.
+  let allItems = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
   // Whether the lightbox video is currently muted.
@@ -512,18 +518,12 @@
   }
 
   let resizeTimer = null;
-  let lastCols = -1;
   function onResize() {
+    // Re-render on every resize (debounced): column count may change, or the
+    // column widths may have shifted, both of which affect the row-span maths.
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      const next = getColumnCount();
-      if (next !== lastCols) {
-        lastCols = next;
-        requestAnimationFrame(() => renderGrid(items));
-      } else {
-        // Column count unchanged but widths may have shifted — re-calc spans.
-        requestAnimationFrame(() => renderGrid(items));
-      }
+      requestAnimationFrame(() => renderGrid(allItems));
     }, 120);
   }
   window.addEventListener("resize", onResize);
@@ -627,53 +627,21 @@
     else if (e.key === "ArrowLeft")  step(-1);
   });
 
-  // ---------- Video distribution ----------
-  // Manifest items arrive newest-first; if all videos were added at the same
-  // time they cluster at the top.  This function re-inserts them at evenly-
-  // spaced positions throughout the photo list for a more natural look.
-  function distributeVideos(allItems) {
-    const photos = allItems.filter(it => it.type !== "video");
-    const videos = allItems.filter(it => it.type === "video");
-    if (!videos.length) return photos;
-    if (!photos.length) return videos;
-
-    const total   = photos.length + videos.length;
-    const step    = total / (videos.length + 1); // ideal gap between insertions
-
-    // Compute target positions, nudging forward on collision.
-    const used = new Set();
-    const insertAt = videos.map((_, i) => {
-      let pos = Math.round(step * (i + 1));
-      while (used.has(pos) || pos >= total) pos++;
-      used.add(pos);
-      return pos;
-    });
-
-    const result = new Array(total).fill(null);
-    insertAt.forEach((pos, i) => { result[pos] = videos[i]; });
-
-    let pi = 0;
-    for (let i = 0; i < total; i++) {
-      if (result[i] === null) result[i] = photos[pi++];
-    }
-    return result;
-  }
-
   // ---------- Hero slideshow ----------
 
   const HERO_INTERVAL_MS = 5000;   // ms between auto-advances
   let heroSlides   = [];            // { item, img, dot } per hero photo
   let heroActiveIdx = 0;
   let heroTimer    = null;
+  let heroExifEl   = null;          // cached #hero-exif element (set on build)
 
   function updateHeroExif(item) {
-    const exifEl = document.getElementById("hero-exif");
-    if (!exifEl) return;
+    if (!heroExifEl) return;
     // Fade out → swap text → fade in.
-    exifEl.style.opacity = "0";
+    heroExifEl.style.opacity = "0";
     setTimeout(() => {
-      exifEl.textContent = captionText(item.exif || {});
-      exifEl.style.opacity = "1";
+      heroExifEl.textContent = captionText(item.exif || {});
+      heroExifEl.style.opacity = "1";
     }, 200);
   }
 
@@ -710,6 +678,7 @@
     const exifEl = document.createElement("div");
     exifEl.id = "hero-exif";
     exifEl.className = "hero-exif";
+    heroExifEl = exifEl;
 
     heroes.forEach((h, i) => {
       const img = document.createElement("img");
@@ -762,12 +731,12 @@
       : (manifest.hero ? [manifest.hero] : []);
     buildHeroSlideshow(heroList);
 
-    items = distributeVideos(manifest.photos || []);
-    lastCols = getColumnCount();
+    allItems = manifest.photos || [];
+    items = allItems;
 
     // Defer one frame so the grid has been laid out by the browser and
     // grid.clientWidth returns an accurate value for the row-span maths.
-    requestAnimationFrame(() => renderGrid(items));
+    requestAnimationFrame(() => renderGrid(allItems));
   }
 
   // =====================================================================
@@ -808,8 +777,10 @@
       document.body.classList.toggle('dev-mode', devMode);
       togBtn.classList.toggle('is-active', devMode);
       recBtn.style.display = devMode ? '' : 'none';
-      // Re-render: dev mode shows 1 reference group + mirror; normal shows all.
-      renderGrid(items);
+      // Re-render from the full set: dev mode shows 1 reference group + mirror;
+      // normal shows all. Feeding `allItems` (not `items`) ensures leaving dev
+      // mode restores every tile rather than the dev subset.
+      renderGrid(allItems);
     });
 
     recBtn.addEventListener('click', recordPositions);

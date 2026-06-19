@@ -608,7 +608,7 @@ body.dev-mode .tile--video:hover .video-crop-wrapper video {
 }
 
 /* 4-px grid overlay — horizontal lines every ROW_PX pixels. */
-body.dev-mode #photo-grid::before {
+body.dev-mode #grid::before {
   content: '';
   position: fixed;
   inset: 0;

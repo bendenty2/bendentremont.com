@@ -333,13 +333,18 @@ def _resolve_title(stem: str, exif: dict, titles: dict) -> str | None:
 
 def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | None:
     try:
-        img = Image.open(src)
+        src_img = Image.open(src)
     except Exception as e:
         print(f"  ! skip {src.name}: cannot open ({e})")
         return None
 
-    exif = _named_exif(img)
-    img = ImageOps.exif_transpose(img)
+    exif = _named_exif(src_img)
+    img = ImageOps.exif_transpose(src_img)
+    # exif_transpose returns the same object when there's no orientation tag;
+    # copy in that case so we can close the source file handle safely.
+    if img is src_img:
+        img = img.copy()
+    src_img.close()
 
     stem = src.stem
     thumb_name = f"{stem}.jpg"
@@ -375,7 +380,6 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
             "lens":     exif.get("LensModel"),
             "date":     _format_date(exif),
         },
-        "source_mtime": src.stat().st_mtime,
     }
 
 
@@ -401,7 +405,6 @@ def process_video(src: Path, titles: dict | None = None) -> dict | None:
         "src":    f"videos/{src.name}",
         "width":  None,
         "height": None,
-        "source_mtime": src.stat().st_mtime,
     }
 
 
@@ -582,12 +585,9 @@ def main() -> int:
     # ---- Build manifest --------------------------------------------------------
     # Tile order is already correct — no mtime sort needed.
 
-    public = [{k: v for k, v in e.items() if k != "source_mtime"} for e in entries]
+    public = [dict(e) for e in entries]
 
-    heroes_public = [
-        {k: v for k, v in e.items() if k != "source_mtime"}
-        for e in hero_entries
-    ]
+    heroes_public = [dict(e) for e in hero_entries]
     hero_public = heroes_public[0] if heroes_public else None
 
     manifest = {
