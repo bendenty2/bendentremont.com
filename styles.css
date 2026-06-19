@@ -221,6 +221,10 @@ html, body {
   mask-composite: intersect;
 }
 
+/* The square camera-body clips display at half width so their height roughly
+   matches the widescreen lens clip. */
+.gear-video--compact { width: 50%; }
+
 .about-link {
   color: var(--fg);
   text-decoration: none;
