@@ -93,6 +93,9 @@ html, body {
 .nav-link:hover { transform: scale(1.14); color: #ffffff; }
 .nav-link.is-active { color: #ffffff; }
 
+/* Optical alignment nudge — lift the Pics button to sit level with About. */
+.nav-link[data-view="pics"] { position: relative; top: -2px; }
+
 /* ---------- Main page area (push down below the fixed topbar) ---------- */
 
 .page {
@@ -175,9 +178,9 @@ html, body {
 .gear-col--scl { transform: translateY(20px); }
 
 .gear-device {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-sans);
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--fg);
   margin: 0 0 2px;       /* sit close above its video */
