@@ -66,6 +66,8 @@
   let allItems = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
+  // Element that had focus before the lightbox opened, so we can restore it on close.
+  let lastFocusedEl = null;
   // Whether the lightbox video is currently muted.
   let lightboxMuted = true;
 
@@ -579,11 +581,14 @@
 
   function openLightboxAt(index) {
     if (!items.length) return;
+    lastFocusedEl = document.activeElement;
     currentIndex = ((index % items.length) + items.length) % items.length;
     showLightboxItem(items[currentIndex]);
     lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    // Move focus into the dialog so keyboard/screen-reader users start inside it.
+    if (lightboxClose) lightboxClose.focus();
   }
 
   function closeLightbox() {
@@ -593,6 +598,11 @@
     stopLightboxVideo();
     currentIndex = -1;
     document.body.style.overflow = "";
+    // Return focus to wherever it was before the lightbox opened.
+    if (lastFocusedEl && typeof lastFocusedEl.focus === "function") {
+      lastFocusedEl.focus();
+    }
+    lastFocusedEl = null;
   }
 
   function step(delta) {
@@ -620,11 +630,33 @@
   lightboxPrev.addEventListener("click", (e) => { e.stopPropagation(); step(-1); });
   lightboxNext.addEventListener("click", (e) => { e.stopPropagation(); step(1); });
 
+  // Visible, focusable controls inside the lightbox (audio toggle only when a
+  // video is showing — it's display:none otherwise, so offsetParent is null).
+  function getLightboxFocusables() {
+    return [lightboxClose, lightboxPrev, lightboxNext, lightboxAudioBtn]
+      .filter(el => el && el.offsetParent !== null);
+  }
+
   document.addEventListener("keydown", (e) => {
     if (!lightbox.classList.contains("is-open")) return;
     if (e.key === "Escape")          closeLightbox();
     else if (e.key === "ArrowRight") step(1);
     else if (e.key === "ArrowLeft")  step(-1);
+    else if (e.key === "Tab") {
+      // Trap Tab focus within the dialog so it can't reach the page behind it.
+      const focusables = getLightboxFocusables();
+      if (!focusables.length) return;
+      const first  = focusables[0];
+      const last   = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !lightbox.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !lightbox.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
   });
 
   // ---------- Hero slideshow ----------
@@ -656,8 +688,16 @@
     updateHeroExif(heroSlides[heroActiveIdx].item);
   }
 
+  function prefersReducedMotion() {
+    return !!(window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
   function startHeroTimer() {
     clearInterval(heroTimer);
+    // Respect the OS "reduce motion" setting: no auto-advance for those users
+    // (the dots remain for manual navigation).
+    if (prefersReducedMotion()) return;
     if (heroSlides.length > 1) {
       heroTimer = setInterval(
         () => showHeroSlide(heroActiveIdx + 1),

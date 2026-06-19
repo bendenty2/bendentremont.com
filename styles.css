@@ -574,6 +574,25 @@ html, body {
   }
 }
 
+/* ---------- Reduced motion ----------
+   For visitors who've enabled the OS "reduce motion" accessibility setting:
+   collapse transition/animation timing and drop the hover-zoom. The video
+   crop transform (translateX(-50%) scaleX(1.28)) is preserved — only the
+   extra hover scale is removed — so footage still fills its 3:2 frame.
+   (The hero auto-advance is also paused in script.js.) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .tile:hover img { transform: none; }
+  .tile:hover .tile-caption { transform: none; }
+  .tile--video:hover .video-crop-wrapper video {
+    transform: translateX(-50%) scaleX(1.28);
+  }
+}
+
 /* ---------- Dev mode ---------- */
 
 /* Dashed outline on every tile so allocation boxes are visible. */
