@@ -39,6 +39,15 @@
     if (saved === "pics" || saved === "about") setActiveView(saved);
   } catch (e) { /* private mode — ignore */ }
 
+  // Brand in the top-left returns to the top of the photo view.
+  const brandBtn = document.querySelector(".topbar-brand");
+  if (brandBtn) {
+    brandBtn.addEventListener("click", () => {
+      setActiveView("pics");
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    });
+  }
+
   // Auto-update the footer year so we don't need to touch HTML each January.
   const footerYear = document.getElementById("footer-year");
   if (footerYear) footerYear.textContent = String(new Date().getFullYear());
@@ -70,31 +79,6 @@
   let lastFocusedEl = null;
   // Whether the lightbox video is currently muted.
   let lightboxMuted = true;
-
-  // Dev mode state — managed by the dev mode section at the bottom.
-  let devMode    = false;
-  let devDrag    = null;   // active drag: { tileEl, startClientY, startPadding }
-  // (snap guides removed — dev mode now uses 4 px grid snap)
-  const devMeta  = new WeakMap();  // tileEl → { groupPos }
-  // Live padding values tracked while dragging; indexed by [groupPos].
-  // Seeded from the last non-dev render's actual pixel values (see lastRenderedPadding).
-  const devOffsets = [0, 0, 0, 0, 0, 0, 0];
-
-  // Pixel offsets actually applied in the most recent renderGrid call,
-  // indexed by [groupPos].  Used to seed devOffsets so dragging always
-  // starts from the current visible state.
-  let lastRenderedPadding = [0, 0, 0, 0, 0, 0, 0];
-  // U_rows value from the most recent render — used by recordPositions() to
-  // convert absolute-px devOffsets back to fractions.
-  let lastRenderedU = 68;
-
-  // Gap between the reference group and its mirror (in ROW_PX-sized rows).
-  // Seeded from GROUP_END_TRIM × lastRenderedU when dev mode is entered.
-  let devGapRows   = 0;   // seeded from GROUP_END_TRIM × lastRenderedU when dev mode is entered
-  let devGapHandle = null;   // the gap handle DOM element (refreshed each render)
-  let devGapDrag   = null;   // active gap drag: { startClientY, startGapRows }
-  // Mirror tiles for the copy group: parallel to devOffsets by groupPos.
-  const devCopyTiles = [null, null, null, null, null, null, null];
 
   // ---------- Caption ----------
 
@@ -239,11 +223,10 @@
   // Fallback when SEQUENCE_PADDING is empty.
   const TILE_PADDING = [  0.000,   0.000,  -0.048,  -0.161,  -0.097,  -0.065,  -0.177];  // M0 H1 F0 F1 H4 M1 H6
 
-  // Per-tile padding (px) recorded directly from dev mode with real photos.
-  // When non-empty this takes priority over TILE_PADDING.
-  // Note: these are absolute pixels — they don't scale with viewport width.
-  // Prefer keeping this empty and tuning TILE_PADDING fractions instead.
-  // Paste updated values here after hitting RECORD in dev mode (at full screen).
+  // Optional per-tile padding overrides in absolute pixels, by sequence index.
+  // When non-empty this takes priority over TILE_PADDING. Absolute pixels don't
+  // scale with viewport width, so prefer tuning the TILE_PADDING fractions above
+  // and keeping this empty.
   const SEQUENCE_PADDING = [];
 
   // Fraction of U_rows to trim from the row-spans of the last two tiles per
@@ -330,10 +313,7 @@
       }
     }
 
-    // In dev mode only render the first group so the user sees exactly what
-    // they're tuning — since video and photo tiles now share the same 3:2
-    // shape, one group calibrates all groups.
-    const renderGroups = devMode ? Math.min(groups, 1) : groups;
+    const renderGroups = groups;
 
     const sequence = [];
     let halfIdx  = 0;
@@ -404,15 +384,13 @@
       ].forEach(e => sequence.push(e));
     }
 
-    // Append leftover items only in normal mode — dev mode shows just the two template groups.
-    if (!devMode) {
-      [
-        ...buckets.medium  .slice(groups * 2),
-        ...buckets.full    .slice(groups * 2),
-        ...buckets.halfPhoto.slice(halfIdx),
-        ...buckets.video   .slice(videoIdx),
-      ].forEach(entry => sequence.push({ ...entry, role: "leftover", U_rows: null }));
-    }
+    // Append any leftover items that didn't fill a complete pattern group.
+    [
+      ...buckets.medium  .slice(groups * 2),
+      ...buckets.full    .slice(groups * 2),
+      ...buckets.halfPhoto.slice(halfIdx),
+      ...buckets.video   .slice(videoIdx),
+    ].forEach(entry => sequence.push({ ...entry, role: "leftover", U_rows: null }));
 
     // ── Update global items array to match visual order ───────────────────
     items = sequence.map(e => e.item);
@@ -447,14 +425,11 @@
         tile.style.gridRowEnd = `span ${tileRowSpan(item, colW, colGap)}`;
       }
 
-      // Padding priority:
-      //   1. devOffsets       — live values while dev mode is active
-      //   2. SEQUENCE_PADDING — per-tile values recorded from a previous dev session
-      //   3. TILE_PADDING     — fractional fallback (scales with U_rows)
+      // Per-position vertical nudge. SEQUENCE_PADDING (absolute px, recorded
+      // from tuning) takes priority when present; otherwise TILE_PADDING
+      // fractions are scaled by U_rows so they hold at any viewport width.
       let appliedPadPx = 0;
-      if (devMode && groupPos !== undefined) {
-        appliedPadPx = devOffsets[groupPos] || 0;
-      } else if (SEQUENCE_PADDING.length > 0) {
+      if (SEQUENCE_PADDING.length > 0) {
         appliedPadPx = SEQUENCE_PADDING[seqIdx] || 0;
       } else if (groupPos !== undefined) {
         const frac = TILE_PADDING[groupPos] ?? 0;
@@ -463,60 +438,9 @@
       if (appliedPadPx) {
         tile.style.transform = `translateY(${appliedPadPx}px)`;
       }
-      tile.dataset.tTranslate = String(appliedPadPx);
-
-      // Track rendered offsets so dev mode can be seeded from the live state.
-      if (groupPos !== undefined) {
-        lastRenderedPadding[groupPos] = appliedPadPx;
-        lastRenderedU = U_rows;
-      }
-
-      // Dev mode: attach drag listener (pattern tiles only).
-      if (devMode && groupPos !== undefined) {
-        setupDevTile(tile, groupPos);
-      }
 
       grid.appendChild(tile);
     });
-
-    // ── Dev mode: gap handle + mirror group ──────────────────────────────
-    // After rendering group 0, append a draggable gap handle (whose row-span
-    // records the GROUP_END_TRIM gap), then a dimmed copy of group 0 that
-    // mirrors devOffsets live so you can see how the next group sits.
-    if (devMode && sequence.length > 0) {
-      // Gap handle ─ full-width, height = devGapRows × ROW_PX.
-      devGapHandle = document.createElement('div');
-      devGapHandle.className = 'dev-gap-handle';
-      devGapHandle.style.gridColumn = `1 / -1`;
-      devGapHandle.style.gridRowEnd = `span ${Math.max(1, devGapRows)}`;
-      devGapHandle.addEventListener('mousedown', onGapMouseDown);
-      grid.appendChild(devGapHandle);
-
-      // Mirror group: same items, same spans, same devOffset translations.
-      sequence.forEach(({ item, role, U_rows, groupPos, isVideoGroup }, seqIdx) => {
-        if (groupPos === undefined) return;
-        const copy = buildTile(item, seqIdx);
-        const trimRows = (groupPos === 5 || groupPos === 6)
-          ? Math.round((GROUP_END_TRIM || 0) * U_rows) : 0;
-        if (role === 'medium') {
-          copy.style.gridColumn = 'span 2';
-          copy.style.gridRowEnd = `span ${2 * U_rows - trimRows}`;
-        } else if (role === 'full') {
-          copy.style.gridColumn = 'span 1';
-          copy.style.gridRowEnd = `span ${2 * U_rows}`;
-        } else if (role === 'half') {
-          copy.style.gridColumn = 'span 1';
-          copy.style.gridRowEnd = `span ${Math.max(1, U_rows - trimRows)}`;
-          if (item.type !== 'video') copy.classList.add('tile--half');
-        }
-        const pad = devOffsets[groupPos] || 0;
-        if (pad) copy.style.transform = `translateY(${pad}px)`;
-        copy.dataset.tTranslate = String(pad);
-        copy.classList.add('dev-copy-tile');
-        devCopyTiles[groupPos] = copy;
-        grid.appendChild(copy);
-      });
-    }
   }
 
   let resizeTimer = null;
@@ -777,160 +701,6 @@
     // Defer one frame so the grid has been laid out by the browser and
     // grid.clientWidth returns an accurate value for the row-span maths.
     requestAnimationFrame(() => renderGrid(allItems));
-  }
-
-  // =====================================================================
-  // Dev mode — drag tiles on the live site to dial in padding values,
-  // then hit RECORD to copy a SEQUENCE_PADDING snippet for this file.
-  // =====================================================================
-
-  // (DEV_SNAP_PX removed — tiles snap to the 4 px grid instead of tile edges)
-
-  // ── Inject DEV + RECORD buttons into the topbar ──────────────────────
-  (function injectDevUI() {
-    const nav = document.querySelector('.topbar-nav');
-    if (!nav) return;
-
-    const togBtn = document.createElement('button');
-    togBtn.className = 'nav-link';
-    togBtn.id = 'dev-toggle';
-    togBtn.innerHTML = '<span>DEV</span>';
-    nav.appendChild(togBtn);
-
-    const recBtn = document.createElement('button');
-    recBtn.className = 'nav-link';
-    recBtn.id = 'dev-record';
-    recBtn.innerHTML = '<span>RECORD</span>';
-    recBtn.style.display = 'none';
-    nav.appendChild(recBtn);
-
-    togBtn.addEventListener('click', () => {
-      devMode = !devMode;
-      if (devMode) {
-        // Seed live offsets from the pixel values actually rendered last time
-        // (converted from TILE_PADDING fractions at the current U_rows), so
-        // dragging always starts from the current visible state.
-        lastRenderedPadding.forEach((v, i) => { devOffsets[i] = v; });
-        // Seed the inter-group gap from the current GROUP_END_TRIM fraction.
-        devGapRows = Math.round(GROUP_END_TRIM * lastRenderedU);
-      }
-      document.body.classList.toggle('dev-mode', devMode);
-      togBtn.classList.toggle('is-active', devMode);
-      recBtn.style.display = devMode ? '' : 'none';
-      // Re-render from the full set: dev mode shows 1 reference group + mirror;
-      // normal shows all. Feeding `allItems` (not `items`) ensures leaving dev
-      // mode restores every tile rather than the dev subset.
-      renderGrid(allItems);
-    });
-
-    recBtn.addEventListener('click', recordPositions);
-  })();
-
-  // In dev mode, intercept clicks before they reach the tile's lightbox handler.
-  // Capture phase (3rd arg = true) fires on the way DOWN the DOM, so we stop
-  // the event before it ever reaches any .tile click listener.
-  grid.addEventListener('click', e => {
-    if (devMode) e.stopPropagation();
-  }, true);
-
-  // ── Called from renderGrid for each pattern tile ──────────────────────
-  function setupDevTile(tileEl, groupPos) {
-    devMeta.set(tileEl, { groupPos });
-    tileEl.addEventListener('mousedown', onDevMouseDown, { passive: false });
-  }
-
-  // ── Gap handle drag ───────────────────────────────────────────────────
-  function onGapMouseDown(e) {
-    if (!devMode) return;
-    e.preventDefault();
-    devGapDrag = { startClientY: e.clientY, startGapRows: devGapRows };
-    document.body.style.cursor     = 'ns-resize';
-    document.body.style.userSelect = 'none';
-  }
-
-  function onDevMouseDown(e) {
-    if (!devMode) return;
-    e.preventDefault();
-    const tileEl = e.currentTarget;
-    devDrag = {
-      tileEl,
-      startClientY: e.clientY,
-      startPadding: parseFloat(tileEl.dataset.tTranslate) || 0,
-    };
-    tileEl.classList.add('dev-dragging');
-    document.body.style.cursor     = 'ns-resize';
-    document.body.style.userSelect = 'none';
-  }
-
-  // ── Mouse move: update padding (grid-snap) + gap drag ───────────────
-  document.addEventListener('mousemove', e => {
-    // ── Gap drag ─────────────────────────────────────────────────────────
-    if (devGapDrag) {
-      const deltaRows = Math.round((e.clientY - devGapDrag.startClientY) / ROW_PX);
-      devGapRows = Math.max(0, devGapDrag.startGapRows + deltaRows);
-      if (devGapHandle) devGapHandle.style.gridRowEnd = `span ${Math.max(1, devGapRows)}`;
-      return;
-    }
-
-    // ── Tile drag ─────────────────────────────────────────────────────────
-    if (!devDrag) return;
-    const { tileEl, startClientY, startPadding } = devDrag;
-    let newPad = startPadding + (e.clientY - startClientY);
-
-    // Snap to nearest 4 px grid line.
-    newPad = Math.round(newPad / ROW_PX) * ROW_PX;
-
-    tileEl.style.transform = `translateY(${newPad}px)`;
-    tileEl.dataset.tTranslate = String(newPad);
-
-    // Keep devOffsets in sync + mirror to copy tile.
-    const meta = devMeta.get(tileEl);
-    if (meta) {
-      devOffsets[meta.groupPos] = newPad;
-      const copy = devCopyTiles[meta.groupPos];
-      if (copy) {
-        copy.style.transform = `translateY(${newPad}px)`;
-        copy.dataset.tTranslate = String(newPad);
-      }
-    }
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (devGapDrag) {
-      devGapDrag = null;
-      document.body.style.cursor     = '';
-      document.body.style.userSelect = '';
-      return;
-    }
-    if (!devDrag) return;
-    devDrag.tileEl.classList.remove('dev-dragging');
-    devDrag = null;
-    document.body.style.cursor     = '';
-    document.body.style.userSelect = '';
-  });
-
-  // ── Record: copy TILE_PADDING + GROUP_END_TRIM snippet to clipboard ───
-  // devOffsets (absolute px) → fractions via lastRenderedU (viewport-independent).
-  // devGapRows → GROUP_END_TRIM fraction via lastRenderedU.
-  function recordPositions() {
-    const refPx        = Math.max((lastRenderedU || 1) * ROW_PX, 1);
-    const toFrac       = arr => arr.map(v => (v / refPx).toFixed(3).padStart(7)).join(', ');
-    const groupEndTrim = (devGapRows / Math.max(lastRenderedU, 1)).toFixed(3);
-    const snippet = [
-      `const TILE_PADDING    = [${toFrac(devOffsets)}];  // M0 H1 F0 F1 H4 M1 H6`,
-      `const GROUP_END_TRIM  = ${groupEndTrim};`,
-    ].join('\n');
-
-    navigator.clipboard.writeText(snippet).then(() => {
-      const span = document.querySelector('#dev-record span');
-      if (span) {
-        span.textContent = 'COPIED!';
-        setTimeout(() => { span.textContent = 'RECORD'; }, 1800);
-      }
-    }).catch(() => {
-      // Fallback: show in a prompt so the user can copy manually.
-      window.prompt('Copy this snippet:', snippet);
-    });
   }
 
 })();
