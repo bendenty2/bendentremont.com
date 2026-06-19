@@ -203,9 +203,13 @@ html, body {
   margin: 0 0 8px;
 }
 
-.gear-filters {
-  border-top: 1px solid var(--rule);
-  padding-top: 16px;
+/* Looping gear demo video (e.g. the spinning lens) under a device heading. */
+.gear-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 12px;
+  background: #f4f4f4;   /* placeholder while loading */
 }
 
 .about-link {
@@ -234,6 +238,17 @@ html, body {
   background: var(--bg);
   border-top: 1px solid var(--rule);
   text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+/* Version tag pinned to the left edge; the copyright stays centred. */
+.footer-version {
+  position: absolute;
+  left: clamp(16px, 4vw, 48px);
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--muted);
   font-size: 11px;
   letter-spacing: 0.06em;

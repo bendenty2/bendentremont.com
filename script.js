@@ -26,6 +26,15 @@
     sidebarLinks.forEach(b => {
       b.classList.toggle("is-active", b.dataset.view === name);
     });
+    // Gear videos live in the About section, which starts hidden — kick them
+    // into playing once it's actually shown (muted autoplay can be deferred
+    // while display:none).
+    if (name === "about") {
+      document.querySelectorAll(".gear-video").forEach(v => {
+        const p = v.play();
+        if (p && p.catch) p.catch(() => {});
+      });
+    }
     try { localStorage.setItem(VIEW_NAME_KEY, name); } catch (e) {}
   }
 
