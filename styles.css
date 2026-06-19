@@ -203,13 +203,22 @@ html, body {
   margin: 0 0 8px;
 }
 
-/* Looping gear demo video (e.g. the spinning lens) under a device heading. */
+/* Looping gear demo video (e.g. the spinning lens) under a device heading.
+   The clip's backdrop is whitened in the file itself; this feathers the four
+   edges so the frame melts fully into the white page with no visible rectangle. */
 .gear-video {
   display: block;
   width: 100%;
   height: auto;
   margin-top: 12px;
-  background: #f4f4f4;   /* placeholder while loading */
+  -webkit-mask-image:
+    linear-gradient(to right,  transparent 0, #000 8%, #000 92%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right,  transparent 0, #000 8%, #000 92%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 8%, #000 92%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .about-link {
