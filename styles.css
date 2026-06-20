@@ -279,7 +279,7 @@ html, body {
 
 .hero-section {
   /* Same horizontal margins as the collage grid below. */
-  margin: 12px auto 0;
+  margin: 22px auto 0;
   padding: 0 var(--grid-side-pad);
 }
 
