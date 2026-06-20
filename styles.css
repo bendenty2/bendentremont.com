@@ -300,6 +300,7 @@ html, body {
   position: relative;
   line-height: 0;       /* collapse any inline whitespace between images */
   overflow: hidden;
+  cursor: zoom-in;      /* click to open the hero in the lightbox */
 }
 
 .hero-img {

@@ -67,11 +67,15 @@
   // The full item array we're navigating through, in VISUAL order — used by
   // the lightbox for prev/next. renderGrid() rewrites this to match the order
   // tiles actually appear on screen.
+  // The lightbox order is [heroes…, grid…]: the 4 hero photos are items 0–3,
+  // the catalogue follows from index heroItems.length onward.
   let items = [];
   // The complete, unmodified item set (every photo + video). renderGrid() is
-  // always fed from this so re-renders (resize, leaving dev mode) never lose
-  // tiles, even though `items` above gets shrunk to the rendered subset.
+  // always fed from this so re-renders (resize) never lose tiles, even though
+  // `items` above gets shrunk to the rendered subset.
   let allItems = [];
+  // The hero/slideshow photos, prepended to `items` so they're clickable too.
+  let heroItems = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
   // Element that had focus before the lightbox opened, so we can restore it on close.
@@ -322,10 +326,10 @@
     while (li < land.length)      seq.push({ item: land[li++], span2: false });
     while (pi < portraits.length) seq.push({ item: portraits[pi++], span2: false });
 
-    items = seq.map(e => e.item);
+    items = heroItems.concat(seq.map(e => e.item));
 
     seq.forEach(({ item, span2 }, i) => {
-      const tile = buildTile(item, i);
+      const tile = buildTile(item, heroItems.length + i);
       tile.style.gridColumn = span2 ? "span 2" : "span 1";
       const dispW = span2 ? (colW * 2 + colGap) : colW;
       const imgH  = item.type === "video"
@@ -468,11 +472,12 @@
     ].forEach(entry => sequence.push({ ...entry, role: "leftover", U_rows: null }));
 
     // ── Update global items array to match visual order ───────────────────
-    items = sequence.map(e => e.item);
+    // Heroes are lightbox items 0..N-1; the grid follows.
+    items = heroItems.concat(sequence.map(e => e.item));
 
     // ── Render tiles ───────────────────────────────────────────────────────
     sequence.forEach(({ item, role, U_rows, groupPos, isVideoGroup }, seqIdx) => {
-      const tile = buildTile(item, seqIdx);
+      const tile = buildTile(item, heroItems.length + seqIdx);
 
       // groupPos 5 (M1) and 6 (H6) are the bottom tiles of every group.
       // Trim their row spans to close the visual gap that negative TILE_PADDING
@@ -574,6 +579,14 @@
 
     lightboxTitle.textContent = item.title || "";
     lightboxExif.textContent  = isVideo ? "" : captionText(item.exif || {});
+    updateNavArrows();
+  }
+
+  // Bounded gallery: hide the left arrow on the first item and the right arrow
+  // on the last — there's nothing to scroll to past either end.
+  function updateNavArrows() {
+    lightboxPrev.classList.toggle("is-hidden", currentIndex <= 0);
+    lightboxNext.classList.toggle("is-hidden", currentIndex >= items.length - 1);
   }
 
   function openLightboxAt(index) {
@@ -604,7 +617,9 @@
 
   function step(delta) {
     if (currentIndex < 0 || !items.length) return;
-    currentIndex = (currentIndex + delta + items.length) % items.length;
+    const next = currentIndex + delta;
+    if (next < 0 || next >= items.length) return;   // bounded — no wrap-around
+    currentIndex = next;
     showLightboxItem(items[currentIndex]);
   }
 
@@ -619,7 +634,7 @@
   // Visible, focusable controls inside the lightbox.
   function getLightboxFocusables() {
     return [lightboxClose, lightboxPrev, lightboxNext]
-      .filter(el => el && el.offsetParent !== null);
+      .filter(el => el && el.offsetParent !== null && !el.classList.contains("is-hidden"));
   }
 
   document.addEventListener("keydown", (e) => {
@@ -696,6 +711,9 @@
 
     const slideshow = document.createElement("div");
     slideshow.className = "hero-slideshow";
+    // Click the hero photo to open it in the lightbox (then arrow on into the
+    // rest of the catalogue). Uses the currently-shown slide's index.
+    slideshow.addEventListener("click", () => openLightboxAt(heroActiveIdx));
 
     const dotsEl = document.createElement("div");
     dotsEl.className = "hero-dots";
@@ -754,10 +772,11 @@
     const heroList = manifest.heroes && manifest.heroes.length
       ? manifest.heroes
       : (manifest.hero ? [manifest.hero] : []);
+    heroItems = heroList;
     buildHeroSlideshow(heroList);
 
     allItems = manifest.photos || [];
-    items = allItems;
+    items = heroItems.concat(allItems);
 
     // Defer one frame so the grid has been laid out by the browser and
     // grid.clientWidth returns an accurate value for the row-span maths.
