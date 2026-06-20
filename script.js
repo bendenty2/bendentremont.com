@@ -179,8 +179,8 @@
   // ---------- Column-count ----------
 
   function getColumnCount() {
-    const w = window.innerWidth;
-    if (w <= 700) return 2;
+    // Same 3-column masonry pattern on every screen. On phones the tiles just
+    // get smaller — tap a photo for the full-size view.
     return 3;
   }
 

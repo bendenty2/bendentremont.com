@@ -632,10 +632,11 @@ html, body {
     gap: 24px;
   }
 
-  /* Gear clips: one consistent size in the stack; drop the desktop nudges. */
-  .gear-video,
+  /* Gear clips in the stack; drop the desktop nudges. The square camera-body
+     clips are narrower than the widescreen Sigma so they don't tower over it. */
+  .gear-video { width: 72%; transform: none; }
   .gear-video--r10,
-  .gear-video--scl { width: 72%; transform: none; }
+  .gear-video--scl { width: 52%; transform: none; }
   .gear-col--r10 .gear-device,
   .gear-col--scl .gear-device { transform: none; }
 
