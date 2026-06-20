@@ -17,7 +17,10 @@
 
 # Dev preview: never long-cache CSS/JS, so layout/script edits show up on the
 # next load instead of being held for hours (Cloudflare Pages defaults to 4h).
-/*.css
+# Exact paths — Cloudflare _headers does not support extension globs.
+/styles.css
   Cache-Control: no-cache
-/*.js
+/script.js
+  Cache-Control: no-cache
+/manifest.js
   Cache-Control: no-cache
