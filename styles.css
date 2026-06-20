@@ -11,13 +11,14 @@
   --topbar-bg: #000000;
   --topbar-fg: #ffffff;
   --topbar-height: 73px;
+  --footer-height: 38px;            /* fixed bottom bar — roughly half the old footer */
   /* Gap and side padding scale with the viewport so photo proportions stay
      consistent whether the window is fullscreen or split. clamp(min, fluid, max). */
   --gap: clamp(4px, 0.5vw, 8px);              /* vertical gap between stacked tiles */
   --col-gap: clamp(12px, 1.5vw, 24px);        /* horizontal gap between columns */
   --grid-side-pad: clamp(96px, 18vw, 360px);  /* whitespace at left/right of page */
   --max-width: none;                          /* let the grid fill available width */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, "Helvetica Neue",
                Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -50,12 +51,18 @@ html, body {
 }
 
 .topbar-brand {
-  font-family: 'Inter', var(--font-sans);
+  /* Reset native button styling so it reads as plain text — then make it
+     clickable (returns to the top of the photo view; wired in script.js). */
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.04em;
   color: #ffffff;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .topbar-nav {
@@ -64,57 +71,37 @@ html, body {
   gap: 10px;
 }
 
-/* Pill-shaped nav buttons.
-   The ::before pseudo-element is a white fill that slides in from the top on
-   hover.  The inner <span> uses mix-blend-mode: difference so that white text
-   reads as white on the dark button and inverts to black the moment the white
-   fill sweeps over it — giving a pixel-accurate curtain reveal effect. */
+/* Top-right nav buttons: plain white text on the black bar, no outline.
+   Enlarged a little for an obvious affordance; they swell on hover. */
 .nav-link {
-  background: var(--topbar-bg);      /* opaque so blend-mode has a defined base */
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 999px;              /* fully rounded ends — pill / stadium shape */
-  padding: 7px 20px;
+  background: none;
+  border: 0;
+  padding: 6px 12px;
   margin: 0;
-  font-family: 'Inter', var(--font-sans);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: 0.04em;
   text-align: center;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;               /* confines blend-mode to the button */
+  color: rgba(255, 255, 255, 0.62);
+  transition: transform 200ms ease, color 200ms ease;
 }
 
-/* The white fill that animates in from the top. */
-.nav-link::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #ffffff;
-  transform: translateY(-101%);
-  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
-}
+.nav-link span { pointer-events: none; }
 
-/* Hover: fill slides down.  Active: always filled to mark current section. */
-.nav-link:hover::before,
-.nav-link.is-active::before {
-  transform: translateY(0);
-}
+/* Hover: swell + brighten. Active (current view): full white. */
+.nav-link:hover { transform: scale(1.14); color: #ffffff; }
+.nav-link.is-active { color: #ffffff; }
 
-/* The text span sits above the fill.  mix-blend-mode: difference makes white
-   text appear white on black and invert to black on white — automatically, per
-   pixel, as the fill sweeps across it. */
-.nav-link span {
-  position: relative;
-  color: #ffffff;
-  mix-blend-mode: difference;
-  pointer-events: none;
-}
+/* Optical alignment nudge — lift the Pics button to sit level with About. */
+.nav-link[data-view="pics"] { position: relative; top: -1px; }
 
 /* ---------- Main page area (push down below the fixed topbar) ---------- */
 
 .page {
   padding-top: var(--topbar-height);
+  /* Reserve space so content can scroll clear of the fixed footer. */
+  padding-bottom: var(--footer-height);
 }
 
 /* ---------- View switching (pics / about) ---------- */
@@ -137,10 +124,10 @@ html, body {
 }
 
 .about-title {
-  font-size: 11px;
+  font-size: 15px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #3d3d3d;
   text-align: center;
   margin: 32px 0 28px;
   font-weight: 500;
@@ -150,10 +137,10 @@ html, body {
 .about-block:last-child { margin-bottom: 0; }
 
 .about-subhead {
-  font-size: 11px;
+  font-size: 12.5px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #565656;
   font-weight: 500;
   margin: 0 0 12px;
 }
@@ -184,20 +171,41 @@ html, body {
   margin-bottom: 24px;
 }
 
-.gear-col { min-width: 0; }
+.gear-col { min-width: 0; text-align: center; }
+/* Titles stay aligned across columns (top of the cell); only the videos are
+   nudged (below) so the clips sit at matched heights. */
 
 .gear-device {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: var(--fg);
-  margin: 0 0 8px;
+  margin: 0 0 2px;       /* sit close above its video */
 }
 
-.gear-filters {
-  border-top: 1px solid var(--rule);
-  padding-top: 16px;
+/* Looping gear demo video (e.g. the spinning lens) under a device heading.
+   The clip's backdrop is whitened in the file itself; this feathers the four
+   edges so the frame melts fully into the white page with no visible rectangle. */
+.gear-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 4px auto 0;    /* centred, tight under its title */
+  -webkit-mask-image:
+    linear-gradient(to right,  transparent 0, #000 3%, #000 97%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 3%, #000 97%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right,  transparent 0, #000 3%, #000 97%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 3%, #000 97%, transparent 100%);
+  mask-composite: intersect;
 }
+
+/* The square camera-body clips display smaller (centred) so their height
+   roughly matches the widescreen lens clip, each nudged down slightly. */
+.gear-video--r10 { width: 55%; transform: translateY(5px); }
+.gear-video--scl { width: 60%; transform: translateY(20px); }
 
 .about-link {
   color: var(--fg);
@@ -211,12 +219,31 @@ html, body {
 /* ---------- Site footer (copyright) ---------- */
 
 .site-footer {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 28px var(--grid-side-pad) 32px;
-  border-top: 1px solid var(--rule);
+  /* Pinned to the bottom of the window, mirroring the fixed topbar. */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  min-height: var(--footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px clamp(16px, 4vw, 48px);
+  background: var(--topbar-bg);
   text-align: center;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+/* Version tag pinned to the left edge; the copyright stays centred. */
+.footer-version {
+  position: absolute;
+  left: clamp(16px, 4vw, 48px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 11px;
   letter-spacing: 0.06em;
 }
@@ -293,7 +320,7 @@ html, body {
 /* EXIF caption below the dots */
 .hero-exif {
   padding: 2px 0 20px;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-sans);
   font-size: clamp(9px, 0.6vw + 3px, 12px);
   color: var(--muted);
   letter-spacing: 0.04em;
@@ -385,7 +412,7 @@ html, body {
 .tile-caption {
   margin-top: 4px;
   margin-bottom: 2px;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-sans);
   /* Scales with viewport so captions stay proportional to photo size.
      At ~1300px+ it caps at 10.5px; at ~700px it floors at 8px. */
   font-size: clamp(8px, 0.55vw + 3.5px, 10.5px);
@@ -561,11 +588,12 @@ html, body {
 /* ---------- Mobile: compact topbar ---------- */
 
 @media (max-width: 700px) {
-  :root { --topbar-height: 62px; }
+  /* Taller footer so the copyright line has room to wrap to two lines. */
+  :root { --topbar-height: 62px; --footer-height: 56px; }
 
   .topbar { padding: 0 16px; }
   .topbar-brand { font-size: 13px; }
-  .nav-link { padding: 5px 14px; font-size: 11px; }
+  .nav-link { padding: 5px 9px; font-size: 13.5px; }
 
   /* Collapse the three-column gear grid to a single stack on narrow screens. */
   .gear-grid {
@@ -574,67 +602,21 @@ html, body {
   }
 }
 
-/* ---------- Dev mode ---------- */
-
-/* Dashed outline on every tile so allocation boxes are visible. */
-body.dev-mode .tile {
-  outline: 1px dashed rgba(0, 100, 255, 0.28);
-  cursor: ns-resize !important;
-}
-
-/* Keep pointer events reaching the tile, not getting swallowed by children. */
-body.dev-mode .tile img,
-body.dev-mode .tile .video-crop-wrapper {
-  pointer-events: none;
-}
-
-/* Highlight the tile currently being dragged. */
-body.dev-mode .tile.dev-dragging {
-  outline: 1px solid rgba(0, 100, 255, 0.7);
-  z-index: 10;
-}
-
-/* Suppress hover effects in dev mode so dragging doesn't trigger the swell. */
-body.dev-mode .tile:hover img {
-  opacity: 1 !important;
-  transform: none !important;
-}
-body.dev-mode .tile:hover .tile-caption {
-  transform: none !important;
-}
-body.dev-mode .tile--video:hover .video-crop-wrapper video {
-  opacity: 1 !important;
-  transform: translateX(-50%) scaleX(1.28) !important;
-}
-
-/* 4-px grid overlay — horizontal lines every ROW_PX pixels. */
-body.dev-mode #photo-grid::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 3px,
-    rgba(0, 100, 255, 0.09) 3px,
-    rgba(0, 100, 255, 0.09) 4px
-  );
-}
-
-/* Gap handle between the reference group and its mirror. */
-.dev-gap-handle {
-  grid-column: 1 / -1;
-  cursor: ns-resize;
-  border-top: 2px dashed rgba(0, 100, 255, 0.5);
-  background: rgba(0, 100, 255, 0.04);
-  position: relative;
-  z-index: 2;
-}
-
-/* Mirror group — dimmed, non-interactive, pure visual reference. */
-.dev-copy-tile {
-  pointer-events: none;
-  opacity: 0.45;
+/* ---------- Reduced motion ----------
+   For visitors who've enabled the OS "reduce motion" accessibility setting:
+   collapse transition/animation timing and drop the hover-zoom. The video
+   crop transform (translateX(-50%) scaleX(1.28)) is preserved — only the
+   extra hover scale is removed — so footage still fills its 3:2 frame.
+   (The hero auto-advance is also paused in script.js.) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .tile:hover img { transform: none; }
+  .tile:hover .tile-caption { transform: none; }
+  .tile--video:hover .video-crop-wrapper video {
+    transform: translateX(-50%) scaleX(1.28);
+  }
 }

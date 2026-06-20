@@ -1,0 +1,16 @@
+# Cloudflare Pages headers file.
+#
+# Purpose: keep the DEV preview site (dev.bendentremont.com, served by Cloudflare
+# Pages from the `dev` branch) out of search engines, so it can never outrank or
+# duplicate the real production site (bendentremont.com, served by GitHub Pages
+# from `main`).
+#
+# X-Robots-Tag: noindex is the strongest de-index signal — Google honors it fully.
+#
+# MERGE-SAFE: this file only affects Cloudflare Pages. GitHub Pages (which serves
+# production from `main`) does NOT process `_headers`, and because it runs Jekyll
+# with no `.nojekyll`, it excludes underscore-prefixed files from the build
+# entirely. So even when `dev` merges into `main`, production indexing is unaffected.
+
+/*
+  X-Robots-Tag: noindex, nofollow

@@ -26,6 +26,15 @@
     sidebarLinks.forEach(b => {
       b.classList.toggle("is-active", b.dataset.view === name);
     });
+    // Gear videos live in the About section, which starts hidden — kick them
+    // into playing once it's actually shown (muted autoplay can be deferred
+    // while display:none).
+    if (name === "about") {
+      document.querySelectorAll(".gear-video").forEach(v => {
+        const p = v.play();
+        if (p && p.catch) p.catch(() => {});
+      });
+    }
     try { localStorage.setItem(VIEW_NAME_KEY, name); } catch (e) {}
   }
 
@@ -38,6 +47,15 @@
     const saved = localStorage.getItem(VIEW_NAME_KEY);
     if (saved === "pics" || saved === "about") setActiveView(saved);
   } catch (e) { /* private mode — ignore */ }
+
+  // Brand in the top-left returns to the top of the photo view.
+  const brandBtn = document.querySelector(".topbar-brand");
+  if (brandBtn) {
+    brandBtn.addEventListener("click", () => {
+      setActiveView("pics");
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    });
+  }
 
   // Auto-update the footer year so we don't need to touch HTML each January.
   const footerYear = document.getElementById("footer-year");
@@ -56,37 +74,20 @@
   const lightboxPrev      = lightbox.querySelector(".lightbox-nav--prev");
   const lightboxNext      = lightbox.querySelector(".lightbox-nav--next");
 
-  // The full item array we're navigating through. Set after manifest loads.
+  // The full item array we're navigating through, in VISUAL order — used by
+  // the lightbox for prev/next. renderGrid() rewrites this to match the order
+  // tiles actually appear on screen.
   let items = [];
+  // The complete, unmodified item set (every photo + video). renderGrid() is
+  // always fed from this so re-renders (resize, leaving dev mode) never lose
+  // tiles, even though `items` above gets shrunk to the rendered subset.
+  let allItems = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
+  // Element that had focus before the lightbox opened, so we can restore it on close.
+  let lastFocusedEl = null;
   // Whether the lightbox video is currently muted.
   let lightboxMuted = true;
-
-  // Dev mode state — managed by the dev mode section at the bottom.
-  let devMode    = false;
-  let devDrag    = null;   // active drag: { tileEl, startClientY, startPadding }
-  // (snap guides removed — dev mode now uses 4 px grid snap)
-  const devMeta  = new WeakMap();  // tileEl → { groupPos }
-  // Live padding values tracked while dragging; indexed by [groupPos].
-  // Seeded from the last non-dev render's actual pixel values (see lastRenderedPadding).
-  const devOffsets = [0, 0, 0, 0, 0, 0, 0];
-
-  // Pixel offsets actually applied in the most recent renderGrid call,
-  // indexed by [groupPos].  Used to seed devOffsets so dragging always
-  // starts from the current visible state.
-  let lastRenderedPadding = [0, 0, 0, 0, 0, 0, 0];
-  // U_rows value from the most recent render — used by recordPositions() to
-  // convert absolute-px devOffsets back to fractions.
-  let lastRenderedU = 68;
-
-  // Gap between the reference group and its mirror (in ROW_PX-sized rows).
-  // Seeded from GROUP_END_TRIM × lastRenderedU when dev mode is entered.
-  let devGapRows   = 0;   // seeded from GROUP_END_TRIM × lastRenderedU when dev mode is entered
-  let devGapHandle = null;   // the gap handle DOM element (refreshed each render)
-  let devGapDrag   = null;   // active gap drag: { startClientY, startGapRows }
-  // Mirror tiles for the copy group: parallel to devOffsets by groupPos.
-  const devCopyTiles = [null, null, null, null, null, null, null];
 
   // ---------- Caption ----------
 
@@ -231,11 +232,10 @@
   // Fallback when SEQUENCE_PADDING is empty.
   const TILE_PADDING = [  0.000,   0.000,  -0.048,  -0.161,  -0.097,  -0.065,  -0.177];  // M0 H1 F0 F1 H4 M1 H6
 
-  // Per-tile padding (px) recorded directly from dev mode with real photos.
-  // When non-empty this takes priority over TILE_PADDING.
-  // Note: these are absolute pixels — they don't scale with viewport width.
-  // Prefer keeping this empty and tuning TILE_PADDING fractions instead.
-  // Paste updated values here after hitting RECORD in dev mode (at full screen).
+  // Optional per-tile padding overrides in absolute pixels, by sequence index.
+  // When non-empty this takes priority over TILE_PADDING. Absolute pixels don't
+  // scale with viewport width, so prefer tuning the TILE_PADDING fractions above
+  // and keeping this empty.
   const SEQUENCE_PADDING = [];
 
   // Fraction of U_rows to trim from the row-spans of the last two tiles per
@@ -322,10 +322,7 @@
       }
     }
 
-    // In dev mode only render the first group so the user sees exactly what
-    // they're tuning — since video and photo tiles now share the same 3:2
-    // shape, one group calibrates all groups.
-    const renderGroups = devMode ? Math.min(groups, 1) : groups;
+    const renderGroups = groups;
 
     const sequence = [];
     let halfIdx  = 0;
@@ -396,15 +393,13 @@
       ].forEach(e => sequence.push(e));
     }
 
-    // Append leftover items only in normal mode — dev mode shows just the two template groups.
-    if (!devMode) {
-      [
-        ...buckets.medium  .slice(groups * 2),
-        ...buckets.full    .slice(groups * 2),
-        ...buckets.halfPhoto.slice(halfIdx),
-        ...buckets.video   .slice(videoIdx),
-      ].forEach(entry => sequence.push({ ...entry, role: "leftover", U_rows: null }));
-    }
+    // Append any leftover items that didn't fill a complete pattern group.
+    [
+      ...buckets.medium  .slice(groups * 2),
+      ...buckets.full    .slice(groups * 2),
+      ...buckets.halfPhoto.slice(halfIdx),
+      ...buckets.video   .slice(videoIdx),
+    ].forEach(entry => sequence.push({ ...entry, role: "leftover", U_rows: null }));
 
     // ── Update global items array to match visual order ───────────────────
     items = sequence.map(e => e.item);
@@ -439,14 +434,11 @@
         tile.style.gridRowEnd = `span ${tileRowSpan(item, colW, colGap)}`;
       }
 
-      // Padding priority:
-      //   1. devOffsets       — live values while dev mode is active
-      //   2. SEQUENCE_PADDING — per-tile values recorded from a previous dev session
-      //   3. TILE_PADDING     — fractional fallback (scales with U_rows)
+      // Per-position vertical nudge. SEQUENCE_PADDING (absolute px, recorded
+      // from tuning) takes priority when present; otherwise TILE_PADDING
+      // fractions are scaled by U_rows so they hold at any viewport width.
       let appliedPadPx = 0;
-      if (devMode && groupPos !== undefined) {
-        appliedPadPx = devOffsets[groupPos] || 0;
-      } else if (SEQUENCE_PADDING.length > 0) {
+      if (SEQUENCE_PADDING.length > 0) {
         appliedPadPx = SEQUENCE_PADDING[seqIdx] || 0;
       } else if (groupPos !== undefined) {
         const frac = TILE_PADDING[groupPos] ?? 0;
@@ -455,75 +447,18 @@
       if (appliedPadPx) {
         tile.style.transform = `translateY(${appliedPadPx}px)`;
       }
-      tile.dataset.tTranslate = String(appliedPadPx);
-
-      // Track rendered offsets so dev mode can be seeded from the live state.
-      if (groupPos !== undefined) {
-        lastRenderedPadding[groupPos] = appliedPadPx;
-        lastRenderedU = U_rows;
-      }
-
-      // Dev mode: attach drag listener (pattern tiles only).
-      if (devMode && groupPos !== undefined) {
-        setupDevTile(tile, groupPos);
-      }
 
       grid.appendChild(tile);
     });
-
-    // ── Dev mode: gap handle + mirror group ──────────────────────────────
-    // After rendering group 0, append a draggable gap handle (whose row-span
-    // records the GROUP_END_TRIM gap), then a dimmed copy of group 0 that
-    // mirrors devOffsets live so you can see how the next group sits.
-    if (devMode && sequence.length > 0) {
-      // Gap handle ─ full-width, height = devGapRows × ROW_PX.
-      devGapHandle = document.createElement('div');
-      devGapHandle.className = 'dev-gap-handle';
-      devGapHandle.style.gridColumn = `1 / -1`;
-      devGapHandle.style.gridRowEnd = `span ${Math.max(1, devGapRows)}`;
-      devGapHandle.addEventListener('mousedown', onGapMouseDown);
-      grid.appendChild(devGapHandle);
-
-      // Mirror group: same items, same spans, same devOffset translations.
-      sequence.forEach(({ item, role, U_rows, groupPos, isVideoGroup }, seqIdx) => {
-        if (groupPos === undefined) return;
-        const copy = buildTile(item, seqIdx);
-        const trimRows = (groupPos === 5 || groupPos === 6)
-          ? Math.round((GROUP_END_TRIM || 0) * U_rows) : 0;
-        if (role === 'medium') {
-          copy.style.gridColumn = 'span 2';
-          copy.style.gridRowEnd = `span ${2 * U_rows - trimRows}`;
-        } else if (role === 'full') {
-          copy.style.gridColumn = 'span 1';
-          copy.style.gridRowEnd = `span ${2 * U_rows}`;
-        } else if (role === 'half') {
-          copy.style.gridColumn = 'span 1';
-          copy.style.gridRowEnd = `span ${Math.max(1, U_rows - trimRows)}`;
-          if (item.type !== 'video') copy.classList.add('tile--half');
-        }
-        const pad = devOffsets[groupPos] || 0;
-        if (pad) copy.style.transform = `translateY(${pad}px)`;
-        copy.dataset.tTranslate = String(pad);
-        copy.classList.add('dev-copy-tile');
-        devCopyTiles[groupPos] = copy;
-        grid.appendChild(copy);
-      });
-    }
   }
 
   let resizeTimer = null;
-  let lastCols = -1;
   function onResize() {
+    // Re-render on every resize (debounced): column count may change, or the
+    // column widths may have shifted, both of which affect the row-span maths.
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      const next = getColumnCount();
-      if (next !== lastCols) {
-        lastCols = next;
-        requestAnimationFrame(() => renderGrid(items));
-      } else {
-        // Column count unchanged but widths may have shifted — re-calc spans.
-        requestAnimationFrame(() => renderGrid(items));
-      }
+      requestAnimationFrame(() => renderGrid(allItems));
     }, 120);
   }
   window.addEventListener("resize", onResize);
@@ -579,11 +514,14 @@
 
   function openLightboxAt(index) {
     if (!items.length) return;
+    lastFocusedEl = document.activeElement;
     currentIndex = ((index % items.length) + items.length) % items.length;
     showLightboxItem(items[currentIndex]);
     lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    // Move focus into the dialog so keyboard/screen-reader users start inside it.
+    if (lightboxClose) lightboxClose.focus();
   }
 
   function closeLightbox() {
@@ -593,6 +531,11 @@
     stopLightboxVideo();
     currentIndex = -1;
     document.body.style.overflow = "";
+    // Return focus to wherever it was before the lightbox opened.
+    if (lastFocusedEl && typeof lastFocusedEl.focus === "function") {
+      lastFocusedEl.focus();
+    }
+    lastFocusedEl = null;
   }
 
   function step(delta) {
@@ -620,44 +563,34 @@
   lightboxPrev.addEventListener("click", (e) => { e.stopPropagation(); step(-1); });
   lightboxNext.addEventListener("click", (e) => { e.stopPropagation(); step(1); });
 
+  // Visible, focusable controls inside the lightbox (audio toggle only when a
+  // video is showing — it's display:none otherwise, so offsetParent is null).
+  function getLightboxFocusables() {
+    return [lightboxClose, lightboxPrev, lightboxNext, lightboxAudioBtn]
+      .filter(el => el && el.offsetParent !== null);
+  }
+
   document.addEventListener("keydown", (e) => {
     if (!lightbox.classList.contains("is-open")) return;
     if (e.key === "Escape")          closeLightbox();
     else if (e.key === "ArrowRight") step(1);
     else if (e.key === "ArrowLeft")  step(-1);
-  });
-
-  // ---------- Video distribution ----------
-  // Manifest items arrive newest-first; if all videos were added at the same
-  // time they cluster at the top.  This function re-inserts them at evenly-
-  // spaced positions throughout the photo list for a more natural look.
-  function distributeVideos(allItems) {
-    const photos = allItems.filter(it => it.type !== "video");
-    const videos = allItems.filter(it => it.type === "video");
-    if (!videos.length) return photos;
-    if (!photos.length) return videos;
-
-    const total   = photos.length + videos.length;
-    const step    = total / (videos.length + 1); // ideal gap between insertions
-
-    // Compute target positions, nudging forward on collision.
-    const used = new Set();
-    const insertAt = videos.map((_, i) => {
-      let pos = Math.round(step * (i + 1));
-      while (used.has(pos) || pos >= total) pos++;
-      used.add(pos);
-      return pos;
-    });
-
-    const result = new Array(total).fill(null);
-    insertAt.forEach((pos, i) => { result[pos] = videos[i]; });
-
-    let pi = 0;
-    for (let i = 0; i < total; i++) {
-      if (result[i] === null) result[i] = photos[pi++];
+    else if (e.key === "Tab") {
+      // Trap Tab focus within the dialog so it can't reach the page behind it.
+      const focusables = getLightboxFocusables();
+      if (!focusables.length) return;
+      const first  = focusables[0];
+      const last   = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !lightbox.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !lightbox.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
     }
-    return result;
-  }
+  });
 
   // ---------- Hero slideshow ----------
 
@@ -665,15 +598,15 @@
   let heroSlides   = [];            // { item, img, dot } per hero photo
   let heroActiveIdx = 0;
   let heroTimer    = null;
+  let heroExifEl   = null;          // cached #hero-exif element (set on build)
 
   function updateHeroExif(item) {
-    const exifEl = document.getElementById("hero-exif");
-    if (!exifEl) return;
+    if (!heroExifEl) return;
     // Fade out → swap text → fade in.
-    exifEl.style.opacity = "0";
+    heroExifEl.style.opacity = "0";
     setTimeout(() => {
-      exifEl.textContent = captionText(item.exif || {});
-      exifEl.style.opacity = "1";
+      heroExifEl.textContent = captionText(item.exif || {});
+      heroExifEl.style.opacity = "1";
     }, 200);
   }
 
@@ -688,8 +621,16 @@
     updateHeroExif(heroSlides[heroActiveIdx].item);
   }
 
+  function prefersReducedMotion() {
+    return !!(window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
   function startHeroTimer() {
     clearInterval(heroTimer);
+    // Respect the OS "reduce motion" setting: no auto-advance for those users
+    // (the dots remain for manual navigation).
+    if (prefersReducedMotion()) return;
     if (heroSlides.length > 1) {
       heroTimer = setInterval(
         () => showHeroSlide(heroActiveIdx + 1),
@@ -710,6 +651,7 @@
     const exifEl = document.createElement("div");
     exifEl.id = "hero-exif";
     exifEl.className = "hero-exif";
+    heroExifEl = exifEl;
 
     heroes.forEach((h, i) => {
       const img = document.createElement("img");
@@ -762,164 +704,12 @@
       : (manifest.hero ? [manifest.hero] : []);
     buildHeroSlideshow(heroList);
 
-    items = distributeVideos(manifest.photos || []);
-    lastCols = getColumnCount();
+    allItems = manifest.photos || [];
+    items = allItems;
 
     // Defer one frame so the grid has been laid out by the browser and
     // grid.clientWidth returns an accurate value for the row-span maths.
-    requestAnimationFrame(() => renderGrid(items));
-  }
-
-  // =====================================================================
-  // Dev mode — drag tiles on the live site to dial in padding values,
-  // then hit RECORD to copy a SEQUENCE_PADDING snippet for this file.
-  // =====================================================================
-
-  // (DEV_SNAP_PX removed — tiles snap to the 4 px grid instead of tile edges)
-
-  // ── Inject DEV + RECORD buttons into the topbar ──────────────────────
-  (function injectDevUI() {
-    const nav = document.querySelector('.topbar-nav');
-    if (!nav) return;
-
-    const togBtn = document.createElement('button');
-    togBtn.className = 'nav-link';
-    togBtn.id = 'dev-toggle';
-    togBtn.innerHTML = '<span>DEV</span>';
-    nav.appendChild(togBtn);
-
-    const recBtn = document.createElement('button');
-    recBtn.className = 'nav-link';
-    recBtn.id = 'dev-record';
-    recBtn.innerHTML = '<span>RECORD</span>';
-    recBtn.style.display = 'none';
-    nav.appendChild(recBtn);
-
-    togBtn.addEventListener('click', () => {
-      devMode = !devMode;
-      if (devMode) {
-        // Seed live offsets from the pixel values actually rendered last time
-        // (converted from TILE_PADDING fractions at the current U_rows), so
-        // dragging always starts from the current visible state.
-        lastRenderedPadding.forEach((v, i) => { devOffsets[i] = v; });
-        // Seed the inter-group gap from the current GROUP_END_TRIM fraction.
-        devGapRows = Math.round(GROUP_END_TRIM * lastRenderedU);
-      }
-      document.body.classList.toggle('dev-mode', devMode);
-      togBtn.classList.toggle('is-active', devMode);
-      recBtn.style.display = devMode ? '' : 'none';
-      // Re-render: dev mode shows 1 reference group + mirror; normal shows all.
-      renderGrid(items);
-    });
-
-    recBtn.addEventListener('click', recordPositions);
-  })();
-
-  // In dev mode, intercept clicks before they reach the tile's lightbox handler.
-  // Capture phase (3rd arg = true) fires on the way DOWN the DOM, so we stop
-  // the event before it ever reaches any .tile click listener.
-  grid.addEventListener('click', e => {
-    if (devMode) e.stopPropagation();
-  }, true);
-
-  // ── Called from renderGrid for each pattern tile ──────────────────────
-  function setupDevTile(tileEl, groupPos) {
-    devMeta.set(tileEl, { groupPos });
-    tileEl.addEventListener('mousedown', onDevMouseDown, { passive: false });
-  }
-
-  // ── Gap handle drag ───────────────────────────────────────────────────
-  function onGapMouseDown(e) {
-    if (!devMode) return;
-    e.preventDefault();
-    devGapDrag = { startClientY: e.clientY, startGapRows: devGapRows };
-    document.body.style.cursor     = 'ns-resize';
-    document.body.style.userSelect = 'none';
-  }
-
-  function onDevMouseDown(e) {
-    if (!devMode) return;
-    e.preventDefault();
-    const tileEl = e.currentTarget;
-    devDrag = {
-      tileEl,
-      startClientY: e.clientY,
-      startPadding: parseFloat(tileEl.dataset.tTranslate) || 0,
-    };
-    tileEl.classList.add('dev-dragging');
-    document.body.style.cursor     = 'ns-resize';
-    document.body.style.userSelect = 'none';
-  }
-
-  // ── Mouse move: update padding (grid-snap) + gap drag ───────────────
-  document.addEventListener('mousemove', e => {
-    // ── Gap drag ─────────────────────────────────────────────────────────
-    if (devGapDrag) {
-      const deltaRows = Math.round((e.clientY - devGapDrag.startClientY) / ROW_PX);
-      devGapRows = Math.max(0, devGapDrag.startGapRows + deltaRows);
-      if (devGapHandle) devGapHandle.style.gridRowEnd = `span ${Math.max(1, devGapRows)}`;
-      return;
-    }
-
-    // ── Tile drag ─────────────────────────────────────────────────────────
-    if (!devDrag) return;
-    const { tileEl, startClientY, startPadding } = devDrag;
-    let newPad = startPadding + (e.clientY - startClientY);
-
-    // Snap to nearest 4 px grid line.
-    newPad = Math.round(newPad / ROW_PX) * ROW_PX;
-
-    tileEl.style.transform = `translateY(${newPad}px)`;
-    tileEl.dataset.tTranslate = String(newPad);
-
-    // Keep devOffsets in sync + mirror to copy tile.
-    const meta = devMeta.get(tileEl);
-    if (meta) {
-      devOffsets[meta.groupPos] = newPad;
-      const copy = devCopyTiles[meta.groupPos];
-      if (copy) {
-        copy.style.transform = `translateY(${newPad}px)`;
-        copy.dataset.tTranslate = String(newPad);
-      }
-    }
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (devGapDrag) {
-      devGapDrag = null;
-      document.body.style.cursor     = '';
-      document.body.style.userSelect = '';
-      return;
-    }
-    if (!devDrag) return;
-    devDrag.tileEl.classList.remove('dev-dragging');
-    devDrag = null;
-    document.body.style.cursor     = '';
-    document.body.style.userSelect = '';
-  });
-
-  // ── Record: copy TILE_PADDING + GROUP_END_TRIM snippet to clipboard ───
-  // devOffsets (absolute px) → fractions via lastRenderedU (viewport-independent).
-  // devGapRows → GROUP_END_TRIM fraction via lastRenderedU.
-  function recordPositions() {
-    const refPx        = Math.max((lastRenderedU || 1) * ROW_PX, 1);
-    const toFrac       = arr => arr.map(v => (v / refPx).toFixed(3).padStart(7)).join(', ');
-    const groupEndTrim = (devGapRows / Math.max(lastRenderedU, 1)).toFixed(3);
-    const snippet = [
-      `const TILE_PADDING    = [${toFrac(devOffsets)}];  // M0 H1 F0 F1 H4 M1 H6`,
-      `const GROUP_END_TRIM  = ${groupEndTrim};`,
-    ].join('\n');
-
-    navigator.clipboard.writeText(snippet).then(() => {
-      const span = document.querySelector('#dev-record span');
-      if (span) {
-        span.textContent = 'COPIED!';
-        setTimeout(() => { span.textContent = 'RECORD'; }, 1800);
-      }
-    }).catch(() => {
-      // Fallback: show in a prompt so the user can copy manually.
-      window.prompt('Copy this snippet:', snippet);
-    });
+    requestAnimationFrame(() => renderGrid(allItems));
   }
 
 })();
