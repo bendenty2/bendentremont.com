@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-20T16:19:17",
+  "generated_at": "2026-06-20T16:37:45",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -350,7 +350,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "Tape1_clip1_beach",
       "type": "video",
       "title": "Crystal Crescent Beach",
-      "src": "videos/Tape1_clip1_beach.mp4?v=27509ae1",
+      "src": "videos/Tape1_clip1_beach.mp4?v=bab848e4",
       "width": null,
       "height": null
     },
@@ -605,7 +605,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "Tape1_clip13_rewind_fire3",
       "type": "video",
       "title": "Rewind",
-      "src": "videos/Tape1_clip13_rewind_fire3.mp4?v=495a13f6",
+      "src": "videos/Tape1_clip13_rewind_fire3.mp4?v=5cbaf77d",
       "width": null,
       "height": null
     },
@@ -860,7 +860,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "Tape1_clip5_fire3",
       "type": "video",
       "title": "Camping on the Magaguadavic",
-      "src": "videos/Tape1_clip5_fire3.mp4?v=cc49cafd",
+      "src": "videos/Tape1_clip5_fire3.mp4?v=0f806b69",
       "width": null,
       "height": null
     },

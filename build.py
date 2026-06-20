@@ -102,12 +102,12 @@ ADD_WATERMARK = True                            # flip to False to skip the visi
 WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but readable
 
 # Video watermark: the same © mark, baked into clips by ffmpeg. Tuned for the
-# 1920x1080 Hi-8 footage. Right-aligned like the stills, but raised ABOVE the
-# camcorder date stamp that sits in the very bottom-right corner; kept inside the
-# content so the cropped pillarbox side bars don't clip it.
+# 1920x1080 Hi-8 footage. Tucked into the bottom-right corner BELOW the camcorder
+# date stamp, a letter's height in from the bottom and right edges; kept inside
+# the content so the cropped pillarbox side bars don't clip it.
 VIDEO_WM_FONTSIZE = 20
-VIDEO_WM_RIGHT    = 312    # px: text's right edge, measured from the frame's right
-VIDEO_WM_BOTTOM   = 235    # px: text's bottom, measured from the frame's bottom
+VIDEO_WM_RIGHT    = 304    # px: text's right edge, measured from the frame's right
+VIDEO_WM_BOTTOM   = 16     # px: text's bottom, measured from the frame's bottom
 VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
 
