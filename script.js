@@ -5,18 +5,16 @@
    (open, prev/next, keyboard nav, hover-preload).
 
    Supports both photo items (type: "photo" or no type field) and
-   video items (type: "video").  Videos autoplay muted in the grid;
-   audio is available via a toggle when a video is expanded in the
-   lightbox.
+   video items (type: "video").  Videos play muted everywhere — no audio.
    ------------------------------------------------------------ */
 
 (() => {
   // ---------- View switching (pics / about) ----------
   // The sidebar buttons each carry a data-view attribute; clicking one
-  // toggles which <section class="view"> is visible. The choice is
-  // remembered so reloads land you back on the same tab.
+  // toggles which <section class="view"> is visible. The site always opens on
+  // the Photos view (the HTML default) — the last tab is intentionally NOT
+  // remembered across visits.
 
-  const VIEW_NAME_KEY = "photosite.activeView";
   const sidebarLinks = document.querySelectorAll(".nav-link[data-view]");
 
   function setActiveView(name) {
@@ -35,18 +33,11 @@
         if (p && p.catch) p.catch(() => {});
       });
     }
-    try { localStorage.setItem(VIEW_NAME_KEY, name); } catch (e) {}
   }
 
   sidebarLinks.forEach(b => {
     b.addEventListener("click", () => setActiveView(b.dataset.view));
   });
-
-  // Restore last view choice from previous visit.
-  try {
-    const saved = localStorage.getItem(VIEW_NAME_KEY);
-    if (saved === "pics" || saved === "about") setActiveView(saved);
-  } catch (e) { /* private mode — ignore */ }
 
   // Brand in the top-left returns to the top of the photo view.
   const brandBtn = document.querySelector(".topbar-brand");
@@ -67,7 +58,6 @@
   const lightboxImg       = document.getElementById("lightbox-img");
   const lightboxVideo     = document.getElementById("lightbox-video");
   const lightboxVideoWrap = lightboxVideo ? lightboxVideo.parentElement : null;
-  const lightboxAudioBtn  = document.getElementById("lightbox-audio-toggle");
   const lightboxTitle     = document.getElementById("lightbox-title");
   const lightboxExif      = document.getElementById("lightbox-exif");
   const lightboxClose     = lightbox.querySelector(".lightbox-close");
@@ -77,17 +67,22 @@
   // The full item array we're navigating through, in VISUAL order — used by
   // the lightbox for prev/next. renderGrid() rewrites this to match the order
   // tiles actually appear on screen.
+  // The lightbox order is [heroes…, grid…]: the 4 hero photos are items 0–3,
+  // the catalogue follows from index heroItems.length onward.
   let items = [];
   // The complete, unmodified item set (every photo + video). renderGrid() is
-  // always fed from this so re-renders (resize, leaving dev mode) never lose
-  // tiles, even though `items` above gets shrunk to the rendered subset.
+  // always fed from this so re-renders (resize) never lose tiles, even though
+  // `items` above gets shrunk to the rendered subset.
   let allItems = [];
+  // The hero/slideshow photos, prepended to `items` so they're clickable too.
+  let heroItems = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
   // Element that had focus before the lightbox opened, so we can restore it on close.
   let lastFocusedEl = null;
-  // Whether the lightbox video is currently muted.
-  let lightboxMuted = true;
+  // Spec caption for videos (they have no EXIF) — shown in the grid tile and,
+  // below the title, in the lightbox. Mirrors how photos show their EXIF specs.
+  const VIDEO_SPEC_LABEL = "Hi-8";
 
   // ---------- Caption ----------
 
@@ -164,7 +159,9 @@
     cropWrap.appendChild(video);
 
     tile.appendChild(cropWrap);
-    tile.appendChild(buildCaption(item.title || ""));
+    // Videos have no EXIF specs like the R10 stills, so the grid caption is a
+    // fixed format label. The real title still shows in the lightbox on click.
+    tile.appendChild(buildCaption(VIDEO_SPEC_LABEL));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
@@ -229,14 +226,7 @@
   // layout stays correct at any viewport width or browser zoom level.
   // Positions: 0=M0, 1=H1, 2=F0, 3=F1, 4=H4, 5=M1, 6=H6
   // Actual px at render time = Math.round(fraction × U_rows × ROW_PX).
-  // Fallback when SEQUENCE_PADDING is empty.
   const TILE_PADDING = [  0.000,   0.000,  -0.048,  -0.161,  -0.097,  -0.065,  -0.177];  // M0 H1 F0 F1 H4 M1 H6
-
-  // Optional per-tile padding overrides in absolute pixels, by sequence index.
-  // When non-empty this takes priority over TILE_PADDING. Absolute pixels don't
-  // scale with viewport width, so prefer tuning the TILE_PADDING fractions above
-  // and keeping this empty.
-  const SEQUENCE_PADDING = [];
 
   // Fraction of U_rows to trim from the row-spans of the last two tiles per
   // group (M1 at groupPos 5, H6 at groupPos 6).  The negative TILE_PADDING
@@ -304,10 +294,8 @@
       else landscapes.push(it);
     });
 
-    // Order the videos as they should appear down the page (they get dispersed
-    // through the landscape slots below in this order).
-    const VIDEO_ORDER = ["Tape1_clip1_beach", "Tape1_clip13_rewind_fire3", "Tape1_clip5_fire3"];
-    videos.sort((a, b) => VIDEO_ORDER.indexOf(a.id) - VIDEO_ORDER.indexOf(b.id));
+    // (Videos keep their manifest/layout.txt order; they're dispersed through
+    // the landscape slots below in that order.)
 
     // Too many full-width mediums to space out in 2 columns — demote the extras
     // to small single-column landscapes so none end up stacked.
@@ -341,10 +329,10 @@
     while (li < land.length)      seq.push({ item: land[li++], span2: false });
     while (pi < portraits.length) seq.push({ item: portraits[pi++], span2: false });
 
-    items = seq.map(e => e.item);
+    items = heroItems.concat(seq.map(e => e.item));
 
     seq.forEach(({ item, span2 }, i) => {
-      const tile = buildTile(item, i);
+      const tile = buildTile(item, heroItems.length + i);
       tile.style.gridColumn = span2 ? "span 2" : "span 1";
       const dispW = span2 ? (colW * 2 + colGap) : colW;
       const imgH  = item.type === "video"
@@ -487,11 +475,12 @@
     ].forEach(entry => sequence.push({ ...entry, role: "leftover", U_rows: null }));
 
     // ── Update global items array to match visual order ───────────────────
-    items = sequence.map(e => e.item);
+    // Heroes are lightbox items 0..N-1; the grid follows.
+    items = heroItems.concat(sequence.map(e => e.item));
 
     // ── Render tiles ───────────────────────────────────────────────────────
     sequence.forEach(({ item, role, U_rows, groupPos, isVideoGroup }, seqIdx) => {
-      const tile = buildTile(item, seqIdx);
+      const tile = buildTile(item, heroItems.length + seqIdx);
 
       // groupPos 5 (M1) and 6 (H6) are the bottom tiles of every group.
       // Trim their row spans to close the visual gap that negative TILE_PADDING
@@ -521,15 +510,11 @@
         tile.style.gridRowEnd = `span ${tileRowSpan(item, colW, colGap)}`;
       }
 
-      // Per-position vertical nudge. SEQUENCE_PADDING (absolute px, recorded
-      // from tuning) takes priority when present; otherwise TILE_PADDING
-      // fractions are scaled by U_rows so they hold at any viewport width.
+      // Per-position vertical nudge: TILE_PADDING fractions scaled by U_rows so
+      // they hold at any viewport width. Desktop only — mobile cover-fills its
+      // tiles (no slack), so no nudge is needed.
       let appliedPadPx = 0;
-      if (SEQUENCE_PADDING.length > 0) {
-        appliedPadPx = SEQUENCE_PADDING[seqIdx] || 0;
-      } else if (groupPos !== undefined && window.innerWidth > 700) {
-        // TILE_PADDING corrects natural-aspect image slack on desktop. Mobile
-        // cover-fills tiles (no slack), so no per-tile nudge is needed.
+      if (groupPos !== undefined && window.innerWidth > 700) {
         const frac = TILE_PADDING[groupPos] ?? 0;
         appliedPadPx = frac ? Math.round(frac * U_rows * ROW_PX) : 0;
       }
@@ -562,9 +547,6 @@
     if (!lightboxVideo) return;
     lightboxVideo.pause();
     lightboxVideo.src = "";
-    // Reset audio state for next open.
-    lightboxMuted = true;
-    if (lightboxAudioBtn) lightboxAudioBtn.textContent = "unmute";
   }
 
   function showLightboxItem(item) {
@@ -580,13 +562,10 @@
       // Stop any previously playing video before swapping src.
       lightboxVideo.pause();
       lightboxVideo.src = item.src;
-      lightboxVideo.muted = lightboxMuted;
+      lightboxVideo.muted = true;   // videos have no audio
       lightboxVideo.play().catch(() => {
         // Autoplay blocked — not critical; user can hit play manually.
       });
-      if (lightboxAudioBtn) {
-        lightboxAudioBtn.textContent = lightboxMuted ? "unmute" : "mute";
-      }
     } else {
       // Photo path.
       stopLightboxVideo();
@@ -602,7 +581,15 @@
     }
 
     lightboxTitle.textContent = item.title || "";
-    lightboxExif.textContent  = isVideo ? "" : captionText(item.exif || {});
+    lightboxExif.textContent  = isVideo ? VIDEO_SPEC_LABEL : captionText(item.exif || {});
+    updateNavArrows();
+  }
+
+  // Bounded gallery: hide the left arrow on the first item and the right arrow
+  // on the last — there's nothing to scroll to past either end.
+  function updateNavArrows() {
+    lightboxPrev.classList.toggle("is-hidden", currentIndex <= 0);
+    lightboxNext.classList.toggle("is-hidden", currentIndex >= items.length - 1);
   }
 
   function openLightboxAt(index) {
@@ -633,19 +620,10 @@
 
   function step(delta) {
     if (currentIndex < 0 || !items.length) return;
-    currentIndex = (currentIndex + delta + items.length) % items.length;
+    const next = currentIndex + delta;
+    if (next < 0 || next >= items.length) return;   // bounded — no wrap-around
+    currentIndex = next;
     showLightboxItem(items[currentIndex]);
-  }
-
-  // ---------- Audio toggle ----------
-
-  if (lightboxAudioBtn) {
-    lightboxAudioBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      lightboxMuted = !lightboxMuted;
-      if (lightboxVideo) lightboxVideo.muted = lightboxMuted;
-      lightboxAudioBtn.textContent = lightboxMuted ? "unmute" : "mute";
-    });
   }
 
   // Click the dim overlay (but not the inner content) to close.
@@ -656,11 +634,10 @@
   lightboxPrev.addEventListener("click", (e) => { e.stopPropagation(); step(-1); });
   lightboxNext.addEventListener("click", (e) => { e.stopPropagation(); step(1); });
 
-  // Visible, focusable controls inside the lightbox (audio toggle only when a
-  // video is showing — it's display:none otherwise, so offsetParent is null).
+  // Visible, focusable controls inside the lightbox.
   function getLightboxFocusables() {
-    return [lightboxClose, lightboxPrev, lightboxNext, lightboxAudioBtn]
-      .filter(el => el && el.offsetParent !== null);
+    return [lightboxClose, lightboxPrev, lightboxNext]
+      .filter(el => el && el.offsetParent !== null && !el.classList.contains("is-hidden"));
   }
 
   document.addEventListener("keydown", (e) => {
@@ -737,6 +714,9 @@
 
     const slideshow = document.createElement("div");
     slideshow.className = "hero-slideshow";
+    // Click the hero photo to open it in the lightbox (then arrow on into the
+    // rest of the catalogue). Uses the currently-shown slide's index.
+    slideshow.addEventListener("click", () => openLightboxAt(heroActiveIdx));
 
     const dotsEl = document.createElement("div");
     dotsEl.className = "hero-dots";
@@ -795,10 +775,11 @@
     const heroList = manifest.heroes && manifest.heroes.length
       ? manifest.heroes
       : (manifest.hero ? [manifest.hero] : []);
+    heroItems = heroList;
     buildHeroSlideshow(heroList);
 
     allItems = manifest.photos || [];
-    items = allItems;
+    items = heroItems.concat(allItems);
 
     // Defer one frame so the grid has been laid out by the browser and
     // grid.clientWidth returns an accurate value for the row-span maths.

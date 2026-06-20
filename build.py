@@ -59,26 +59,20 @@ MANIFEST_PATH = SITE_DIR / "manifest.js"
 # can fill in titles for whichever photos you care about and re-run.
 TITLES_PATH = SOURCE_DIR / "titles.json"
 
-# Source subfolders — place your images/videos into these.
+# Source layout — two things in the catalogue folder:
 #
-#   large_photos/   -> hero images shown in the slideshow above the grid
-#
-#   tiles/tileN/    -> each subfolder is one 7-item grid group.
-#                      ODD  tile numbers (1, 3, 5, ...) have no video slot:
-#                        medium_photo_top          medium_photo_bottom
-#                        small_photo_portrait_left small_photo_portrait_right
-#                        small_photo_top           small_photo_middle   small_photo_bottom
-#                      EVEN tile numbers (2, 4, 6, ...) include a video slot:
-#                        medium_photo_top          medium_photo_bottom
-#                        small_photo_portrait_left small_photo_portrait_right
-#                        small_photo_top           small_photo_bottom
-#                        video_middle
-#
-# Place a single image (or video) file inside each slot subfolder.
-# Tiles are consumed in numeric order (tile1, tile2, tile3, ...).
-# To add a new tile just create the next tileN folder and re-run build.py.
-LARGE_PHOTOS_DIR = SOURCE_DIR / "large_photos"
-TILES_DIR        = SOURCE_DIR / "tiles"
+#   media/          -> a single flat pool of every image and video (grid tiles
+#                      AND hero/slideshow photos).
+#   layout.txt      -> the whole page, top to bottom — one item per line:
+#                      "<filename> <role>". Roles: hero (slideshow, listed
+#                      first), medium (span-2 grid tile), "small landscape" /
+#                      "small portrait" (half-width grid tiles). Videos take no
+#                      role (detected by extension). The extension is optional;
+#                      titles come from titles.json. Reorder by moving lines; add
+#                      content by dropping a file in media/ and adding a line.
+#                      (See the header inside layout.txt.)
+MEDIA_DIR   = SOURCE_DIR / "media"
+LAYOUT_FILE = SOURCE_DIR / "layout.txt"
 
 # Max long-edge sizes for the generated derivatives.
 THUMB_LONG_EDGE = 1200   # grid view (retina-friendly for ~600px columns)
@@ -106,6 +100,15 @@ COPYRIGHT_YEAR = datetime.now().year
 WATERMARK_TEXT = f"© {COPYRIGHT_HOLDER}"
 ADD_WATERMARK = True                            # flip to False to skip the visible mark
 WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but readable
+
+# Video watermark: the same © mark, baked into clips by ffmpeg. Tuned for the
+# 1920x1080 Hi-8 footage. Tucked into the bottom-right corner BELOW the camcorder
+# date stamp, a letter's height in from the bottom and right edges; kept inside
+# the content so the cropped pillarbox side bars don't clip it.
+VIDEO_WM_FONTSIZE = 20
+VIDEO_WM_RIGHT    = 334    # px: text's right edge, measured from the frame's right
+VIDEO_WM_BOTTOM   = 16     # px: text's bottom, measured from the frame's bottom
+VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
 
 # --------------------------------------------------------------------------
@@ -383,26 +386,89 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
     }
 
 
+def _watermark_font_file() -> Path | None:
+    # The actual TTF the stills use (first existing candidate) — ffmpeg's
+    # drawtext needs a real file path, not a name PIL can resolve internally.
+    for name in _FONT_CANDIDATES:
+        p = Path(name)
+        if p.is_file():
+            return p
+    return None
+
+
+_WM_DIR: Path | None = None
+
+
+def _watermark_assets() -> Path | None:
+    # A temp dir holding the watermark text + font under simple relative names,
+    # so they parse inside an ffmpeg filter regardless of spaces/colons in the
+    # real paths (the repo path contains a space). Built once, reused.
+    global _WM_DIR
+    if _WM_DIR is None:
+        font = _watermark_font_file()
+        if not font:
+            return None
+        import tempfile, shutil
+        d = Path(tempfile.mkdtemp(prefix="photosite_wm_"))
+        (d / "wm.txt").write_text(WATERMARK_TEXT, encoding="utf-8")
+        shutil.copy(font, d / "font.ttf")
+        _WM_DIR = d
+    return _WM_DIR
+
+
+def _transcode_watermarked(src: Path, dest: Path) -> bool:
+    # Re-encode a video with the © watermark baked in (mirrors the stills).
+    # Returns False if it can't (disabled / no font / no ffmpeg) so the caller
+    # falls back to a plain copy.
+    if not ADD_WATERMARK:
+        return False
+    wm = _watermark_assets()
+    if not wm:
+        return False
+    import subprocess
+    a_text = WATERMARK_OPACITY / 255      # same opacity as the stills
+    a_shad = 110 / 255                     # same subtle drop shadow
+    vf = (f"drawtext=textfile=wm.txt:fontfile=font.ttf:fontsize={VIDEO_WM_FONTSIZE}:"
+          f"fontcolor=white@{a_text:.3f}:shadowcolor=black@{a_shad:.3f}:"
+          f"shadowx=1:shadowy=1:x=w-tw-{VIDEO_WM_RIGHT}:y=h-th-{VIDEO_WM_BOTTOM}")
+    cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+           "-i", str(src), "-vf", vf,
+           "-c:v", "libx264", "-crf", str(VIDEO_CRF), "-preset", "medium",
+           "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart",
+           str(dest)]
+    try:
+        return subprocess.run(cmd, cwd=str(wm)).returncode == 0 and dest.exists()
+    except FileNotFoundError:
+        print("  ! ffmpeg not found on PATH — copying video without watermark")
+        return False
+
+
 def process_video(src: Path, titles: dict | None = None) -> dict | None:
     import shutil
 
     dest = VIDEOS_DIR / src.name
     try:
         if not dest.exists() or src.stat().st_mtime > dest.stat().st_mtime:
-            shutil.copy2(src, dest)
+            if not _transcode_watermarked(src, dest):
+                shutil.copy2(src, dest)   # fallback when ffmpeg/font unavailable
     except Exception as e:
-        print(f"  ! skip {src.name}: cannot copy ({e})")
+        print(f"  ! skip {src.name}: cannot process ({e})")
         return None
 
     stem      = src.stem
     raw_title = (titles or {}).get(stem, "")
     title     = raw_title.strip() or None
 
+    import hashlib
+    cache_key = hashlib.md5(dest.read_bytes()).hexdigest()[:8]
+
     return {
         "id":     stem,
         "type":   "video",
         "title":  title,
-        "src":    f"videos/{src.name}",
+        # Content cache-bust: videos aren't covered by index.html's ?v bumps,
+        # and the CDN caches them by URL across deploys.
+        "src":    f"videos/{src.name}?v={cache_key}",
         "width":  None,
         "height": None,
     }
@@ -422,101 +488,87 @@ def main() -> int:
 
     # ---- Helpers ----------------------------------------------------------------
 
-    def _tile_num(name: str) -> int | None:
-        low = name.lower()
-        if low.startswith("tile"):
-            try:
-                return int(low[4:])
-            except ValueError:
-                pass
+    def _resolve_source(name: str) -> Path | None:
+        # Find a file in media/ by name; the extension is optional in layout.txt.
+        direct = MEDIA_DIR / name
+        if direct.is_file():
+            return direct
+        if MEDIA_DIR.exists():
+            for p in sorted(MEDIA_DIR.glob(name + ".*")):
+                if p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS):
+                    return p
         return None
 
-    def _get_sorted_tile_dirs(parent: Path) -> list[Path]:
-        if not parent.exists():
-            return []
-        dirs = [p for p in parent.iterdir()
-                if p.is_dir() and _tile_num(p.name) is not None]
-        return sorted(dirs, key=lambda p: _tile_num(p.name))
-
-    def _pick_file(slot_dir: Path, exts: set) -> Path | None:
-        if not slot_dir.exists():
-            return None
-        for p in slot_dir.iterdir():
-            if p.is_file() and p.suffix.lower() in exts:
-                return p
-        return None
-
-    def _scan_photos(folder: Path) -> list[Path]:
-        if not folder.exists():
-            return []
-        return sorted(
-            p for p in folder.iterdir()
-            if p.is_file() and p.suffix.lower() in SUPPORTED_EXTS
-        )
-
-    # ---- Slot definitions -------------------------------------------------------
-    # Each entry: (subfolder_name, span, item_type)
-    # Emission order here determines per-bucket ordering in the JS grid renderer.
-
-    NV_SLOTS = [   # odd tile numbers — no video
-        ("medium_photo_top",           2, "photo"),
-        ("medium_photo_bottom",        2, "photo"),
-        ("small_photo_portrait_left",  1, "photo"),
-        ("small_photo_portrait_right", 1, "photo"),
-        ("small_photo_top",            1, "photo"),
-        ("small_photo_middle",         1, "photo"),
-        ("small_photo_bottom",         1, "photo"),
-    ]
-    V_SLOTS = [    # even tile numbers — includes a video
-        ("medium_photo_top",           2, "photo"),
-        ("medium_photo_bottom",        2, "photo"),
-        ("small_photo_portrait_left",  1, "photo"),
-        ("small_photo_portrait_right", 1, "photo"),
-        ("small_photo_top",            1, "photo"),
-        ("small_photo_bottom",         1, "photo"),
-        ("video_middle",               1, "video"),
-    ]
+    def _read_layout() -> list[tuple]:
+        # Parse layout.txt -> [(Path, role, item_type, name)] in file order.
+        # One item per line: "<filename> [role]", role one of: hero, medium,
+        # "small landscape", "small portrait". Videos take no role (detected by
+        # extension). '#' starts a comment; blank lines are ignored.
+        entries: list[tuple] = []
+        for lineno, raw in enumerate(
+                LAYOUT_FILE.read_text(encoding="utf-8").splitlines(), 1):
+            line = raw.split("#", 1)[0].strip()
+            if not line:
+                continue
+            parts = line.split()
+            name  = parts[0]
+            tag   = " ".join(parts[1:]).lower()
+            src   = _resolve_source(name)
+            if not src:
+                print(f"  ! layout.txt line {lineno}: no file for '{name}'")
+                continue
+            if src.suffix.lower() in VIDEO_EXTS:
+                role, item_type = "video", "video"
+            elif tag == "hero":
+                role, item_type = "hero", "photo"
+            elif tag == "medium":
+                role, item_type = "medium", "photo"
+            elif tag in ("small landscape", "landscape"):
+                role, item_type = "small_landscape", "photo"
+            elif tag in ("small portrait", "portrait"):
+                role, item_type = "small_portrait", "photo"
+            else:
+                if tag:
+                    print(f"  ! layout.txt line {lineno}: unknown role '{tag}' "
+                          f"for {name}; treating as a small grid photo")
+                role, item_type = "small", "photo"
+            entries.append((src, role, item_type, name))
+        return entries
 
     # ---- Discover sources -------------------------------------------------------
 
-    large_sources = _scan_photos(LARGE_PHOTOS_DIR)
-    all_tile_dirs = _get_sorted_tile_dirs(TILES_DIR)
+    # Page order comes entirely from layout.txt: hero-tagged lines become the
+    # slideshow, the rest become grid tiles, all in file order.
+    work_items: list[tuple]  = []    # grid: (Path, span, item_type, label)
+    hero_sources: list[Path] = []    # heroes in display order
+    grid_roles: dict[str, str] = {}  # stem -> declared role, for a sanity check
+    if LAYOUT_FILE.exists():
+        for src, role, item_type, name in _read_layout():
+            if role == "hero":
+                hero_sources.append(src)
+            else:
+                span = 2 if role == "medium" else 1
+                work_items.append((src, span, item_type, name))
+                if item_type == "photo":
+                    grid_roles[src.stem] = role
 
-    if not large_sources and not all_tile_dirs:
+    if not hero_sources and not work_items:
         sys.stderr.write(
-            "No photos or videos found. Expected subfolders:\n"
-            f"  {LARGE_PHOTOS_DIR}\n"
-            f"  {TILES_DIR}/tile1/  ...\n"
+            "No photos or videos found. Expected:\n"
+            f"  {MEDIA_DIR}/ + {LAYOUT_FILE}\n"
         )
         return 1
 
-    # Build ordered work list: walk tiles in numeric order.
-    # Odd tile numbers -> NV_SLOTS (no video), even -> V_SLOTS (with video).
-    work_items: list[tuple] = []   # (Path, span, item_type, label)
-
-    for tile_dir in all_tile_dirs:
-        n     = _tile_num(tile_dir.name)
-        slots = NV_SLOTS if (n % 2 == 1) else V_SLOTS
-        for slot_name, span, item_type in slots:
-            exts = SUPPORTED_EXTS if item_type == "photo" else VIDEO_EXTS
-            src  = _pick_file(tile_dir / slot_name, exts)
-            if src:
-                work_items.append((src, span, item_type, f"{tile_dir.name}/{slot_name}"))
-            else:
-                print(f"  ! slot missing: {tile_dir.name}/{slot_name}")
-
+    grid_desc         = f"layout.txt + {MEDIA_DIR.name}/"
     photo_work        = [(src, span, lbl) for src, span, t, lbl in work_items if t == "photo"]
     video_work        = [(src, lbl)       for src, span, t, lbl in work_items if t == "video"]
-    all_photo_sources = large_sources + [src for src, *_ in photo_work]
+    all_photo_sources = hero_sources + [src for src, *_ in photo_work]
     all_video_sources = [src for src, _ in video_work]
 
-    nv_count = sum(1 for d in all_tile_dirs if _tile_num(d.name) % 2 == 1)
-    v_count  = len(all_tile_dirs) - nv_count
+    n_medium = sum(1 for _s, span, t, _l in work_items if t == "photo" and span == 2)
     print(
-        f"Found  {len(large_sources)} hero  |  "
-        f"{nv_count} non-video tiles  |  "
-        f"{v_count} video tiles  |  "
-        f"{len(photo_work)} grid photos  |  "
+        f"Found  {len(hero_sources)} hero  |  grid from {grid_desc}  |  "
+        f"{len(photo_work)} grid photos ({n_medium} medium)  |  "
         f"{len(video_work)} videos"
     )
     print(f"Writing site assets into {SITE_DIR}")
@@ -541,11 +593,11 @@ def main() -> int:
     workers      = max(1, os.cpu_count() or 4)
     hero_entries: list[dict] = []
 
-    if large_sources:
+    if hero_sources:
         worker_hero = partial(process_one, titles=titles, span=1)
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            for i, entry in enumerate(pool.map(worker_hero, large_sources), 1):
-                print(f"  [hero {i:>2}/{len(large_sources)}] {large_sources[i-1].name}")
+            for i, entry in enumerate(pool.map(worker_hero, hero_sources), 1):
+                print(f"  [hero {i:>2}/{len(hero_sources)}] {hero_sources[i-1].name}")
                 if entry:
                     hero_entries.append(entry)
 
@@ -568,6 +620,23 @@ def main() -> int:
             print(f"  [{i:>3}/{len(photo_srcs)}] {lbl} -- {src.name}")
             if entry:
                 stem_to_entry[src.stem] = entry
+
+    # Sanity check: warn when a declared "small landscape/portrait" or "medium"
+    # role disagrees with the image's real orientation. The grid still renders by
+    # actual dimensions — this just flags likely typos in layout.txt.
+    _want = {"small_landscape": "landscape", "small_portrait": "portrait",
+             "medium": "landscape"}
+    for stem, role in grid_roles.items():
+        entry = stem_to_entry.get(stem)
+        if not entry or role not in _want:
+            continue
+        w, h = entry.get("width"), entry.get("height")
+        if w and h:
+            actual = "portrait" if h > w else "landscape"
+            if actual != _want[role]:
+                print(f"  ! role mismatch: {stem} is tagged "
+                      f"'{role.replace('_', ' ')}' but the image is {actual} "
+                      f"— rendered as {actual}")
 
     # Re-assemble in tile order, inserting videos inline.
     entries: list[dict] = []
@@ -625,8 +694,7 @@ def main() -> int:
 
     print(
         f"\nDone. Heroes: {len(heroes_public)}. "
-        f"Grid: {len(public)} items  "
-        f"({nv_count} non-video tiles, {v_count} video tiles)."
+        f"Grid: {len(public)} items ({len(video_work)} videos)."
     )
     return 0
 
