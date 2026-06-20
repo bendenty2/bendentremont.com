@@ -287,9 +287,14 @@
     grid.style.setProperty("--cols", 2);
     grid.dataset.cols = 2;
     const { colW, colGap } = getGridMetrics(2);
-    const capH = 16.5;  // caption box reserved in the row span; tuned so the
-                        // empty gap below each tile stays tight (caption sits
-                        // lower now via its larger margin-top)
+    // Tunable vertical-spacing knobs (px). Mobile grid-auto-rows is 1px (see the
+    // mobile CSS) so these land near-exactly. CAP_OFFSET must match the
+    // .tile-caption margin-top in the mobile media query.
+    const MROW       = 1;    // px per grid row on mobile
+    const CAP_OFFSET = 20;   // caption sits this far below its photo
+    const CAP_TEXT   = 8;    // caption text line height (~6px font)
+    const TILE_GAP   = 40;   // empty gap below each tile, before the next one
+    const reserve    = CAP_OFFSET + CAP_TEXT + TILE_GAP;
 
     const mediums = [], portraits = [], landscapes = [], videos = [];
     list.forEach(it => {
@@ -340,9 +345,9 @@
       const imgH  = item.type === "video"
         ? dispW / VIDEO_CROP_RATIO            // videos shown at 3:2
         : dispW * item.height / item.width;   // photos at native aspect
-      // +1 row (row-gap is 0) gives the vertical breathing room between tiles.
-      // The same +1 on every tile keeps a block's two columns equal height.
-      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil((imgH + capH) / ROW_PX) + 1)}`;
+      // Reserve image + caption + gap. The same reserve on every tile keeps a
+      // block's two columns equal height.
+      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil((imgH + reserve) / MROW))}`;
       grid.appendChild(tile);
     });
   }
