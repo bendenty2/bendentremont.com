@@ -658,7 +658,7 @@ html, body {
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1px; }
   .tile { min-width: 0; }
   /* margin-top must match CAP_OFFSET in renderGridMobile. */
-  .tile-caption { font-size: 6px; margin-top: 20px; margin-bottom: 0; }
+  .tile-caption { font-size: 6px; margin-top: 5px; margin-bottom: 0; }
 
   /* Grid videos sit in the 3:2 landscape slots. The source is 16:9 with ~15%
      black bars each side (5:4 content); scale it up so the bars overflow and
