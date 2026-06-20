@@ -413,7 +413,9 @@
       // translations create (tiles move up but grid rows stay allocated).
       // trimRows scales with U_rows so the correction stays proportional at
       // any viewport width or zoom level.
-      const trimRows = (groupPos === 5 || groupPos === 6)
+      // Desktop only: the trim closes a gap created by the negative TILE_PADDING
+      // nudges. On mobile tiles cover-fill, so we skip both nudges and trim.
+      const trimRows = (window.innerWidth > 700 && (groupPos === 5 || groupPos === 6))
         ? Math.round((GROUP_END_TRIM || 0) * U_rows)
         : 0;
 
@@ -440,7 +442,9 @@
       let appliedPadPx = 0;
       if (SEQUENCE_PADDING.length > 0) {
         appliedPadPx = SEQUENCE_PADDING[seqIdx] || 0;
-      } else if (groupPos !== undefined) {
+      } else if (groupPos !== undefined && window.innerWidth > 700) {
+        // TILE_PADDING corrects natural-aspect image slack on desktop. Mobile
+        // cover-fills tiles (no slack), so no per-tile nudge is needed.
         const frac = TILE_PADDING[groupPos] ?? 0;
         appliedPadPx = frac ? Math.round(frac * U_rows * ROW_PX) : 0;
       }

@@ -651,6 +651,25 @@ html, body {
 
   /* Smaller captions so the tiles feel less busy at phone size. */
   .tile-caption { font-size: 6.5px; }
+
+  /* Cover-fill each tile so every tile of a type is the exact same height and
+     the photo/video edges line up perfectly (tap a tile for the full image). */
+  .tile { align-self: stretch; }
+  .tile img { flex: 1 1 0; min-height: 0; object-fit: cover; }
+  .tile--video .video-crop-wrapper {
+    flex: 1 1 0;
+    min-height: 0;
+    aspect-ratio: auto;
+    clip-path: none;
+  }
+  .tile--video .video-crop-wrapper video {
+    position: static;
+    width: 100%;
+    height: 100%;
+    left: auto;
+    transform: none;
+    object-fit: cover;
+  }
 }
 
 /* ---------- Reduced motion ----------
