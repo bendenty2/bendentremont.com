@@ -80,6 +80,9 @@
   let currentIndex = -1;
   // Element that had focus before the lightbox opened, so we can restore it on close.
   let lastFocusedEl = null;
+  // Spec caption for videos (they have no EXIF) — shown in the grid tile and,
+  // below the title, in the lightbox. Mirrors how photos show their EXIF specs.
+  const VIDEO_SPEC_LABEL = "Hi-8";
 
   // ---------- Caption ----------
 
@@ -158,7 +161,7 @@
     tile.appendChild(cropWrap);
     // Videos have no EXIF specs like the R10 stills, so the grid caption is a
     // fixed format label. The real title still shows in the lightbox on click.
-    tile.appendChild(buildCaption("Hi-8"));
+    tile.appendChild(buildCaption(VIDEO_SPEC_LABEL));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
@@ -578,7 +581,7 @@
     }
 
     lightboxTitle.textContent = item.title || "";
-    lightboxExif.textContent  = isVideo ? "" : captionText(item.exif || {});
+    lightboxExif.textContent  = isVideo ? VIDEO_SPEC_LABEL : captionText(item.exif || {});
     updateNavArrows();
   }
 
