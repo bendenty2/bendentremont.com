@@ -668,6 +668,10 @@ html, body {
      divider above them. */
   .about-subhead { font-size: 16px; margin-top: -8px; }
 
+  /* Contact blurb reads left-aligned; the title and the email line below it
+     stay centered. */
+  .about-block--contact .about-text:first-of-type { text-align: left; }
+
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
   .gear-col--r10   { order: 2; }
