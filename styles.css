@@ -84,13 +84,13 @@ html, body {
   text-align: center;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.62);
-  transition: transform 200ms ease, color 200ms ease;
+  transition: color 200ms ease;
 }
 
 .nav-link span { pointer-events: none; }
 
-/* Hover: swell + brighten. Active (current view): full white. */
-.nav-link:hover { transform: scale(1.14); color: #ffffff; }
+/* Hover: brighten only (no swell). Active (current view): full white. */
+.nav-link:hover { color: #ffffff; }
 .nav-link.is-active { color: #ffffff; }
 
 /* ---------- Main page area (push down below the fixed topbar) ---------- */
@@ -104,7 +104,17 @@ html, body {
 /* ---------- View switching (pics / about) ---------- */
 
 .view { display: none; }
-.view.is-active { display: block; }
+.view.is-active { display: block; animation: viewReveal 0.5s ease-out backwards; }
+
+/* When a view (Photos / About) becomes active, reveal its contents with a
+   seamless top-to-bottom fade instead of snapping in. `backwards` fill applies
+   the start frame at t=0 but leaves no clip-path lingering afterwards (so tile
+   hover effects aren't clipped). Reduced-motion users get it near-instant via
+   the global prefers-reduced-motion rule. */
+@keyframes viewReveal {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; clip-path: inset(0 0 0 0); }
+}
 
 /* ---------- About panel ---------- */
 
@@ -654,6 +664,10 @@ html, body {
   .gear-video--r10 { margin-top: -13%; clip-path: inset(30% 0 0 0); }
   .gear-video--scl { margin-top: -1px; }   /* nudge the SCL clip up toward its title */
 
+  /* GEAR / CONTACT labels: match the gear-title size and sit closer to the
+     divider above them. */
+  .about-subhead { font-size: 16px; margin-top: -8px; }
+
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
   .gear-col--r10   { order: 2; }
@@ -666,7 +680,7 @@ html, body {
   /* Two columns; photos keep their native 3:2 / 2:3 aspect (no cropping), so
      tiles size to their image. minmax(0,1fr) stops a wide tile from stretching
      a column past the screen edge. */
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1px; margin-bottom: 44px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1px; margin-bottom: 24px; }
   .tile { min-width: 0; }
   /* margin-top must match CAP_OFFSET in renderGridMobile. */
   .tile-caption { font-size: 6px; margin-top: 5px; margin-bottom: 0; }
