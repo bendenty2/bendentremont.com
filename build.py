@@ -63,22 +63,24 @@ TITLES_PATH = SOURCE_DIR / "titles.json"
 #
 #   large_photos/   -> hero images shown in the slideshow above the grid
 #
-#   tiles/tileN/    -> each subfolder is one 7-item grid group.
-#                      ODD  tile numbers (1, 3, 5, ...) have no video slot:
-#                        medium_photo_top          medium_photo_bottom
-#                        small_photo_portrait_left small_photo_portrait_right
-#                        small_photo_top           small_photo_middle   small_photo_bottom
-#                      EVEN tile numbers (2, 4, 6, ...) include a video slot:
-#                        medium_photo_top          medium_photo_bottom
-#                        small_photo_portrait_left small_photo_portrait_right
-#                        small_photo_top           small_photo_bottom
-#                        video_middle
+#   grid/           -> a flat folder holding every grid photo and video.
+#   layout.txt      -> the running order of the grid, one item per line, top to
+#                      bottom. Each line is a filename in grid/ (extension
+#                      optional); append "  medium" to make it a span-2 (full
+#                      width) tile. Portrait vs landscape is read from the image,
+#                      videos from the extension, titles from titles.json.
+#                      Reorder by moving lines; add content by dropping a file in
+#                      grid/ and adding a line. (See the header inside layout.txt.)
 #
-# Place a single image (or video) file inside each slot subfolder.
-# Tiles are consumed in numeric order (tile1, tile2, tile3, ...).
-# To add a new tile just create the next tileN folder and re-run build.py.
+#   tiles/tileN/    -> LEGACY fallback, used only when layout.txt is absent. Each
+#                      subfolder is one 7-item group of named slots
+#                      (medium_photo_top/bottom, small_photo_portrait_left/right,
+#                      small_photo_top/middle/bottom, plus video_middle on even
+#                      tiles), consumed in numeric order.
 LARGE_PHOTOS_DIR = SOURCE_DIR / "large_photos"
 TILES_DIR        = SOURCE_DIR / "tiles"
+GRID_DIR         = SOURCE_DIR / "grid"
+LAYOUT_FILE      = SOURCE_DIR / "layout.txt"
 
 # Max long-edge sizes for the generated derivatives.
 THUMB_LONG_EDGE = 1200   # grid view (retina-friendly for ~600px columns)
@@ -454,6 +456,39 @@ def main() -> int:
             if p.is_file() and p.suffix.lower() in SUPPORTED_EXTS
         )
 
+    def _resolve_grid_file(name: str) -> Path | None:
+        # Find a file in grid/ by name; the extension is optional in layout.txt.
+        direct = GRID_DIR / name
+        if direct.is_file():
+            return direct
+        if GRID_DIR.exists():
+            for p in sorted(GRID_DIR.glob(name + ".*")):
+                if p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS):
+                    return p
+        return None
+
+    def _read_layout() -> list[tuple]:
+        # Parse layout.txt -> [(Path, span, item_type, label)] in file order.
+        # One item per line: "<filename> [medium]". '#' starts a comment.
+        work: list[tuple] = []
+        for lineno, raw in enumerate(
+                LAYOUT_FILE.read_text(encoding="utf-8").splitlines(), 1):
+            line = raw.split("#", 1)[0].strip()
+            if not line:
+                continue
+            parts = line.split()
+            name  = parts[0]
+            tags  = {p.lower() for p in parts[1:]}
+            span  = 2 if "medium" in tags else 1
+            src   = _resolve_grid_file(name)
+            if not src:
+                print(f"  ! layout.txt line {lineno}: no file for '{name}' "
+                      f"in {GRID_DIR.name}/")
+                continue
+            item_type = "video" if src.suffix.lower() in VIDEO_EXTS else "photo"
+            work.append((src, span, item_type, name))
+        return work
+
     # ---- Slot definitions -------------------------------------------------------
     # Each entry: (subfolder_name, span, item_type)
     # Emission order here determines per-bucket ordering in the JS grid renderer.
@@ -480,43 +515,45 @@ def main() -> int:
     # ---- Discover sources -------------------------------------------------------
 
     large_sources = _scan_photos(LARGE_PHOTOS_DIR)
-    all_tile_dirs = _get_sorted_tile_dirs(TILES_DIR)
 
-    if not large_sources and not all_tile_dirs:
+    # Grid order: prefer layout.txt + the flat grid/ folder; fall back to the
+    # legacy tiles/ folder structure when no layout file is present.
+    work_items: list[tuple] = []   # (Path, span, item_type, label)
+    if LAYOUT_FILE.exists():
+        work_items = _read_layout()
+        grid_desc  = f"layout.txt + {GRID_DIR.name}/"
+    else:
+        for tile_dir in _get_sorted_tile_dirs(TILES_DIR):
+            n     = _tile_num(tile_dir.name)
+            slots = NV_SLOTS if (n % 2 == 1) else V_SLOTS
+            for slot_name, span, item_type in slots:
+                exts = SUPPORTED_EXTS if item_type == "photo" else VIDEO_EXTS
+                src  = _pick_file(tile_dir / slot_name, exts)
+                if src:
+                    work_items.append((src, span, item_type,
+                                       f"{tile_dir.name}/{slot_name}"))
+                else:
+                    print(f"  ! slot missing: {tile_dir.name}/{slot_name}")
+        grid_desc = f"{TILES_DIR.name}/ (legacy)"
+
+    if not large_sources and not work_items:
         sys.stderr.write(
-            "No photos or videos found. Expected subfolders:\n"
-            f"  {LARGE_PHOTOS_DIR}\n"
-            f"  {TILES_DIR}/tile1/  ...\n"
+            "No photos or videos found. Expected:\n"
+            f"  {LARGE_PHOTOS_DIR}/\n"
+            f"  {GRID_DIR}/ + {LAYOUT_FILE}\n"
+            f"  (or legacy {TILES_DIR}/tile1/ ...)\n"
         )
         return 1
-
-    # Build ordered work list: walk tiles in numeric order.
-    # Odd tile numbers -> NV_SLOTS (no video), even -> V_SLOTS (with video).
-    work_items: list[tuple] = []   # (Path, span, item_type, label)
-
-    for tile_dir in all_tile_dirs:
-        n     = _tile_num(tile_dir.name)
-        slots = NV_SLOTS if (n % 2 == 1) else V_SLOTS
-        for slot_name, span, item_type in slots:
-            exts = SUPPORTED_EXTS if item_type == "photo" else VIDEO_EXTS
-            src  = _pick_file(tile_dir / slot_name, exts)
-            if src:
-                work_items.append((src, span, item_type, f"{tile_dir.name}/{slot_name}"))
-            else:
-                print(f"  ! slot missing: {tile_dir.name}/{slot_name}")
 
     photo_work        = [(src, span, lbl) for src, span, t, lbl in work_items if t == "photo"]
     video_work        = [(src, lbl)       for src, span, t, lbl in work_items if t == "video"]
     all_photo_sources = large_sources + [src for src, *_ in photo_work]
     all_video_sources = [src for src, _ in video_work]
 
-    nv_count = sum(1 for d in all_tile_dirs if _tile_num(d.name) % 2 == 1)
-    v_count  = len(all_tile_dirs) - nv_count
+    n_medium = sum(1 for _s, span, t, _l in work_items if t == "photo" and span == 2)
     print(
-        f"Found  {len(large_sources)} hero  |  "
-        f"{nv_count} non-video tiles  |  "
-        f"{v_count} video tiles  |  "
-        f"{len(photo_work)} grid photos  |  "
+        f"Found  {len(large_sources)} hero  |  grid from {grid_desc}  |  "
+        f"{len(photo_work)} grid photos ({n_medium} medium)  |  "
         f"{len(video_work)} videos"
     )
     print(f"Writing site assets into {SITE_DIR}")
@@ -625,8 +662,7 @@ def main() -> int:
 
     print(
         f"\nDone. Heroes: {len(heroes_public)}. "
-        f"Grid: {len(public)} items  "
-        f"({nv_count} non-video tiles, {v_count} video tiles)."
+        f"Grid: {len(public)} items ({len(video_work)} videos)."
     )
     return 0
 
