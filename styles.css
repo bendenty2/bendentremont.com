@@ -140,11 +140,15 @@ html, body {
    inside the about panel it spans the (already padded) content width. */
 .section-divider {
   border: 0;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid #f0f0f0;   /* lighter = finer line */
   height: 0;
-  margin: 26px var(--grid-side-pad);
+  /* hero rule overhangs the hero photo's edges by a little */
+  margin: 26px calc(var(--grid-side-pad) - 32px);
 }
-.about-panel .section-divider { margin: 28px 0; }
+.about-panel .section-divider {
+  width: 60%;            /* 40% shorter, centred */
+  margin: 28px auto;
+}
 
 .about-subhead {
   font-size: 12.5px;
