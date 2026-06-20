@@ -156,7 +156,9 @@
     cropWrap.appendChild(video);
 
     tile.appendChild(cropWrap);
-    tile.appendChild(buildCaption(item.title || ""));
+    // Videos have no EXIF specs like the R10 stills, so the grid caption is a
+    // fixed format label. The real title still shows in the lightbox on click.
+    tile.appendChild(buildCaption("Hi-8"));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
