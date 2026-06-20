@@ -646,7 +646,7 @@ html, body {
   /* Stack-spacing tweaks: more room above the R10 entry, and pull the R10 clip
      up toward its own label. */
   .gear-col--r10 { margin-top: 5px; }
-  .gear-video--r10 { margin-top: -6px; }
+  .gear-video--r10 { margin-top: -31px; }
 
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
