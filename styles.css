@@ -618,7 +618,7 @@ html, body {
      side margins keep the grid from filling the screen edge-to-edge. */
   :root {
     --topbar-height: 37px;
-    --footer-height: 42px;
+    --footer-height: 37px;
     --grid-side-pad: 35px;
   }
 
@@ -642,6 +642,11 @@ html, body {
   .gear-video--scl { width: 52%; transform: none; }
   .gear-col--r10 .gear-device,
   .gear-col--scl .gear-device { transform: none; }
+
+  /* Stack-spacing tweaks: more room above the R10 entry, and pull the R10 clip
+     up toward its own label. */
+  .gear-col--r10 { margin-top: 5px; }
+  .gear-video--r10 { margin-top: -6px; }
 
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }

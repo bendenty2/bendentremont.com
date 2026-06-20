@@ -293,7 +293,7 @@
     const MROW       = 1;    // px per grid row on mobile
     const CAP_OFFSET = 5;    // caption sits this far below its photo
     const CAP_TEXT   = 8;    // caption text line height (~6px font)
-    const TILE_GAP   = 10;   // empty gap below each tile, before the next one
+    const TILE_GAP   = 8;    // empty gap below each tile, before the next one
     const reserve    = CAP_OFFSET + CAP_TEXT + TILE_GAP;
 
     const mediums = [], portraits = [], landscapes = [], videos = [];
