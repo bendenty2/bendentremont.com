@@ -714,9 +714,29 @@
 
     const slideshow = document.createElement("div");
     slideshow.className = "hero-slideshow";
-    // Click the hero photo to open it in the lightbox (then arrow on into the
-    // rest of the catalogue). Uses the currently-shown slide's index.
-    slideshow.addEventListener("click", () => openLightboxAt(heroActiveIdx));
+
+    // Tap the hero to open it in the lightbox (then arrow on into the rest of the
+    // catalogue). On touch (mobile only), a horizontal swipe cycles slides
+    // instead — left = next, right = previous (both wrap). Desktop keeps the
+    // auto-advance + clickable dots; no swipe there.
+    let swipeStartX = 0, swipeStartY = 0, didSwipe = false;
+    slideshow.addEventListener("touchstart", (e) => {
+      const t = e.changedTouches[0];
+      swipeStartX = t.clientX; swipeStartY = t.clientY; didSwipe = false;
+    }, { passive: true });
+    slideshow.addEventListener("touchend", (e) => {
+      if (window.innerWidth > 700) return;                 // mobile only
+      const t = e.changedTouches[0];
+      const dx = t.clientX - swipeStartX, dy = t.clientY - swipeStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        didSwipe = true;                                   // suppress tap-to-open
+        showHeroSlide(heroActiveIdx + (dx < 0 ? 1 : -1));  // left=next, right=prev
+        startHeroTimer();                                  // reset auto-advance
+      }
+    }, { passive: true });
+    slideshow.addEventListener("click", () => {
+      if (!didSwipe) openLightboxAt(heroActiveIdx);
+    });
 
     const dotsEl = document.createElement("div");
     dotsEl.className = "hero-dots";
