@@ -5,18 +5,16 @@
    (open, prev/next, keyboard nav, hover-preload).
 
    Supports both photo items (type: "photo" or no type field) and
-   video items (type: "video").  Videos autoplay muted in the grid;
-   audio is available via a toggle when a video is expanded in the
-   lightbox.
+   video items (type: "video").  Videos play muted everywhere — no audio.
    ------------------------------------------------------------ */
 
 (() => {
   // ---------- View switching (pics / about) ----------
   // The sidebar buttons each carry a data-view attribute; clicking one
-  // toggles which <section class="view"> is visible. The choice is
-  // remembered so reloads land you back on the same tab.
+  // toggles which <section class="view"> is visible. The site always opens on
+  // the Photos view (the HTML default) — the last tab is intentionally NOT
+  // remembered across visits.
 
-  const VIEW_NAME_KEY = "photosite.activeView";
   const sidebarLinks = document.querySelectorAll(".nav-link[data-view]");
 
   function setActiveView(name) {
@@ -35,18 +33,11 @@
         if (p && p.catch) p.catch(() => {});
       });
     }
-    try { localStorage.setItem(VIEW_NAME_KEY, name); } catch (e) {}
   }
 
   sidebarLinks.forEach(b => {
     b.addEventListener("click", () => setActiveView(b.dataset.view));
   });
-
-  // Restore last view choice from previous visit.
-  try {
-    const saved = localStorage.getItem(VIEW_NAME_KEY);
-    if (saved === "pics" || saved === "about") setActiveView(saved);
-  } catch (e) { /* private mode — ignore */ }
 
   // Brand in the top-left returns to the top of the photo view.
   const brandBtn = document.querySelector(".topbar-brand");
@@ -67,7 +58,6 @@
   const lightboxImg       = document.getElementById("lightbox-img");
   const lightboxVideo     = document.getElementById("lightbox-video");
   const lightboxVideoWrap = lightboxVideo ? lightboxVideo.parentElement : null;
-  const lightboxAudioBtn  = document.getElementById("lightbox-audio-toggle");
   const lightboxTitle     = document.getElementById("lightbox-title");
   const lightboxExif      = document.getElementById("lightbox-exif");
   const lightboxClose     = lightbox.querySelector(".lightbox-close");
@@ -86,8 +76,6 @@
   let currentIndex = -1;
   // Element that had focus before the lightbox opened, so we can restore it on close.
   let lastFocusedEl = null;
-  // Whether the lightbox video is currently muted.
-  let lightboxMuted = true;
 
   // ---------- Caption ----------
 
@@ -562,9 +550,6 @@
     if (!lightboxVideo) return;
     lightboxVideo.pause();
     lightboxVideo.src = "";
-    // Reset audio state for next open.
-    lightboxMuted = true;
-    if (lightboxAudioBtn) lightboxAudioBtn.textContent = "unmute";
   }
 
   function showLightboxItem(item) {
@@ -580,13 +565,10 @@
       // Stop any previously playing video before swapping src.
       lightboxVideo.pause();
       lightboxVideo.src = item.src;
-      lightboxVideo.muted = lightboxMuted;
+      lightboxVideo.muted = true;   // videos have no audio
       lightboxVideo.play().catch(() => {
         // Autoplay blocked — not critical; user can hit play manually.
       });
-      if (lightboxAudioBtn) {
-        lightboxAudioBtn.textContent = lightboxMuted ? "unmute" : "mute";
-      }
     } else {
       // Photo path.
       stopLightboxVideo();
@@ -637,17 +619,6 @@
     showLightboxItem(items[currentIndex]);
   }
 
-  // ---------- Audio toggle ----------
-
-  if (lightboxAudioBtn) {
-    lightboxAudioBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      lightboxMuted = !lightboxMuted;
-      if (lightboxVideo) lightboxVideo.muted = lightboxMuted;
-      lightboxAudioBtn.textContent = lightboxMuted ? "unmute" : "mute";
-    });
-  }
-
   // Click the dim overlay (but not the inner content) to close.
   lightbox.addEventListener("click", (e) => {
     if (e.target === lightbox) closeLightbox();
@@ -656,10 +627,9 @@
   lightboxPrev.addEventListener("click", (e) => { e.stopPropagation(); step(-1); });
   lightboxNext.addEventListener("click", (e) => { e.stopPropagation(); step(1); });
 
-  // Visible, focusable controls inside the lightbox (audio toggle only when a
-  // video is showing — it's display:none otherwise, so offsetParent is null).
+  // Visible, focusable controls inside the lightbox.
   function getLightboxFocusables() {
-    return [lightboxClose, lightboxPrev, lightboxNext, lightboxAudioBtn]
+    return [lightboxClose, lightboxPrev, lightboxNext]
       .filter(el => el && el.offsetParent !== null);
   }
 
