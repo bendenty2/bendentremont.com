@@ -18,7 +18,7 @@
   --col-gap: clamp(12px, 1.5vw, 24px);        /* horizontal gap between columns */
   --grid-side-pad: clamp(96px, 18vw, 360px);  /* whitespace at left/right of page */
   --max-width: none;                          /* let the grid fill available width */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, "Helvetica Neue",
                Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -56,7 +56,7 @@ html, body {
   background: none;
   border: 0;
   padding: 0;
-  font-family: 'Inter', var(--font-sans);
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -78,7 +78,7 @@ html, body {
   border: 0;
   padding: 6px 12px;
   margin: 0;
-  font-family: 'Inter', var(--font-sans);
+  font-family: var(--font-sans);
   font-size: 15px;
   letter-spacing: 0.04em;
   text-align: center;
@@ -94,7 +94,7 @@ html, body {
 .nav-link.is-active { color: #ffffff; }
 
 /* Optical alignment nudge — lift the Pics button to sit level with About. */
-.nav-link[data-view="pics"] { position: relative; top: -2px; }
+.nav-link[data-view="pics"] { position: relative; top: -1px; }
 
 /* ---------- Main page area (push down below the fixed topbar) ---------- */
 
@@ -172,15 +172,13 @@ html, body {
 }
 
 .gear-col { min-width: 0; text-align: center; }
-/* Nudge whole columns (title + video together) so the videos sit at matched
-   heights while their titles stay tight above them. */
-.gear-col--r10 { transform: translateY(5px); }
-.gear-col--scl { transform: translateY(20px); }
+/* Titles stay aligned across columns (top of the cell); only the videos are
+   nudged (below) so the clips sit at matched heights. */
 
 .gear-device {
   font-family: var(--font-sans);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.01em;
   color: var(--fg);
   margin: 0 0 2px;       /* sit close above its video */
@@ -206,8 +204,8 @@ html, body {
 
 /* The square camera-body clips display smaller (centred) so their height
    roughly matches the widescreen lens clip, each nudged down slightly. */
-.gear-video--r10 { width: 55%; }
-.gear-video--scl { width: 60%; }
+.gear-video--r10 { width: 55%; transform: translateY(5px); }
+.gear-video--scl { width: 60%; transform: translateY(20px); }
 
 .about-link {
   color: var(--fg);
@@ -322,7 +320,7 @@ html, body {
 /* EXIF caption below the dots */
 .hero-exif {
   padding: 2px 0 20px;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-sans);
   font-size: clamp(9px, 0.6vw + 3px, 12px);
   color: var(--muted);
   letter-spacing: 0.04em;
@@ -414,7 +412,7 @@ html, body {
 .tile-caption {
   margin-top: 4px;
   margin-bottom: 2px;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-sans);
   /* Scales with viewport so captions stay proportional to photo size.
      At ~1300px+ it caps at 10.5px; at ~700px it floors at 8px. */
   font-size: clamp(8px, 0.55vw + 3.5px, 10.5px);
