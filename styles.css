@@ -93,9 +93,6 @@ html, body {
 .nav-link:hover { transform: scale(1.14); color: #ffffff; }
 .nav-link.is-active { color: #ffffff; }
 
-/* Optical alignment nudge — lift the Pics button to sit level with About. */
-.nav-link[data-view="pics"] { position: relative; top: -1px; }
-
 /* ---------- Main page area (push down below the fixed topbar) ---------- */
 
 .page {
@@ -206,6 +203,11 @@ html, body {
    roughly matches the widescreen lens clip, each nudged down slightly. */
 .gear-video--r10 { width: 55%; transform: translateY(5px); }
 .gear-video--scl { width: 60%; transform: translateY(20px); }
+
+/* Lower the single-line camera-body titles so they sit level with the middle
+   of the Sigma entry's two-line title. */
+.gear-col--r10 .gear-device,
+.gear-col--scl .gear-device { transform: translateY(13px); }
 
 .about-link {
   color: var(--fg);
