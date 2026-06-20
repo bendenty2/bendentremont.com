@@ -10,7 +10,7 @@
   --rule: #ececec;
   --topbar-bg: #000000;
   --topbar-fg: #ffffff;
-  --topbar-height: 73px;
+  --topbar-height: 44px;
   --footer-height: 38px;            /* fixed bottom bar — roughly half the old footer */
   /* Gap and side padding scale with the viewport so photo proportions stay
      consistent whether the window is fullscreen or split. clamp(min, fluid, max). */
@@ -130,7 +130,7 @@ html, body {
   font-weight: 500;
 }
 
-.about-block { margin: 0 0 64px; }
+.about-block { margin: 0 0 51px; }
 .about-block:last-child { margin-bottom: 0; }
 
 /* Contact section: centred label + content (blurb and email). */
@@ -259,7 +259,7 @@ html, body {
 
 .hero-section {
   /* Same horizontal margins as the collage grid below. */
-  margin: 24px auto 0;
+  margin: 12px auto 0;
   padding: 0 var(--grid-side-pad);
 }
 
@@ -595,7 +595,7 @@ html, body {
 
 @media (max-width: 700px) {
   /* Taller footer so the copyright line has room to wrap to two lines. */
-  :root { --topbar-height: 62px; --footer-height: 56px; }
+  :root { --topbar-height: 37px; --footer-height: 56px; }
 
   .topbar { padding: 0 16px; }
   .topbar-brand { font-size: 13px; }
