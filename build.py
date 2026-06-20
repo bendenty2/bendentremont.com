@@ -102,11 +102,12 @@ ADD_WATERMARK = True                            # flip to False to skip the visi
 WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but readable
 
 # Video watermark: the same © mark, baked into clips by ffmpeg. Tuned for the
-# 1920x1080 Hi-8 footage — placed bottom-LEFT, because the bottom-right holds the
-# camcorder date stamp and the pillarbox side bars get cropped on display.
-VIDEO_WM_FONTSIZE = 26
-VIDEO_WM_X        = 310    # px from the left (just inside the croppable side bar)
-VIDEO_WM_PAD_Y    = 22     # px up from the bottom edge
+# 1920x1080 Hi-8 footage. Right-aligned like the stills, but raised ABOVE the
+# camcorder date stamp that sits in the very bottom-right corner; kept inside the
+# content so the cropped pillarbox side bars don't clip it.
+VIDEO_WM_FONTSIZE = 20
+VIDEO_WM_RIGHT    = 295    # px: text's right edge, measured from the frame's right
+VIDEO_WM_BOTTOM   = 255    # px: text's bottom, measured from the frame's bottom
 VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
 
@@ -429,7 +430,7 @@ def _transcode_watermarked(src: Path, dest: Path) -> bool:
     a_shad = 110 / 255                     # same subtle drop shadow
     vf = (f"drawtext=textfile=wm.txt:fontfile=font.ttf:fontsize={VIDEO_WM_FONTSIZE}:"
           f"fontcolor=white@{a_text:.3f}:shadowcolor=black@{a_shad:.3f}:"
-          f"shadowx=1:shadowy=1:x={VIDEO_WM_X}:y=h-th-{VIDEO_WM_PAD_Y}")
+          f"shadowx=1:shadowy=1:x=w-tw-{VIDEO_WM_RIGHT}:y=h-th-{VIDEO_WM_BOTTOM}")
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
            "-i", str(src), "-vf", vf,
            "-c:v", "libx264", "-crf", str(VIDEO_CRF), "-preset", "medium",
