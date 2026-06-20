@@ -467,8 +467,9 @@ def main() -> int:
 
     # Page order comes entirely from layout.txt: hero-tagged lines become the
     # slideshow, the rest become grid tiles, all in file order.
-    work_items: list[tuple]  = []   # grid: (Path, span, item_type, label)
-    hero_sources: list[Path] = []   # heroes in display order
+    work_items: list[tuple]  = []    # grid: (Path, span, item_type, label)
+    hero_sources: list[Path] = []    # heroes in display order
+    grid_roles: dict[str, str] = {}  # stem -> declared role, for a sanity check
     if LAYOUT_FILE.exists():
         for src, role, item_type, name in _read_layout():
             if role == "hero":
@@ -476,6 +477,8 @@ def main() -> int:
             else:
                 span = 2 if role == "medium" else 1
                 work_items.append((src, span, item_type, name))
+                if item_type == "photo":
+                    grid_roles[src.stem] = role
 
     if not hero_sources and not work_items:
         sys.stderr.write(
@@ -545,6 +548,23 @@ def main() -> int:
             print(f"  [{i:>3}/{len(photo_srcs)}] {lbl} -- {src.name}")
             if entry:
                 stem_to_entry[src.stem] = entry
+
+    # Sanity check: warn when a declared "small landscape/portrait" or "medium"
+    # role disagrees with the image's real orientation. The grid still renders by
+    # actual dimensions — this just flags likely typos in layout.txt.
+    _want = {"small_landscape": "landscape", "small_portrait": "portrait",
+             "medium": "landscape"}
+    for stem, role in grid_roles.items():
+        entry = stem_to_entry.get(stem)
+        if not entry or role not in _want:
+            continue
+        w, h = entry.get("width"), entry.get("height")
+        if w and h:
+            actual = "portrait" if h > w else "landscape"
+            if actual != _want[role]:
+                print(f"  ! role mismatch: {stem} is tagged "
+                      f"'{role.replace('_', ' ')}' but the image is {actual} "
+                      f"— rendered as {actual}")
 
     # Re-assemble in tile order, inserting videos inline.
     entries: list[dict] = []
