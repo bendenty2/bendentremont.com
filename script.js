@@ -371,7 +371,7 @@
         ph1U(ph4),                       // video or half-photo at pos 4
         ph1U(ph6),                       // half-photo at pos 6
       );
-      const gapPx  = GAP_PX;
+      const gapPx  = (window.innerWidth <= 700) ? GAP_PX + 6 : GAP_PX;
       const U_rows = Math.max(1, Math.ceil((U_content + gapPx) / ROW_PX));
 
       // ── Consume items (advance bucket indices) ──────────────────────────

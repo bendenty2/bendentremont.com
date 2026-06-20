@@ -643,6 +643,14 @@ html, body {
   /* Dividers span the content width with no edge overhang (avoid h-overflow). */
   .section-divider,
   .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
+
+  /* Clamp columns to their share so wide images/captions can't stretch a column
+     past the screen edge (kills the horizontal scroll). */
+  .grid { grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); }
+  .tile { min-width: 0; }
+
+  /* Smaller captions so the tiles feel less busy at phone size. */
+  .tile-caption { font-size: 6.5px; }
 }
 
 /* ---------- Reduced motion ----------
