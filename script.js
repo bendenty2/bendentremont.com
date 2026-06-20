@@ -179,8 +179,8 @@
   // ---------- Column-count ----------
 
   function getColumnCount() {
-    const w = window.innerWidth;
-    if (w <= 700) return 2;
+    // Same 3-column masonry pattern on every screen. On phones the tiles just
+    // get smaller — tap a photo for the full-size view.
     return 3;
   }
 
@@ -273,7 +273,92 @@
     return Math.round((imgH + CAPTION_H_PHOTO) / ROW_PX) + 2;
   }
 
+  // ---------- Mobile grid ----------
+  // Phones get a simpler 2-column layout instead of the desktop tiling pattern.
+  // Every photo keeps its native 3:2 / 2:3 aspect (no cropping). Tiles are laid
+  // out as "4-small" interlock blocks (2 portraits + 2 landscapes — each column
+  // is one portrait + one landscape, so the two columns self-balance to equal
+  // height) and full-width "medium" bands, interleaved so no two mediums ever
+  // stack. Videos are dispersed evenly through the landscape slots and shown at
+  // 3:2 like a small landscape. Relies on `grid-auto-flow: row dense` (set in
+  // CSS) to pack the interlock.
+  function renderGridMobile(list) {
+    grid.innerHTML = "";
+    grid.style.setProperty("--cols", 2);
+    grid.dataset.cols = 2;
+    const { colW, colGap } = getGridMetrics(2);
+    // Tunable vertical-spacing knobs (px). Mobile grid-auto-rows is 1px (see the
+    // mobile CSS) so these land near-exactly. CAP_OFFSET must match the
+    // .tile-caption margin-top in the mobile media query.
+    const MROW       = 1;    // px per grid row on mobile
+    const CAP_OFFSET = 5;    // caption sits this far below its photo
+    const CAP_TEXT   = 8;    // caption text line height (~6px font)
+    const TILE_GAP   = 8;    // empty gap below each tile, before the next one
+    const reserve    = CAP_OFFSET + CAP_TEXT + TILE_GAP;
+
+    const mediums = [], portraits = [], landscapes = [], videos = [];
+    list.forEach(it => {
+      if (it.type === "video") videos.push(it);
+      else if (it.span === 2) mediums.push(it);
+      else if (!it.width || !it.height || it.height > it.width) portraits.push(it);
+      else landscapes.push(it);
+    });
+
+    // Order the videos as they should appear down the page (they get dispersed
+    // through the landscape slots below in this order).
+    const VIDEO_ORDER = ["Tape1_clip1_beach", "Tape1_clip13_rewind_fire3", "Tape1_clip5_fire3"];
+    videos.sort((a, b) => VIDEO_ORDER.indexOf(a.id) - VIDEO_ORDER.indexOf(b.id));
+
+    // Too many full-width mediums to space out in 2 columns — demote the extras
+    // to small single-column landscapes so none end up stacked.
+    while (mediums.length > 11) landscapes.push(mediums.pop());
+
+    // Disperse the videos evenly through the landscape stream.
+    const land = landscapes.slice();
+    videos.forEach((v, k) => {
+      const pos = Math.round((k + 1) / (videos.length + 1) * (land.length + 1));
+      land.splice(Math.max(0, Math.min(pos, land.length)), 0, v);
+    });
+
+    // Small-content groups: 4-small interlock blocks (emit order L P P L), then
+    // any leftover landscapes as side-by-side pairs.
+    const smalls = [];
+    let li = 0, pi = 0;
+    while (pi + 1 < portraits.length && li + 1 < land.length) {
+      smalls.push([land[li], portraits[pi], portraits[pi + 1], land[li + 1]]);
+      li += 2; pi += 2;
+    }
+    while (li + 1 < land.length) { smalls.push([land[li], land[li + 1]]); li += 2; }
+
+    // Interleave: small group, medium, small group, medium, …
+    const seq = [];
+    let mi = 0;
+    smalls.forEach(group => {
+      group.forEach(it => seq.push({ item: it, span2: false }));
+      if (mi < mediums.length) seq.push({ item: mediums[mi++], span2: true });
+    });
+    while (mi < mediums.length) seq.push({ item: mediums[mi++], span2: true });
+    while (li < land.length)      seq.push({ item: land[li++], span2: false });
+    while (pi < portraits.length) seq.push({ item: portraits[pi++], span2: false });
+
+    items = seq.map(e => e.item);
+
+    seq.forEach(({ item, span2 }, i) => {
+      const tile = buildTile(item, i);
+      tile.style.gridColumn = span2 ? "span 2" : "span 1";
+      const dispW = span2 ? (colW * 2 + colGap) : colW;
+      const imgH  = item.type === "video"
+        ? dispW / VIDEO_CROP_RATIO            // videos shown at 3:2
+        : dispW * item.height / item.width;   // photos at native aspect
+      // Reserve image + caption + gap. The same reserve on every tile keeps a
+      // block's two columns equal height.
+      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil((imgH + reserve) / MROW))}`;
+      grid.appendChild(tile);
+    });
+  }
+
   function renderGrid(list) {
+    if (window.innerWidth <= 700) { renderGridMobile(list); return; }
     const cols = getColumnCount();
     grid.innerHTML = "";
     grid.style.setProperty("--cols", cols);
@@ -413,7 +498,9 @@
       // translations create (tiles move up but grid rows stay allocated).
       // trimRows scales with U_rows so the correction stays proportional at
       // any viewport width or zoom level.
-      const trimRows = (groupPos === 5 || groupPos === 6)
+      // Desktop only: the trim closes a gap created by the negative TILE_PADDING
+      // nudges. On mobile tiles cover-fill, so we skip both nudges and trim.
+      const trimRows = (window.innerWidth > 700 && (groupPos === 5 || groupPos === 6))
         ? Math.round((GROUP_END_TRIM || 0) * U_rows)
         : 0;
 
@@ -440,7 +527,9 @@
       let appliedPadPx = 0;
       if (SEQUENCE_PADDING.length > 0) {
         appliedPadPx = SEQUENCE_PADDING[seqIdx] || 0;
-      } else if (groupPos !== undefined) {
+      } else if (groupPos !== undefined && window.innerWidth > 700) {
+        // TILE_PADDING corrects natural-aspect image slack on desktop. Mobile
+        // cover-fills tiles (no slack), so no per-tile nudge is needed.
         const frac = TILE_PADDING[groupPos] ?? 0;
         appliedPadPx = frac ? Math.round(frac * U_rows * ROW_PX) : 0;
       }
@@ -453,9 +542,13 @@
   }
 
   let resizeTimer = null;
+  let lastWidth = window.innerWidth;
   function onResize() {
-    // Re-render on every resize (debounced): column count may change, or the
-    // column widths may have shifted, both of which affect the row-span maths.
+    // The masonry layout depends only on the viewport WIDTH. Ignore height-only
+    // resizes — notably the mobile address bar showing/hiding as you scroll —
+    // otherwise rebuilding the grid mid-scroll yanks you back to the top.
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       requestAnimationFrame(() => renderGrid(allItems));

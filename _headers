@@ -14,3 +14,8 @@
 
 /*
   X-Robots-Tag: noindex, nofollow
+
+# NOTE: Cloudflare Pages caches CSS/JS for 4h and ignores Cache-Control set here
+# (it enforces its own asset caching). To force fresh CSS/JS we cache-bust via a
+# ?v=<version> query on the <link>/<script> tags in index.html — bump it whenever
+# styles.css or script.js changes.
