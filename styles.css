@@ -140,10 +140,10 @@ html, body {
    inside the about panel it spans the (already padded) content width. */
 .section-divider {
   border: 0;
-  border-top: 1px solid #eeeeee;   /* fine, light line */
+  border-top: 1px solid #e4e4e4;   /* fine line */
   height: 0;
-  /* hero rule overhangs the hero photo's edges a little; raised 10px (top 16 vs 26) */
-  margin: 16px calc(var(--grid-side-pad) - 32px) 26px;
+  /* hero rule overhangs the hero photo's edges a little; raised 20px (top 6 vs 26) */
+  margin: 6px calc(var(--grid-side-pad) - 32px) 26px;
 }
 .about-panel .section-divider {
   width: 60%;            /* 40% shorter, centred */
@@ -248,7 +248,7 @@ html, body {
   min-height: var(--footer-height);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   padding: 6px clamp(16px, 4vw, 48px);
   background: var(--topbar-bg);
   text-align: center;
