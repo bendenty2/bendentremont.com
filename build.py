@@ -106,7 +106,7 @@ WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but r
 # date stamp, a letter's height in from the bottom and right edges; kept inside
 # the content so the cropped pillarbox side bars don't clip it.
 VIDEO_WM_FONTSIZE = 20
-VIDEO_WM_RIGHT    = 304    # px: text's right edge, measured from the frame's right
+VIDEO_WM_RIGHT    = 324    # px: text's right edge, measured from the frame's right
 VIDEO_WM_BOTTOM   = 16     # px: text's bottom, measured from the frame's bottom
 VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
