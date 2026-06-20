@@ -14,3 +14,10 @@
 
 /*
   X-Robots-Tag: noindex, nofollow
+
+# Dev preview: never long-cache CSS/JS, so layout/script edits show up on the
+# next load instead of being held for hours (Cloudflare Pages defaults to 4h).
+/*.css
+  Cache-Control: no-cache
+/*.js
+  Cache-Control: no-cache
