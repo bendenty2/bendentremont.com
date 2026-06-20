@@ -15,12 +15,7 @@
 /*
   X-Robots-Tag: noindex, nofollow
 
-# Dev preview: never long-cache CSS/JS, so layout/script edits show up on the
-# next load instead of being held for hours (Cloudflare Pages defaults to 4h).
-# Exact paths — Cloudflare _headers does not support extension globs.
-/styles.css
-  Cache-Control: no-cache
-/script.js
-  Cache-Control: no-cache
-/manifest.js
-  Cache-Control: no-cache
+# NOTE: Cloudflare Pages caches CSS/JS for 4h and ignores Cache-Control set here
+# (it enforces its own asset caching). To force fresh CSS/JS we cache-bust via a
+# ?v=<version> query on the <link>/<script> tags in index.html — bump it whenever
+# styles.css or script.js changes.
