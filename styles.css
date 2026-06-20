@@ -130,11 +130,21 @@ html, body {
   font-weight: 500;
 }
 
-.about-block { margin: 0 0 51px; }
+.about-block { margin: 0; }
 .about-block:last-child { margin-bottom: 0; }
 
 /* Contact section: centred label + content (blurb and email). */
 .about-block--contact { text-align: center; }
+
+/* Thin section-divider rule. Default inset matches the grid/hero side padding;
+   inside the about panel it spans the (already padded) content width. */
+.section-divider {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  height: 0;
+  margin: 26px var(--grid-side-pad);
+}
+.about-panel .section-divider { margin: 28px 0; }
 
 .about-subhead {
   font-size: 12.5px;
