@@ -140,10 +140,10 @@ html, body {
    inside the about panel it spans the (already padded) content width. */
 .section-divider {
   border: 0;
-  border-top: 1px solid #f0f0f0;   /* lighter = finer line */
+  border-top: 1px solid #eeeeee;   /* fine, light line */
   height: 0;
-  /* hero rule overhangs the hero photo's edges by a little */
-  margin: 26px calc(var(--grid-side-pad) - 32px);
+  /* hero rule overhangs the hero photo's edges a little; raised 10px (top 16 vs 26) */
+  margin: 16px calc(var(--grid-side-pad) - 32px) 26px;
 }
 .about-panel .section-divider {
   width: 60%;            /* 40% shorter, centred */
