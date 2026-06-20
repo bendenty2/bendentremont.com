@@ -61,16 +61,17 @@ TITLES_PATH = SOURCE_DIR / "titles.json"
 
 # Source subfolders — place your images/videos into these.
 #
-#   large_photos/   -> hero images shown in the slideshow above the grid
-#
 #   grid/           -> a flat folder holding every grid photo and video.
-#   layout.txt      -> the running order of the grid, one item per line, top to
-#                      bottom. Each line is a filename in grid/ (extension
-#                      optional); append "  medium" to make it a span-2 (full
-#                      width) tile. Portrait vs landscape is read from the image,
-#                      videos from the extension, titles from titles.json.
-#                      Reorder by moving lines; add content by dropping a file in
-#                      grid/ and adding a line. (See the header inside layout.txt.)
+#   large_photos/   -> the pool of hero (slideshow) images.
+#   layout.txt      -> the whole page, top to bottom — one item per line:
+#                      "<filename> <role>". Roles: hero (slideshow, listed
+#                      first), medium (span-2 grid tile), "small landscape" /
+#                      "small portrait" (half-width grid tiles). Videos take no
+#                      role (detected by extension). Filenames resolve from grid/
+#                      or large_photos/; the extension is optional. Titles come
+#                      from titles.json. Reorder by moving lines; add content by
+#                      dropping a file in the folder and adding a line. (See the
+#                      header inside layout.txt.)
 #
 #   tiles/tileN/    -> LEGACY fallback, used only when layout.txt is absent. Each
 #                      subfolder is one 7-item group of named slots
@@ -456,21 +457,25 @@ def main() -> int:
             if p.is_file() and p.suffix.lower() in SUPPORTED_EXTS
         )
 
-    def _resolve_grid_file(name: str) -> Path | None:
-        # Find a file in grid/ by name; the extension is optional in layout.txt.
-        direct = GRID_DIR / name
-        if direct.is_file():
-            return direct
-        if GRID_DIR.exists():
-            for p in sorted(GRID_DIR.glob(name + ".*")):
-                if p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS):
-                    return p
+    def _resolve_source(name: str) -> Path | None:
+        # Find a file by name in grid/ (grid items) or large_photos/ (heroes);
+        # the extension is optional in layout.txt.
+        for folder in (GRID_DIR, LARGE_PHOTOS_DIR):
+            direct = folder / name
+            if direct.is_file():
+                return direct
+            if folder.exists():
+                for p in sorted(folder.glob(name + ".*")):
+                    if p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS):
+                        return p
         return None
 
     def _read_layout() -> list[tuple]:
-        # Parse layout.txt -> [(Path, span, item_type, label)] in file order.
-        # One item per line: "<filename> [medium]". '#' starts a comment.
-        work: list[tuple] = []
+        # Parse layout.txt -> [(Path, role, item_type, name)] in file order.
+        # One item per line: "<filename> [role]", role one of: hero, medium,
+        # "small landscape", "small portrait". Videos take no role (detected by
+        # extension). '#' starts a comment; blank lines are ignored.
+        entries: list[tuple] = []
         for lineno, raw in enumerate(
                 LAYOUT_FILE.read_text(encoding="utf-8").splitlines(), 1):
             line = raw.split("#", 1)[0].strip()
@@ -478,16 +483,28 @@ def main() -> int:
                 continue
             parts = line.split()
             name  = parts[0]
-            tags  = {p.lower() for p in parts[1:]}
-            span  = 2 if "medium" in tags else 1
-            src   = _resolve_grid_file(name)
+            tag   = " ".join(parts[1:]).lower()
+            src   = _resolve_source(name)
             if not src:
-                print(f"  ! layout.txt line {lineno}: no file for '{name}' "
-                      f"in {GRID_DIR.name}/")
+                print(f"  ! layout.txt line {lineno}: no file for '{name}'")
                 continue
-            item_type = "video" if src.suffix.lower() in VIDEO_EXTS else "photo"
-            work.append((src, span, item_type, name))
-        return work
+            if src.suffix.lower() in VIDEO_EXTS:
+                role, item_type = "video", "video"
+            elif tag == "hero":
+                role, item_type = "hero", "photo"
+            elif tag == "medium":
+                role, item_type = "medium", "photo"
+            elif tag in ("small landscape", "landscape"):
+                role, item_type = "small_landscape", "photo"
+            elif tag in ("small portrait", "portrait"):
+                role, item_type = "small_portrait", "photo"
+            else:
+                if tag:
+                    print(f"  ! layout.txt line {lineno}: unknown role '{tag}' "
+                          f"for {name}; treating as a small grid photo")
+                role, item_type = "small", "photo"
+            entries.append((src, role, item_type, name))
+        return entries
 
     # ---- Slot definitions -------------------------------------------------------
     # Each entry: (subfolder_name, span, item_type)
@@ -514,14 +531,19 @@ def main() -> int:
 
     # ---- Discover sources -------------------------------------------------------
 
-    large_sources = _scan_photos(LARGE_PHOTOS_DIR)
-
-    # Grid order: prefer layout.txt + the flat grid/ folder; fall back to the
-    # legacy tiles/ folder structure when no layout file is present.
-    work_items: list[tuple] = []   # (Path, span, item_type, label)
+    # Page order: prefer layout.txt (heroes + grid, in order); otherwise fall
+    # back to scanning large_photos/ for heroes and the legacy tiles/ structure
+    # for the grid.
+    work_items: list[tuple]  = []   # grid: (Path, span, item_type, label)
+    hero_sources: list[Path] = []   # heroes in display order
     if LAYOUT_FILE.exists():
-        work_items = _read_layout()
-        grid_desc  = f"layout.txt + {GRID_DIR.name}/"
+        for src, role, item_type, name in _read_layout():
+            if role == "hero":
+                hero_sources.append(src)
+            else:
+                span = 2 if role == "medium" else 1
+                work_items.append((src, span, item_type, name))
+        grid_desc = f"layout.txt + {GRID_DIR.name}/"
     else:
         for tile_dir in _get_sorted_tile_dirs(TILES_DIR):
             n     = _tile_num(tile_dir.name)
@@ -536,23 +558,26 @@ def main() -> int:
                     print(f"  ! slot missing: {tile_dir.name}/{slot_name}")
         grid_desc = f"{TILES_DIR.name}/ (legacy)"
 
-    if not large_sources and not work_items:
+    # Heroes fall back to scanning large_photos/ when layout.txt names none.
+    if not hero_sources:
+        hero_sources = _scan_photos(LARGE_PHOTOS_DIR)
+
+    if not hero_sources and not work_items:
         sys.stderr.write(
             "No photos or videos found. Expected:\n"
-            f"  {LARGE_PHOTOS_DIR}/\n"
             f"  {GRID_DIR}/ + {LAYOUT_FILE}\n"
-            f"  (or legacy {TILES_DIR}/tile1/ ...)\n"
+            f"  (heroes in {LARGE_PHOTOS_DIR}/; or legacy {TILES_DIR}/tile1/ ...)\n"
         )
         return 1
 
     photo_work        = [(src, span, lbl) for src, span, t, lbl in work_items if t == "photo"]
     video_work        = [(src, lbl)       for src, span, t, lbl in work_items if t == "video"]
-    all_photo_sources = large_sources + [src for src, *_ in photo_work]
+    all_photo_sources = hero_sources + [src for src, *_ in photo_work]
     all_video_sources = [src for src, _ in video_work]
 
     n_medium = sum(1 for _s, span, t, _l in work_items if t == "photo" and span == 2)
     print(
-        f"Found  {len(large_sources)} hero  |  grid from {grid_desc}  |  "
+        f"Found  {len(hero_sources)} hero  |  grid from {grid_desc}  |  "
         f"{len(photo_work)} grid photos ({n_medium} medium)  |  "
         f"{len(video_work)} videos"
     )
@@ -578,11 +603,11 @@ def main() -> int:
     workers      = max(1, os.cpu_count() or 4)
     hero_entries: list[dict] = []
 
-    if large_sources:
+    if hero_sources:
         worker_hero = partial(process_one, titles=titles, span=1)
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            for i, entry in enumerate(pool.map(worker_hero, large_sources), 1):
-                print(f"  [hero {i:>2}/{len(large_sources)}] {large_sources[i-1].name}")
+            for i, entry in enumerate(pool.map(worker_hero, hero_sources), 1):
+                print(f"  [hero {i:>2}/{len(hero_sources)}] {hero_sources[i-1].name}")
                 if entry:
                     hero_entries.append(entry)
 
