@@ -649,11 +649,12 @@ html, body {
   .grid { grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); }
   .tile { min-width: 0; }
 
-  /* Smaller captions, nudged up toward the photo above them. */
-  .tile-caption { font-size: 5px; margin-top: 1px; margin-bottom: 4px; }
+  /* Smaller captions, nudged up a touch (midpoint of the original and the
+     too-high version). */
+  .tile-caption { font-size: 5px; margin-top: 2.5px; margin-bottom: 3px; }
   /* Empty video caption matches the photo caption height so a video's bottom
      edge lines up with its neighbouring photo's bottom. */
-  .tile--video .tile-caption { margin-bottom: 10px; }
+  .tile--video .tile-caption { margin-bottom: 9px; }
 
   /* Cover-fill each tile so every tile of a type is the exact same height and
      the photo/video edges line up perfectly (tap a tile for the full image). */
@@ -667,6 +668,9 @@ html, body {
     aspect-ratio: auto;
     clip-path: none;
   }
+  /* Bias the crop toward the right edge so the bottom-right timestamp isn't
+     clipped off (the centred crop was cutting it). */
+  .tile--video .video-crop-wrapper video { transform: translateX(-65%) scaleX(1.28); }
 
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
