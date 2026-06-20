@@ -11,7 +11,7 @@
   --topbar-bg: #000000;
   --topbar-fg: #ffffff;
   --topbar-height: 44px;
-  --footer-height: 38px;            /* fixed bottom bar — roughly half the old footer */
+  --footer-height: 28px;            /* fixed bottom bar */
   /* Gap and side padding scale with the viewport so photo proportions stay
      consistent whether the window is fullscreen or split. clamp(min, fluid, max). */
   --gap: clamp(4px, 0.5vw, 8px);              /* vertical gap between stacked tiles */
@@ -142,8 +142,8 @@ html, body {
   border: 0;
   border-top: 1px solid #e4e4e4;   /* fine line */
   height: 0;
-  /* hero rule overhangs the hero photo's edges a little; raised 20px (top 6 vs 26) */
-  margin: 6px calc(var(--grid-side-pad) - 32px) 26px;
+  /* hero rule overhangs the hero photo's edges a little; raised 30px (top -4 vs 26) */
+  margin: -4px calc(var(--grid-side-pad) - 32px) 26px;
 }
 .about-panel .section-divider {
   width: 60%;            /* 40% shorter, centred */
@@ -609,7 +609,7 @@ html, body {
 
 @media (max-width: 700px) {
   /* Taller footer so the copyright line has room to wrap to two lines. */
-  :root { --topbar-height: 37px; --footer-height: 56px; }
+  :root { --topbar-height: 37px; --footer-height: 42px; }
 
   .topbar { padding: 0 16px; }
   .topbar-brand { font-size: 13px; }
