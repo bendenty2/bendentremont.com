@@ -130,8 +130,11 @@ html, body {
   font-weight: 500;
 }
 
-.about-block { margin: 0 0 32px; }
+.about-block { margin: 0 0 64px; }
 .about-block:last-child { margin-bottom: 0; }
+
+/* Contact section: centred label + content (blurb and email). */
+.about-block--contact { text-align: center; }
 
 .about-subhead {
   font-size: 12.5px;
@@ -140,6 +143,7 @@ html, body {
   color: #565656;
   font-weight: 500;
   margin: 0 0 12px;
+  text-align: center;
 }
 
 .about-text { margin: 0 0 12px; }
