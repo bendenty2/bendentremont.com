@@ -643,10 +643,14 @@ html, body {
   .gear-col--r10 .gear-device,
   .gear-col--scl .gear-device { transform: none; }
 
-  /* Stack-spacing tweaks: more room above the R10 entry, and pull the R10 clip
-     up toward its own label. */
+  /* Stack-spacing tweaks: more room above the R10 entry, and tighten the R10
+     label-to-clip gap. The R10 clip has ~33% empty white space on top (camera
+     sits low in frame), so we clip that top region away and pull the clip up by
+     the same proportion — the camera rises toward its label, while the cropped
+     (transparent) top no longer covers the label. Proportional units so it
+     holds as the clip scales with screen width. */
   .gear-col--r10 { margin-top: 5px; }
-  .gear-video--r10 { margin-top: -31px; }
+  .gear-video--r10 { margin-top: -14.5%; clip-path: inset(30% 0 0 0); }
 
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
