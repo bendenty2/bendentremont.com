@@ -623,7 +623,7 @@ html, body {
   }
 
   /* The hero ignores the grid margins and runs nearly full-width. */
-  .hero-section { padding: 0 8px; }
+  .hero-section { padding: 0 16px; }
 
   .topbar { padding: 0 16px; }
   .topbar-brand { font-size: 13px; }

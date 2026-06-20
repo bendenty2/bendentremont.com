@@ -338,9 +338,9 @@
       const imgH  = item.type === "video"
         ? dispW / VIDEO_CROP_RATIO            // videos shown at 3:2
         : dispW * item.height / item.width;   // photos at native aspect
-      // +2 rows (row-gap is 0) gives the vertical breathing room between tiles.
-      // The same +2 on every tile keeps a block's two columns equal height.
-      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil((imgH + capH) / ROW_PX) + 2)}`;
+      // +1 row (row-gap is 0) gives the vertical breathing room between tiles.
+      // The same +1 on every tile keeps a block's two columns equal height.
+      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil((imgH + capH) / ROW_PX) + 1)}`;
       grid.appendChild(tile);
     });
   }
