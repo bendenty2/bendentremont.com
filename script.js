@@ -273,7 +273,80 @@
     return Math.round((imgH + CAPTION_H_PHOTO) / ROW_PX) + 2;
   }
 
+  // ---------- Mobile grid ----------
+  // Phones get a simpler 2-column layout instead of the desktop tiling pattern.
+  // Every photo keeps its native 3:2 / 2:3 aspect (no cropping). Tiles are laid
+  // out as "4-small" interlock blocks (2 portraits + 2 landscapes — each column
+  // is one portrait + one landscape, so the two columns self-balance to equal
+  // height) and full-width "medium" bands, interleaved so no two mediums ever
+  // stack. Videos are dispersed evenly through the landscape slots and shown at
+  // 3:2 like a small landscape. Relies on `grid-auto-flow: row dense` (set in
+  // CSS) to pack the interlock.
+  function renderGridMobile(list) {
+    grid.innerHTML = "";
+    grid.style.setProperty("--cols", 2);
+    grid.dataset.cols = 2;
+    const { colW, colGap } = getGridMetrics(2);
+    const capH = 14;  // approx mobile caption height, reserved in the row span
+
+    const mediums = [], portraits = [], landscapes = [], videos = [];
+    list.forEach(it => {
+      if (it.type === "video") videos.push(it);
+      else if (it.span === 2) mediums.push(it);
+      else if (!it.width || !it.height || it.height > it.width) portraits.push(it);
+      else landscapes.push(it);
+    });
+
+    // Too many full-width mediums to space out in 2 columns — demote the extras
+    // to small single-column landscapes so none end up stacked.
+    while (mediums.length > 11) landscapes.push(mediums.pop());
+
+    // Disperse the videos evenly through the landscape stream.
+    const land = landscapes.slice();
+    videos.forEach((v, k) => {
+      const pos = Math.round((k + 1) / (videos.length + 1) * (land.length + 1));
+      land.splice(Math.max(0, Math.min(pos, land.length)), 0, v);
+    });
+
+    // Small-content groups: 4-small interlock blocks (emit order L P P L), then
+    // any leftover landscapes as side-by-side pairs.
+    const smalls = [];
+    let li = 0, pi = 0;
+    while (pi + 1 < portraits.length && li + 1 < land.length) {
+      smalls.push([land[li], portraits[pi], portraits[pi + 1], land[li + 1]]);
+      li += 2; pi += 2;
+    }
+    while (li + 1 < land.length) { smalls.push([land[li], land[li + 1]]); li += 2; }
+
+    // Interleave: small group, medium, small group, medium, …
+    const seq = [];
+    let mi = 0;
+    smalls.forEach(group => {
+      group.forEach(it => seq.push({ item: it, span2: false }));
+      if (mi < mediums.length) seq.push({ item: mediums[mi++], span2: true });
+    });
+    while (mi < mediums.length) seq.push({ item: mediums[mi++], span2: true });
+    while (li < land.length)      seq.push({ item: land[li++], span2: false });
+    while (pi < portraits.length) seq.push({ item: portraits[pi++], span2: false });
+
+    items = seq.map(e => e.item);
+
+    seq.forEach(({ item, span2 }, i) => {
+      const tile = buildTile(item, i);
+      tile.style.gridColumn = span2 ? "span 2" : "span 1";
+      const dispW = span2 ? (colW * 2 + colGap) : colW;
+      const imgH  = item.type === "video"
+        ? dispW / VIDEO_CROP_RATIO            // videos shown at 3:2
+        : dispW * item.height / item.width;   // photos at native aspect
+      // +2 rows (row-gap is 0) gives the vertical breathing room between tiles.
+      // The same +2 on every tile keeps a block's two columns equal height.
+      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil((imgH + capH) / ROW_PX) + 2)}`;
+      grid.appendChild(tile);
+    });
+  }
+
   function renderGrid(list) {
+    if (window.innerWidth <= 700) { renderGridMobile(list); return; }
     const cols = getColumnCount();
     grid.innerHTML = "";
     grid.style.setProperty("--cols", cols);

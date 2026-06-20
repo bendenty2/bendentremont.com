@@ -614,12 +614,12 @@ html, body {
 /* ---------- Mobile: compact topbar ---------- */
 
 @media (max-width: 700px) {
-  /* Phones: tiny side padding (the desktop 96px min wastes most of the screen)
-     and compact bars. */
+  /* Phones get a dedicated 2-column layout (built in renderGridMobile). Wide
+     side margins keep the grid from filling the screen edge-to-edge. */
   :root {
     --topbar-height: 37px;
     --footer-height: 42px;
-    --grid-side-pad: 16px;
+    --grid-side-pad: 70px;
   }
 
   .topbar { padding: 0 16px; }
@@ -640,42 +640,40 @@ html, body {
   .gear-col--r10 .gear-device,
   .gear-col--scl .gear-device { transform: none; }
 
-  /* Dividers span the content width with no edge overhang (avoid h-overflow). */
-  .section-divider,
-  .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
-
-  /* Clamp columns to their share so wide images/captions can't stretch a column
-     past the screen edge (kills the horizontal scroll). */
-  .grid { grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); }
-  .tile { min-width: 0; }
-
-  /* Smaller captions, nudged up a touch (midpoint of the original and the
-     too-high version). */
-  .tile-caption { font-size: 5px; margin-top: 2.5px; margin-bottom: 3px; }
-  /* Empty video caption matches the photo caption height so a video's bottom
-     edge lines up with its neighbouring photo's bottom. */
-  .tile--video .tile-caption { margin-bottom: 9px; }
-
-  /* Cover-fill each tile so every tile of a type is the exact same height and
-     the photo/video edges line up perfectly (tap a tile for the full image). */
-  .tile { align-self: stretch; }
-  .tile img { flex: 1 1 0; min-height: 0; object-fit: cover; }
-  /* Video: let the wrapper fill the tile but keep the desktop scaleX crop, which
-     hides the pillarbox bars (object-fit:cover left them showing). */
-  .tile--video .video-crop-wrapper {
-    flex: 1 1 0;
-    min-height: 0;
-    aspect-ratio: auto;
-    clip-path: none;
-  }
-  /* Bias the crop toward the right edge so the bottom-right timestamp isn't
-     clipped off (the centred crop was cutting it). */
-  .tile--video .video-crop-wrapper video { transform: translateX(-65%) scaleX(1.28); }
-
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
   .gear-col--r10   { order: 2; }
   .gear-col--scl   { order: 3; }
+
+  /* Dividers span the content width with no edge overhang (avoid h-overflow). */
+  .section-divider,
+  .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
+
+  /* Two columns; photos keep their native 3:2 / 2:3 aspect (no cropping), so
+     tiles size to their image. minmax(0,1fr) stops a wide tile from stretching
+     a column past the screen edge. */
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile { min-width: 0; }
+  .tile-caption { font-size: 6px; margin-top: 2px; margin-bottom: 4px; }
+
+  /* Grid videos sit in the 3:2 landscape slots. The source is 16:9 with ~15%
+     black bars each side (5:4 content); scale it up so the bars overflow and
+     clip, and bottom-anchor it so the corner timestamp stays in view. */
+  .tile--video .video-crop-wrapper {
+    aspect-ratio: 3 / 2;
+    clip-path: none;
+  }
+  .tile--video .video-crop-wrapper video {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    top: auto;
+    width: 143%;
+    height: auto;
+    transform: translateX(-50%);
+  }
+  /* Keep the mobile framing on tap/hover (the desktop hover adds scaleX). */
+  .tile--video:hover .video-crop-wrapper video { transform: translateX(-50%); }
 }
 
 /* ---------- Reduced motion ----------
