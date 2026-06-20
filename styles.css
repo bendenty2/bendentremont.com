@@ -149,6 +149,12 @@ html, body {
   width: 60%;            /* 40% shorter, centred */
   margin: 28px auto;
 }
+/* GEAR/CONTACT rules match the hero rule's length (overhang past the content edges). */
+.about-panel .section-divider--full {
+  width: auto;
+  margin-left: -32px;
+  margin-right: -32px;
+}
 
 .about-subhead {
   font-size: 12.5px;
