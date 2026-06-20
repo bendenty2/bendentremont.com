@@ -649,27 +649,29 @@ html, body {
   .grid { grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); }
   .tile { min-width: 0; }
 
-  /* Smaller captions so the tiles feel less busy at phone size. */
-  .tile-caption { font-size: 6.5px; }
+  /* Smaller captions, nudged up toward the photo above them. */
+  .tile-caption { font-size: 5px; margin-top: 1px; margin-bottom: 4px; }
+  /* Empty video caption matches the photo caption height so a video's bottom
+     edge lines up with its neighbouring photo's bottom. */
+  .tile--video .tile-caption { margin-bottom: 10px; }
 
   /* Cover-fill each tile so every tile of a type is the exact same height and
      the photo/video edges line up perfectly (tap a tile for the full image). */
   .tile { align-self: stretch; }
   .tile img { flex: 1 1 0; min-height: 0; object-fit: cover; }
+  /* Video: let the wrapper fill the tile but keep the desktop scaleX crop, which
+     hides the pillarbox bars (object-fit:cover left them showing). */
   .tile--video .video-crop-wrapper {
     flex: 1 1 0;
     min-height: 0;
     aspect-ratio: auto;
     clip-path: none;
   }
-  .tile--video .video-crop-wrapper video {
-    position: static;
-    width: 100%;
-    height: 100%;
-    left: auto;
-    transform: none;
-    object-fit: cover;
-  }
+
+  /* About: show the Sigma lens first in the single-column stack, then the R10. */
+  .gear-col--sigma { order: 1; }
+  .gear-col--r10   { order: 2; }
+  .gear-col--scl   { order: 3; }
 }
 
 /* ---------- Reduced motion ----------
