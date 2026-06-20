@@ -453,9 +453,13 @@
   }
 
   let resizeTimer = null;
+  let lastWidth = window.innerWidth;
   function onResize() {
-    // Re-render on every resize (debounced): column count may change, or the
-    // column widths may have shifted, both of which affect the row-span maths.
+    // The masonry layout depends only on the viewport WIDTH. Ignore height-only
+    // resizes — notably the mobile address bar showing/hiding as you scroll —
+    // otherwise rebuilding the grid mid-scroll yanks you back to the top.
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       requestAnimationFrame(() => renderGrid(allItems));

@@ -614,8 +614,13 @@ html, body {
 /* ---------- Mobile: compact topbar ---------- */
 
 @media (max-width: 700px) {
-  /* Taller footer so the copyright line has room to wrap to two lines. */
-  :root { --topbar-height: 37px; --footer-height: 42px; }
+  /* Phones: tiny side padding (the desktop 96px min wastes most of the screen)
+     and compact bars. */
+  :root {
+    --topbar-height: 37px;
+    --footer-height: 42px;
+    --grid-side-pad: 16px;
+  }
 
   .topbar { padding: 0 16px; }
   .topbar-brand { font-size: 13px; }
@@ -626,6 +631,17 @@ html, body {
     grid-template-columns: 1fr;
     gap: 24px;
   }
+
+  /* Gear clips: one consistent size in the stack; drop the desktop nudges. */
+  .gear-video,
+  .gear-video--r10,
+  .gear-video--scl { width: 72%; transform: none; }
+  .gear-col--r10 .gear-device,
+  .gear-col--scl .gear-device { transform: none; }
+
+  /* Dividers span the content width with no edge overhang (avoid h-overflow). */
+  .section-divider,
+  .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
 }
 
 /* ---------- Reduced motion ----------
