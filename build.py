@@ -101,6 +101,14 @@ WATERMARK_TEXT = f"© {COPYRIGHT_HOLDER}"
 ADD_WATERMARK = True                            # flip to False to skip the visible mark
 WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but readable
 
+# Video watermark: the same © mark, baked into clips by ffmpeg. Tuned for the
+# 1920x1080 Hi-8 footage — placed bottom-LEFT, because the bottom-right holds the
+# camcorder date stamp and the pillarbox side bars get cropped on display.
+VIDEO_WM_FONTSIZE = 26
+VIDEO_WM_X        = 310    # px from the left (just inside the croppable side bar)
+VIDEO_WM_PAD_Y    = 22     # px up from the bottom edge
+VIDEO_CRF         = 23     # libx264 quality for the re-encode
+
 
 # --------------------------------------------------------------------------
 # EXIF helpers
@@ -377,26 +385,89 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
     }
 
 
+def _watermark_font_file() -> Path | None:
+    # The actual TTF the stills use (first existing candidate) — ffmpeg's
+    # drawtext needs a real file path, not a name PIL can resolve internally.
+    for name in _FONT_CANDIDATES:
+        p = Path(name)
+        if p.is_file():
+            return p
+    return None
+
+
+_WM_DIR: Path | None = None
+
+
+def _watermark_assets() -> Path | None:
+    # A temp dir holding the watermark text + font under simple relative names,
+    # so they parse inside an ffmpeg filter regardless of spaces/colons in the
+    # real paths (the repo path contains a space). Built once, reused.
+    global _WM_DIR
+    if _WM_DIR is None:
+        font = _watermark_font_file()
+        if not font:
+            return None
+        import tempfile, shutil
+        d = Path(tempfile.mkdtemp(prefix="photosite_wm_"))
+        (d / "wm.txt").write_text(WATERMARK_TEXT, encoding="utf-8")
+        shutil.copy(font, d / "font.ttf")
+        _WM_DIR = d
+    return _WM_DIR
+
+
+def _transcode_watermarked(src: Path, dest: Path) -> bool:
+    # Re-encode a video with the © watermark baked in (mirrors the stills).
+    # Returns False if it can't (disabled / no font / no ffmpeg) so the caller
+    # falls back to a plain copy.
+    if not ADD_WATERMARK:
+        return False
+    wm = _watermark_assets()
+    if not wm:
+        return False
+    import subprocess
+    a_text = WATERMARK_OPACITY / 255      # same opacity as the stills
+    a_shad = 110 / 255                     # same subtle drop shadow
+    vf = (f"drawtext=textfile=wm.txt:fontfile=font.ttf:fontsize={VIDEO_WM_FONTSIZE}:"
+          f"fontcolor=white@{a_text:.3f}:shadowcolor=black@{a_shad:.3f}:"
+          f"shadowx=1:shadowy=1:x={VIDEO_WM_X}:y=h-th-{VIDEO_WM_PAD_Y}")
+    cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+           "-i", str(src), "-vf", vf,
+           "-c:v", "libx264", "-crf", str(VIDEO_CRF), "-preset", "medium",
+           "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart",
+           str(dest)]
+    try:
+        return subprocess.run(cmd, cwd=str(wm)).returncode == 0 and dest.exists()
+    except FileNotFoundError:
+        print("  ! ffmpeg not found on PATH — copying video without watermark")
+        return False
+
+
 def process_video(src: Path, titles: dict | None = None) -> dict | None:
     import shutil
 
     dest = VIDEOS_DIR / src.name
     try:
         if not dest.exists() or src.stat().st_mtime > dest.stat().st_mtime:
-            shutil.copy2(src, dest)
+            if not _transcode_watermarked(src, dest):
+                shutil.copy2(src, dest)   # fallback when ffmpeg/font unavailable
     except Exception as e:
-        print(f"  ! skip {src.name}: cannot copy ({e})")
+        print(f"  ! skip {src.name}: cannot process ({e})")
         return None
 
     stem      = src.stem
     raw_title = (titles or {}).get(stem, "")
     title     = raw_title.strip() or None
 
+    import hashlib
+    cache_key = hashlib.md5(dest.read_bytes()).hexdigest()[:8]
+
     return {
         "id":     stem,
         "type":   "video",
         "title":  title,
-        "src":    f"videos/{src.name}",
+        # Content cache-bust: videos aren't covered by index.html's ?v bumps,
+        # and the CDN caches them by URL across deploys.
+        "src":    f"videos/{src.name}?v={cache_key}",
         "width":  None,
         "height": None,
     }
