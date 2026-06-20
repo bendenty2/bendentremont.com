@@ -289,10 +289,8 @@
       else landscapes.push(it);
     });
 
-    // Order the videos as they should appear down the page (they get dispersed
-    // through the landscape slots below in this order).
-    const VIDEO_ORDER = ["Tape1_clip1_beach", "Tape1_clip13_rewind_fire3", "Tape1_clip5_fire3"];
-    videos.sort((a, b) => VIDEO_ORDER.indexOf(a.id) - VIDEO_ORDER.indexOf(b.id));
+    // (Videos keep their manifest/layout.txt order; they're dispersed through
+    // the landscape slots below in that order.)
 
     // Too many full-width mediums to space out in 2 columns — demote the extras
     // to small single-column landscapes so none end up stacked.
