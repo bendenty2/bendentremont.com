@@ -59,29 +59,20 @@ MANIFEST_PATH = SITE_DIR / "manifest.js"
 # can fill in titles for whichever photos you care about and re-run.
 TITLES_PATH = SOURCE_DIR / "titles.json"
 
-# Source subfolders — place your images/videos into these.
+# Source layout — two things in the catalogue folder:
 #
-#   grid/           -> a flat folder holding every grid photo and video.
-#   large_photos/   -> the pool of hero (slideshow) images.
+#   media/          -> a single flat pool of every image and video (grid tiles
+#                      AND hero/slideshow photos).
 #   layout.txt      -> the whole page, top to bottom — one item per line:
 #                      "<filename> <role>". Roles: hero (slideshow, listed
 #                      first), medium (span-2 grid tile), "small landscape" /
 #                      "small portrait" (half-width grid tiles). Videos take no
-#                      role (detected by extension). Filenames resolve from grid/
-#                      or large_photos/; the extension is optional. Titles come
-#                      from titles.json. Reorder by moving lines; add content by
-#                      dropping a file in the folder and adding a line. (See the
-#                      header inside layout.txt.)
-#
-#   tiles/tileN/    -> LEGACY fallback, used only when layout.txt is absent. Each
-#                      subfolder is one 7-item group of named slots
-#                      (medium_photo_top/bottom, small_photo_portrait_left/right,
-#                      small_photo_top/middle/bottom, plus video_middle on even
-#                      tiles), consumed in numeric order.
-LARGE_PHOTOS_DIR = SOURCE_DIR / "large_photos"
-TILES_DIR        = SOURCE_DIR / "tiles"
-GRID_DIR         = SOURCE_DIR / "grid"
-LAYOUT_FILE      = SOURCE_DIR / "layout.txt"
+#                      role (detected by extension). The extension is optional;
+#                      titles come from titles.json. Reorder by moving lines; add
+#                      content by dropping a file in media/ and adding a line.
+#                      (See the header inside layout.txt.)
+MEDIA_DIR   = SOURCE_DIR / "media"
+LAYOUT_FILE = SOURCE_DIR / "layout.txt"
 
 # Max long-edge sizes for the generated derivatives.
 THUMB_LONG_EDGE = 1200   # grid view (retina-friendly for ~600px columns)
@@ -425,49 +416,15 @@ def main() -> int:
 
     # ---- Helpers ----------------------------------------------------------------
 
-    def _tile_num(name: str) -> int | None:
-        low = name.lower()
-        if low.startswith("tile"):
-            try:
-                return int(low[4:])
-            except ValueError:
-                pass
-        return None
-
-    def _get_sorted_tile_dirs(parent: Path) -> list[Path]:
-        if not parent.exists():
-            return []
-        dirs = [p for p in parent.iterdir()
-                if p.is_dir() and _tile_num(p.name) is not None]
-        return sorted(dirs, key=lambda p: _tile_num(p.name))
-
-    def _pick_file(slot_dir: Path, exts: set) -> Path | None:
-        if not slot_dir.exists():
-            return None
-        for p in slot_dir.iterdir():
-            if p.is_file() and p.suffix.lower() in exts:
-                return p
-        return None
-
-    def _scan_photos(folder: Path) -> list[Path]:
-        if not folder.exists():
-            return []
-        return sorted(
-            p for p in folder.iterdir()
-            if p.is_file() and p.suffix.lower() in SUPPORTED_EXTS
-        )
-
     def _resolve_source(name: str) -> Path | None:
-        # Find a file by name in grid/ (grid items) or large_photos/ (heroes);
-        # the extension is optional in layout.txt.
-        for folder in (GRID_DIR, LARGE_PHOTOS_DIR):
-            direct = folder / name
-            if direct.is_file():
-                return direct
-            if folder.exists():
-                for p in sorted(folder.glob(name + ".*")):
-                    if p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS):
-                        return p
+        # Find a file in media/ by name; the extension is optional in layout.txt.
+        direct = MEDIA_DIR / name
+        if direct.is_file():
+            return direct
+        if MEDIA_DIR.exists():
+            for p in sorted(MEDIA_DIR.glob(name + ".*")):
+                if p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS):
+                    return p
         return None
 
     def _read_layout() -> list[tuple]:
@@ -506,34 +463,10 @@ def main() -> int:
             entries.append((src, role, item_type, name))
         return entries
 
-    # ---- Slot definitions -------------------------------------------------------
-    # Each entry: (subfolder_name, span, item_type)
-    # Emission order here determines per-bucket ordering in the JS grid renderer.
-
-    NV_SLOTS = [   # odd tile numbers — no video
-        ("medium_photo_top",           2, "photo"),
-        ("medium_photo_bottom",        2, "photo"),
-        ("small_photo_portrait_left",  1, "photo"),
-        ("small_photo_portrait_right", 1, "photo"),
-        ("small_photo_top",            1, "photo"),
-        ("small_photo_middle",         1, "photo"),
-        ("small_photo_bottom",         1, "photo"),
-    ]
-    V_SLOTS = [    # even tile numbers — includes a video
-        ("medium_photo_top",           2, "photo"),
-        ("medium_photo_bottom",        2, "photo"),
-        ("small_photo_portrait_left",  1, "photo"),
-        ("small_photo_portrait_right", 1, "photo"),
-        ("small_photo_top",            1, "photo"),
-        ("small_photo_bottom",         1, "photo"),
-        ("video_middle",               1, "video"),
-    ]
-
     # ---- Discover sources -------------------------------------------------------
 
-    # Page order: prefer layout.txt (heroes + grid, in order); otherwise fall
-    # back to scanning large_photos/ for heroes and the legacy tiles/ structure
-    # for the grid.
+    # Page order comes entirely from layout.txt: hero-tagged lines become the
+    # slideshow, the rest become grid tiles, all in file order.
     work_items: list[tuple]  = []   # grid: (Path, span, item_type, label)
     hero_sources: list[Path] = []   # heroes in display order
     if LAYOUT_FILE.exists():
@@ -543,33 +476,15 @@ def main() -> int:
             else:
                 span = 2 if role == "medium" else 1
                 work_items.append((src, span, item_type, name))
-        grid_desc = f"layout.txt + {GRID_DIR.name}/"
-    else:
-        for tile_dir in _get_sorted_tile_dirs(TILES_DIR):
-            n     = _tile_num(tile_dir.name)
-            slots = NV_SLOTS if (n % 2 == 1) else V_SLOTS
-            for slot_name, span, item_type in slots:
-                exts = SUPPORTED_EXTS if item_type == "photo" else VIDEO_EXTS
-                src  = _pick_file(tile_dir / slot_name, exts)
-                if src:
-                    work_items.append((src, span, item_type,
-                                       f"{tile_dir.name}/{slot_name}"))
-                else:
-                    print(f"  ! slot missing: {tile_dir.name}/{slot_name}")
-        grid_desc = f"{TILES_DIR.name}/ (legacy)"
-
-    # Heroes fall back to scanning large_photos/ when layout.txt names none.
-    if not hero_sources:
-        hero_sources = _scan_photos(LARGE_PHOTOS_DIR)
 
     if not hero_sources and not work_items:
         sys.stderr.write(
             "No photos or videos found. Expected:\n"
-            f"  {GRID_DIR}/ + {LAYOUT_FILE}\n"
-            f"  (heroes in {LARGE_PHOTOS_DIR}/; or legacy {TILES_DIR}/tile1/ ...)\n"
+            f"  {MEDIA_DIR}/ + {LAYOUT_FILE}\n"
         )
         return 1
 
+    grid_desc         = f"layout.txt + {MEDIA_DIR.name}/"
     photo_work        = [(src, span, lbl) for src, span, t, lbl in work_items if t == "photo"]
     video_work        = [(src, lbl)       for src, span, t, lbl in work_items if t == "video"]
     all_photo_sources = hero_sources + [src for src, *_ in photo_work]

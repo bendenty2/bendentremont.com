@@ -217,14 +217,7 @@
   // layout stays correct at any viewport width or browser zoom level.
   // Positions: 0=M0, 1=H1, 2=F0, 3=F1, 4=H4, 5=M1, 6=H6
   // Actual px at render time = Math.round(fraction × U_rows × ROW_PX).
-  // Fallback when SEQUENCE_PADDING is empty.
   const TILE_PADDING = [  0.000,   0.000,  -0.048,  -0.161,  -0.097,  -0.065,  -0.177];  // M0 H1 F0 F1 H4 M1 H6
-
-  // Optional per-tile padding overrides in absolute pixels, by sequence index.
-  // When non-empty this takes priority over TILE_PADDING. Absolute pixels don't
-  // scale with viewport width, so prefer tuning the TILE_PADDING fractions above
-  // and keeping this empty.
-  const SEQUENCE_PADDING = [];
 
   // Fraction of U_rows to trim from the row-spans of the last two tiles per
   // group (M1 at groupPos 5, H6 at groupPos 6).  The negative TILE_PADDING
@@ -509,15 +502,11 @@
         tile.style.gridRowEnd = `span ${tileRowSpan(item, colW, colGap)}`;
       }
 
-      // Per-position vertical nudge. SEQUENCE_PADDING (absolute px, recorded
-      // from tuning) takes priority when present; otherwise TILE_PADDING
-      // fractions are scaled by U_rows so they hold at any viewport width.
+      // Per-position vertical nudge: TILE_PADDING fractions scaled by U_rows so
+      // they hold at any viewport width. Desktop only — mobile cover-fills its
+      // tiles (no slack), so no nudge is needed.
       let appliedPadPx = 0;
-      if (SEQUENCE_PADDING.length > 0) {
-        appliedPadPx = SEQUENCE_PADDING[seqIdx] || 0;
-      } else if (groupPos !== undefined && window.innerWidth > 700) {
-        // TILE_PADDING corrects natural-aspect image slack on desktop. Mobile
-        // cover-fills tiles (no slack), so no per-tile nudge is needed.
+      if (groupPos !== undefined && window.innerWidth > 700) {
         const frac = TILE_PADDING[groupPos] ?? 0;
         appliedPadPx = frac ? Math.round(frac * U_rows * ROW_PX) : 0;
       }
