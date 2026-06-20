@@ -287,7 +287,9 @@
     grid.style.setProperty("--cols", 2);
     grid.dataset.cols = 2;
     const { colW, colGap } = getGridMetrics(2);
-    const capH = 14;  // approx mobile caption height, reserved in the row span
+    const capH = 16.5;  // caption box reserved in the row span; tuned so the
+                        // empty gap below each tile stays tight (caption sits
+                        // lower now via its larger margin-top)
 
     const mediums = [], portraits = [], landscapes = [], videos = [];
     list.forEach(it => {

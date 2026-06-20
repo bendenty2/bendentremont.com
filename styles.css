@@ -657,7 +657,7 @@ html, body {
      a column past the screen edge. */
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tile { min-width: 0; }
-  .tile-caption { font-size: 6px; margin-top: 2px; margin-bottom: 4px; }
+  .tile-caption { font-size: 6px; margin-top: 7px; margin-bottom: 4px; }
 
   /* Grid videos sit in the 3:2 landscape slots. The source is 16:9 with ~15%
      black bars each side (5:4 content); scale it up so the bars overflow and
