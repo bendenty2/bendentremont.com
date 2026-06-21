@@ -543,7 +543,9 @@ def main() -> int:
                 print(f"  ! id '{key}': using {edited.name}, ignoring {drop.name}")
 
     def _resolve_source(name: str) -> Path | None:
-        return media_index.get(name)
+        # Accept either the canonical id ("IMG_1009") or the actual edited
+        # filename ("IMG_1009_DxO") in layout.txt — both resolve to the same file.
+        return media_index.get(_canonical_stem(name))
 
     def _read_layout() -> list[tuple]:
         # Parse layout.txt -> [(Path, role, item_type, name)] in file order.
