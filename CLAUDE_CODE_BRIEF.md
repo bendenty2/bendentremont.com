@@ -139,6 +139,11 @@ you just can't re-run a full build without it.
 Expected source layout (as of 2026-06-20 — replaced the old `large_photos/` + `tiles/`
 slot-folder scheme):
 - `media/` → a **single flat pool** of every image and video (grid tiles AND hero photos).
+  Filenames may carry a DxO PhotoLab edit suffix (`IMG_2214_DxO.jpg`); the build **strips the
+  `_DxO…` suffix** to get the canonical id (`IMG_2214`), so an edited copy transparently
+  replaces the original everywhere (no `layout.txt`/`titles.json` rename needed). If both an
+  original and a `_DxO` edit share an id, the **edit wins**. (Owner's DxO workflow: edit → export
+  JPEG q100, sRGB, no resize, "no watermark", `_DxO` suffix → drop into `media/` → rebuild.)
 - `layout.txt` → **the whole page, top to bottom.** One item per line: `<filename> <role>`.
   - The filename resolves from `media/`; the **extension is optional**.
   - Roles: `hero` (slideshow image — list all heroes first), `medium` (span-2 full-width grid
@@ -160,7 +165,9 @@ slot-folder scheme):
 camera/lens/date), auto-orients via EXIF transpose, resizes to thumbnail (≤1200) and full
 (≤2400) long edges (LANCZOS), bakes a subtle **visible watermark** ("© Benjamin d'Entremont",
 bottom-right, ~60% opacity — toggle `ADD_WATERMARK`) **and** EXIF Copyright/Artist tags into
-every derivative, then writes progressive optimized JPEGs (quality 82 thumb / 88 full).
+every derivative, then writes progressive optimized JPEGs (quality 82 thumb / 88 full). Each
+photo's `thumbnail`/`full` manifest URL carries a **content-hash `?v=`** (same as videos), so a
+swapped-in edit appears immediately with no stale CDN/browser cache.
 Videos are **re-encoded** into `videos/` with **ffmpeg** (libx264 crf 23, `-movflags +faststart`),
 baking in the same © watermark via a `drawtext` filter — placed bottom-right **below** the
 camcorder date stamp, tuned by `VIDEO_WM_*` constants (re-done only when the source is newer; a
