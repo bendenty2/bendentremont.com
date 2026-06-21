@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-20T21:58:17",
+  "generated_at": "2026-06-20T22:33:19",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -40,22 +40,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2468",
+      "id": "IMG_1009",
       "type": "photo",
       "span": 1,
-      "title": "Wood Duck",
-      "thumbnail": "thumbnails/IMG_2468.jpg?v=026257b4",
-      "full": "photos/IMG_2468.jpg?v=b1e2c227",
+      "title": "American Toad",
+      "thumbnail": "thumbnails/IMG_1009.jpg?v=c9cdea68",
+      "full": "photos/IMG_1009.jpg?v=61732b95",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 1600",
+        "aperture": "f/8",
+        "iso": "ISO 400",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "date": "2025-06-01"
       }
     },
     {
@@ -100,25 +100,6 @@ window.PHOTOSITE_MANIFEST = {
   "count": 49,
   "photos": [
     {
-      "id": "IMG_1009",
-      "type": "photo",
-      "span": 2,
-      "title": "American Toad",
-      "thumbnail": "thumbnails/IMG_1009.jpg?v=c9cdea68",
-      "full": "photos/IMG_1009.jpg?v=61732b95",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 400",
-        "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-06-01"
-      }
-    },
-    {
       "id": "IMG_2414",
       "type": "photo",
       "span": 2,
@@ -135,6 +116,25 @@ window.PHOTOSITE_MANIFEST = {
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2026-05-02"
+      }
+    },
+    {
+      "id": "IMG_1329",
+      "type": "photo",
+      "span": 2,
+      "title": "Lightning",
+      "thumbnail": "thumbnails/IMG_1329.jpg?v=5729182a",
+      "full": "photos/IMG_1329.jpg?v=b9e13724",
+      "width": 2400,
+      "height": 1600,
+      "exif": {
+        "aperture": "f/5.6",
+        "iso": "ISO 2500",
+        "shutter": "1/10s",
+        "focal": "100mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2025-09-21"
       }
     },
     {
@@ -374,22 +374,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_1329",
+      "id": "IMG_2468",
       "type": "photo",
       "span": 2,
-      "title": "Lightning",
-      "thumbnail": "thumbnails/IMG_1329.jpg?v=5729182a",
-      "full": "photos/IMG_1329.jpg?v=b9e13724",
+      "title": "Wood Duck",
+      "thumbnail": "thumbnails/IMG_2468.jpg?v=026257b4",
+      "full": "photos/IMG_2468.jpg?v=b1e2c227",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/5.6",
-        "iso": "ISO 2500",
-        "shutter": "1/10s",
-        "focal": "100mm",
+        "aperture": "f/9",
+        "iso": "ISO 1600",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-09-21"
+        "date": "2026-05-02"
       }
     },
     {
