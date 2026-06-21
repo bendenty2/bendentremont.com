@@ -16,6 +16,7 @@ Configuration lives in the CONFIG block below.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -334,6 +335,16 @@ def _resolve_title(stem: str, exif: dict, titles: dict) -> str | None:
     return None
 
 
+def _canonical_stem(stem: str) -> str:
+    """Map a media filename's stem to its canonical id by stripping a DxO
+    PhotoLab edit suffix ('_DxO…'). So an edited copy 'IMG_1009_DxO.JPG' is
+    treated as 'IMG_1009' — same id, same output URL, same layout.txt / titles
+    entry — letting you keep the suffix to track which photos you've edited."""
+    low = stem.lower()
+    i = low.find("_dxo")
+    return stem[:i] if i != -1 else stem
+
+
 def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | None:
     try:
         src_img = Image.open(src)
@@ -349,7 +360,7 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
         img = img.copy()
     src_img.close()
 
-    stem = src.stem
+    stem = _canonical_stem(src.stem)
     thumb_name = f"{stem}.jpg"
     full_name  = f"{stem}.jpg"
 
@@ -362,6 +373,12 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
     _save_jpeg(thumb, THUMBS_DIR / thumb_name, THUMB_QUALITY, exif_bytes=_COPYRIGHT_EXIF)
     _save_jpeg(full,  PHOTOS_DIR / full_name,  FULL_QUALITY,  exif_bytes=_COPYRIGHT_EXIF)
 
+    # Content-hash cache-bust: a re-edited photo keeps the same filename/URL, so
+    # without this the browser/CDN would serve the stale cached copy. The 8-char
+    # hash changes only when the pixels do.
+    thumb_v = hashlib.md5((THUMBS_DIR / thumb_name).read_bytes()).hexdigest()[:8]
+    full_v  = hashlib.md5((PHOTOS_DIR / full_name).read_bytes()).hexdigest()[:8]
+
     w, h = full.size
 
     return {
@@ -369,8 +386,8 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
         "type":      "photo",
         "span":      span,
         "title":     _resolve_title(stem, exif, titles or {}),
-        "thumbnail": f"thumbnails/{thumb_name}",
-        "full":      f"photos/{full_name}",
+        "thumbnail": f"thumbnails/{thumb_name}?v={thumb_v}",
+        "full":      f"photos/{full_name}?v={full_v}",
         "width":     w,
         "height":    h,
         "exif": {
@@ -455,11 +472,10 @@ def process_video(src: Path, titles: dict | None = None) -> dict | None:
         print(f"  ! skip {src.name}: cannot process ({e})")
         return None
 
-    stem      = src.stem
+    stem      = _canonical_stem(src.stem)
     raw_title = (titles or {}).get(stem, "")
     title     = raw_title.strip() or None
 
-    import hashlib
     cache_key = hashlib.md5(dest.read_bytes()).hexdigest()[:8]
 
     return {
@@ -488,16 +504,27 @@ def main() -> int:
 
     # ---- Helpers ----------------------------------------------------------------
 
+    # Index every media file by its canonical id (DxO edit suffix + extension
+    # stripped), so layout.txt's bare ids resolve whether or not a file carries a
+    # "_DxO…" suffix. If both an original and a _DxO edit share an id, prefer the
+    # edit and warn so the leftover can be cleaned up.
+    media_index: dict[str, Path] = {}
+    if MEDIA_DIR.exists():
+        for p in sorted(MEDIA_DIR.iterdir()):
+            if not (p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS)):
+                continue
+            key  = _canonical_stem(p.stem)
+            prev = media_index.get(key)
+            if prev is None:
+                media_index[key] = p
+            else:
+                edited = p if "_dxo" in p.stem.lower() else prev
+                drop   = prev if edited is p else p
+                media_index[key] = edited
+                print(f"  ! id '{key}': using {edited.name}, ignoring {drop.name}")
+
     def _resolve_source(name: str) -> Path | None:
-        # Find a file in media/ by name; the extension is optional in layout.txt.
-        direct = MEDIA_DIR / name
-        if direct.is_file():
-            return direct
-        if MEDIA_DIR.exists():
-            for p in sorted(MEDIA_DIR.glob(name + ".*")):
-                if p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS):
-                    return p
-        return None
+        return media_index.get(name)
 
     def _read_layout() -> list[tuple]:
         # Parse layout.txt -> [(Path, role, item_type, name)] in file order.
@@ -581,8 +608,9 @@ def main() -> int:
     titles = _load_titles()
     title_changes = False
     for src in all_photo_sources + all_video_sources:
-        if src.stem not in titles:
-            titles[src.stem] = ""
+        key = _canonical_stem(src.stem)
+        if key not in titles:
+            titles[key] = ""
             title_changes = True
     if title_changes or not TITLES_PATH.exists():
         _save_titles(titles)
@@ -678,7 +706,7 @@ def main() -> int:
 
     # ---- Stale-file cleanup ----------------------------------------------------
 
-    valid_photo_stems = {p.stem for p in all_photo_sources}
+    valid_photo_stems = {_canonical_stem(p.stem) for p in all_photo_sources}
     for d in (THUMBS_DIR, PHOTOS_DIR):
         for leftover in d.glob("*.jpg"):
             if leftover.stem not in valid_photo_stems:
