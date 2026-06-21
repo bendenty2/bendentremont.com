@@ -323,6 +323,25 @@ def _save_titles(titles: dict) -> None:
         print(f"  ! could not write {TITLES_PATH.name}: {e}")
 
 
+# Optional sidecar (in the SOURCE folder) mapping canonical id -> partial EXIF,
+# used to fill spec fields a source file is missing — e.g. DxO PhotoLab drops
+# aperture/shutter/focal when you crop a shot. Values are the same formatted
+# strings the manifest uses ("f/9", "1/640s", "400mm", lens model). Only BLANK
+# fields get filled; real EXIF is never overwritten.
+EXIF_OVERRIDES_PATH = SOURCE_DIR / "exif_overrides.json"
+
+
+def _load_exif_overrides() -> dict:
+    if not EXIF_OVERRIDES_PATH.exists():
+        return {}
+    try:
+        data = json.loads(EXIF_OVERRIDES_PATH.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"  ! could not read {EXIF_OVERRIDES_PATH.name}: {e}")
+        return {}
+
+
 def _resolve_title(stem: str, exif: dict, titles: dict) -> str | None:
     sidecar = (titles.get(stem) or "").strip()
     if sidecar:
@@ -678,6 +697,24 @@ def main() -> int:
             entry = process_video(src, titles=titles)
             if entry:
                 entries.append(entry)
+
+    # ---- EXIF overrides --------------------------------------------------------
+    # Fill spec fields a source file is missing (e.g. DxO drops aperture/shutter/
+    # focal on crop) from exif_overrides.json. Never clobbers real EXIF.
+    overrides = _load_exif_overrides()
+    if overrides:
+        filled = 0
+        for e in entries + hero_entries:
+            ov = overrides.get(e.get("id"))
+            if not ov or e.get("type") == "video":
+                continue
+            ex = e.setdefault("exif", {})
+            for k, v in ov.items():
+                if v and not ex.get(k):
+                    ex[k] = v
+                    filled += 1
+        if filled:
+            print(f"  ~ filled {filled} missing EXIF field(s) from {EXIF_OVERRIDES_PATH.name}")
 
     # ---- Build manifest --------------------------------------------------------
     # Tile order is already correct — no mtime sort needed.

@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-20T21:40:06",
+  "generated_at": "2026-06-20T21:58:17",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -49,12 +49,12 @@ window.PHOTOSITE_MANIFEST = {
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": null,
+        "aperture": "f/9",
         "iso": "ISO 1600",
-        "shutter": null,
-        "focal": null,
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
-        "lens": null,
+        "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2026-05-02"
       }
     },
@@ -280,12 +280,12 @@ window.PHOTOSITE_MANIFEST = {
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": null,
+        "aperture": "f/8",
         "iso": "ISO 100",
-        "shutter": null,
-        "focal": null,
+        "shutter": "1/320s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
-        "lens": null,
+        "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2026-04-29"
       }
     },
@@ -459,12 +459,12 @@ window.PHOTOSITE_MANIFEST = {
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": null,
+        "aperture": "f/9",
         "iso": "ISO 2500",
-        "shutter": null,
-        "focal": null,
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
-        "lens": null,
+        "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2023-04-08"
       }
     },
@@ -714,12 +714,12 @@ window.PHOTOSITE_MANIFEST = {
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": null,
+        "aperture": "f/10",
         "iso": "ISO 100",
-        "shutter": null,
-        "focal": null,
+        "shutter": "1/500s",
+        "focal": "214mm",
         "camera": "Canon EOS R10",
-        "lens": null,
+        "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2024-03-02"
       }
     },
