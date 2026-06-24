@@ -688,6 +688,15 @@ html, body {
   }
   /* Keep the mobile framing on tap/hover (the desktop hover adds scaleX). */
   .tile--video:hover .video-crop-wrapper video { transform: translateX(-50%); }
+
+  /* Lightbox on phones: keep the prev/next arrows OFF the photo (portrait or
+     landscape) by reserving a margin each side, and pull the arrows to the very
+     edges into that margin. (Swipe-to-cycle is wired in script.js.) */
+  .lightbox-figure img { max-width: calc(100vw - 84px); }
+  .lightbox-video-wrap { width: min(calc(100vw - 84px), calc((100vh - 120px) * 1.5)); }
+  .lightbox-nav { font-size: 40px; padding: 10px 6px; }
+  .lightbox-nav--prev { left: 2px; }
+  .lightbox-nav--next { right: 2px; }
 }
 
 /* ---------- Reduced motion ----------
