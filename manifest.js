@@ -1,12 +1,12 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-20T22:33:19",
+  "generated_at": "2026-06-23T23:54:25",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
     "span": 1,
     "title": "Baltimore Oriole",
-    "thumbnail": "thumbnails/IMG_2237.jpg?v=9559a0dc",
-    "full": "photos/IMG_2237.jpg?v=6afb8d94",
+    "thumbnail": "thumbnails/IMG_2237.jpg?v=107feadb",
+    "full": "photos/IMG_2237.jpg?v=3291f05a",
     "width": 2400,
     "height": 1600,
     "exif": {
@@ -25,8 +25,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2237.jpg?v=9559a0dc",
-      "full": "photos/IMG_2237.jpg?v=6afb8d94",
+      "thumbnail": "thumbnails/IMG_2237.jpg?v=107feadb",
+      "full": "photos/IMG_2237.jpg?v=3291f05a",
       "width": 2400,
       "height": 1600,
       "exif": {
@@ -378,8 +378,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Wood Duck",
-      "thumbnail": "thumbnails/IMG_2468.jpg?v=026257b4",
-      "full": "photos/IMG_2468.jpg?v=b1e2c227",
+      "thumbnail": "thumbnails/IMG_2468.jpg?v=4acc4cff",
+      "full": "photos/IMG_2468.jpg?v=1cca0106",
       "width": 2400,
       "height": 1600,
       "exif": {
@@ -511,8 +511,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "American Robin",
-      "thumbnail": "thumbnails/IMG_0642.jpg?v=97d46381",
-      "full": "photos/IMG_0642.jpg?v=525f670d",
+      "thumbnail": "thumbnails/IMG_0642.jpg?v=ca12a5f2",
+      "full": "photos/IMG_0642.jpg?v=e5c56b7e",
       "width": 2400,
       "height": 1600,
       "exif": {

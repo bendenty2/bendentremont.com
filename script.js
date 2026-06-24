@@ -626,9 +626,27 @@
     showLightboxItem(items[currentIndex]);
   }
 
-  // Click the dim overlay (but not the inner content) to close.
+  // Touch (mobile only): swipe left = next, right = previous — same as the
+  // arrows, bounded (no wrap). A swipe suppresses the tap-to-close.
+  let lbTouchX = 0, lbTouchY = 0, lbSwiped = false;
+  lightbox.addEventListener("touchstart", (e) => {
+    const t = e.changedTouches[0];
+    lbTouchX = t.clientX; lbTouchY = t.clientY; lbSwiped = false;
+  }, { passive: true });
+  lightbox.addEventListener("touchend", (e) => {
+    if (window.innerWidth > 700) return;                 // mobile only
+    const t = e.changedTouches[0];
+    const dx = t.clientX - lbTouchX, dy = t.clientY - lbTouchY;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      lbSwiped = true;
+      step(dx < 0 ? 1 : -1);                             // left=next, right=prev
+    }
+  }, { passive: true });
+
+  // Click the dim overlay (but not the inner content) to close — unless that
+  // "click" was actually a swipe.
   lightbox.addEventListener("click", (e) => {
-    if (e.target === lightbox) closeLightbox();
+    if (e.target === lightbox && !lbSwiped) closeLightbox();
   });
   lightboxClose.addEventListener("click", closeLightbox);
   lightboxPrev.addEventListener("click", (e) => { e.stopPropagation(); step(-1); });
