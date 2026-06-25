@@ -419,14 +419,16 @@ html, body {
   overflow: clip;            /* only matters for the hover swell */
 }
 
-/* The clips are now baked to a clean 3:2 by build.py (bars cropped out), so the
-   video simply fills the 3:2 wrapper — no stretch, no over-fill, no overflow clip
-   at a fractional edge (which used to leave a sub-pixel dark seam on the right). */
+/* The clips have the pillarbox bars cropped out (5:4) by build.py; the site
+   stretches them to the 3:2 tile with object-fit:fill. fill NEVER clips (it
+   stretches to fit exactly), so there's no overflow edge for a sub-pixel dark
+   seam to live on — and the full frame height is shown (no vertical trim),
+   matching the original look (incl. its slight horizontal stretch). */
 .tile--video .video-crop-wrapper video {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
   transition: opacity 180ms ease, transform 220ms ease;
 }
 
@@ -513,11 +515,11 @@ html, body {
 .lightbox-video-wrap.is-active { display: block; }
 
 .lightbox-video-wrap video {
-  /* Clips are baked to 3:2, so just fill the 3:2 wrapper (no crop/stretch). */
+  /* Clips are 5:4 (bars cropped); stretch to the 3:2 wrapper with fill (no clip). */
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
 }
 
 .lightbox-caption {
@@ -655,8 +657,13 @@ html, body {
   /* margin-top must match CAP_OFFSET in renderGridMobile. */
   .tile-caption { font-size: 6px; margin-top: 5px; margin-bottom: 0; }
 
-  /* Grid videos are baked to a clean 3:2 by build.py now, so they fill the tile
-     via the base object-fit:cover — no mobile-specific crop needed. */
+  /* Desktop stretches the 5:4 clips to 3:2; on mobile keep the no-stretch look
+     instead — crop to the 3:2 slot, anchored to the bottom so the timestamp (and
+     watermark) stay in view. */
+  .tile--video .video-crop-wrapper video {
+    object-fit: cover;
+    object-position: center bottom;
+  }
 
   /* Lightbox on phones: keep the prev/next arrows OFF the photo (portrait or
      landscape) by reserving a margin each side, and pull the arrows to the very

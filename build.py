@@ -102,15 +102,16 @@ WATERMARK_TEXT = f"© {COPYRIGHT_HOLDER}"
 ADD_WATERMARK = True                            # flip to False to skip the visible mark
 WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but readable
 
-# Video: the 1920x1080 Hi-8 footage is first cropped to strip the ~15% pillarbox
-# side bars AND down to a clean 3:2 (1350x900), so the site can display the clips
-# edge-to-edge with no CSS stretch/clip (which caused a sub-pixel right-edge seam).
-# Only the top is trimmed for the 3:2 — the bottom (camcorder date stamp) is kept.
-VIDEO_CROP        = "1350:900:285:180"  # ffmpeg crop=w:h:x:y (bars off → 3:2, keep bottom)
-# The © watermark sits bottom-right below the date stamp, tuned for the 1350x900 frame.
-VIDEO_WM_FONTSIZE = 17
+# Video: the 1920x1080 Hi-8 footage is cropped to strip ONLY the ~15% pillarbox
+# side bars (down to the 1350x1080 5:4 content, FULL height kept). The site then
+# stretches it horizontally to the 3:2 tile via CSS object-fit:fill — same full
+# frame as the original (incl. the slight horizontal stretch), but with no
+# overflow clip, so the sub-pixel edge seam has nowhere to live.
+VIDEO_CROP        = "1350:1080:285:0"  # ffmpeg crop=w:h:x:y — strip side bars, keep full height
+# The © watermark sits bottom-right below the date stamp, tuned for the 1350x1080 frame.
+VIDEO_WM_FONTSIZE = 20
 VIDEO_WM_RIGHT    = 48     # px: text's right edge, from the cropped frame's right (1350)
-VIDEO_WM_BOTTOM   = 16     # px: text's bottom, from the frame's bottom (900)
+VIDEO_WM_BOTTOM   = 16     # px: text's bottom, from the frame's bottom (1080)
 VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
 
