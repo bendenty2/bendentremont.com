@@ -416,33 +416,23 @@ html, body {
   position: relative;
   aspect-ratio: 3 / 2;
   width: 100%;
-  overflow: clip;
-  /* No dark backdrop, no edge clip. The scaled video over-fills and fully covers
-     the wrapper, so a transparent backdrop lets the faint sub-pixel layer edge
-     blend into the (light) page instead of reading as a thin dark line on the
-     right — and the video runs full width to the tile edges, like the photos. */
-  background: transparent;
+  overflow: clip;            /* only matters for the hover swell */
 }
 
+/* The clips are now baked to a clean 3:2 by build.py (bars cropped out), so the
+   video simply fills the 3:2 wrapper — no stretch, no over-fill, no overflow clip
+   at a fractional edge (which used to leave a sub-pixel dark seam on the right). */
 .tile--video .video-crop-wrapper video {
-  /* Fill the wrapper height so the video extends wider than the wrapper.
-     scaleX(1.28) pushes the 16:9 pillarbox bars out so they overflow and clip.
-     Deliberately NOT promoted to its own GPU layer (no will-change /
-     backface-visibility): that layer, clipped at the wrapper's fractional-pixel
-     right edge, was the source of the thin dark seam that only appeared at ~100%
-     zoom. Without it the overflow clip rasterises pixel-snapped into the parent. */
-  position: absolute;
+  display: block;
+  width: 100%;
   height: 100%;
-  width: auto;
-  left: 50%;
-  transform: translateX(-50%) scaleX(1.28);
-  transform-origin: center center;
+  object-fit: cover;
   transition: opacity 180ms ease, transform 220ms ease;
 }
 
 .tile--video:hover .video-crop-wrapper video {
   opacity: 0.88;
-  transform: translateX(-50%) scaleX(1.28) scale(1.012);
+  transform: scale(1.012);
 }
 
 .tile-caption {
@@ -523,15 +513,11 @@ html, body {
 .lightbox-video-wrap.is-active { display: block; }
 
 .lightbox-video-wrap video {
-  /* Same crop-and-fill as the grid tile. */
-  position: absolute;
-  height: 100%;
-  width: auto;
-  left: 50%;
-  transform: translateX(-50%) scaleX(1.28);
-  transform-origin: center center;
-  will-change: transform;
+  /* Clips are baked to 3:2, so just fill the 3:2 wrapper (no crop/stretch). */
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .lightbox-caption {
@@ -669,24 +655,8 @@ html, body {
   /* margin-top must match CAP_OFFSET in renderGridMobile. */
   .tile-caption { font-size: 6px; margin-top: 5px; margin-bottom: 0; }
 
-  /* Grid videos sit in the 3:2 landscape slots. The source is 16:9 with ~15%
-     black bars each side (5:4 content); scale it up so the bars overflow and
-     clip, and bottom-anchor it so the corner timestamp stays in view. */
-  .tile--video .video-crop-wrapper {
-    aspect-ratio: 3 / 2;
-    clip-path: none;
-  }
-  .tile--video .video-crop-wrapper video {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    top: auto;
-    width: 143%;
-    height: auto;
-    transform: translateX(-50%);
-  }
-  /* Keep the mobile framing on tap/hover (the desktop hover adds scaleX). */
-  .tile--video:hover .video-crop-wrapper video { transform: translateX(-50%); }
+  /* Grid videos are baked to a clean 3:2 by build.py now, so they fill the tile
+     via the base object-fit:cover — no mobile-specific crop needed. */
 
   /* Lightbox on phones: keep the prev/next arrows OFF the photo (portrait or
      landscape) by reserving a margin each side, and pull the arrows to the very
@@ -700,10 +670,8 @@ html, body {
 
 /* ---------- Reduced motion ----------
    For visitors who've enabled the OS "reduce motion" accessibility setting:
-   collapse transition/animation timing and drop the hover-zoom. The video
-   crop transform (translateX(-50%) scaleX(1.28)) is preserved — only the
-   extra hover scale is removed — so footage still fills its 3:2 frame.
-   (The hero auto-advance is also paused in script.js.) */
+   collapse transition/animation timing and drop the hover-zoom on photos and
+   videos alike. (The hero auto-advance is also paused in script.js.) */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
@@ -712,7 +680,5 @@ html, body {
   }
   .tile:hover img { transform: none; }
   .tile:hover .tile-caption { transform: none; }
-  .tile--video:hover .video-crop-wrapper video {
-    transform: translateX(-50%) scaleX(1.28);
-  }
+  .tile--video:hover .video-crop-wrapper video { transform: none; }
 }

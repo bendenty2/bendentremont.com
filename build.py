@@ -102,13 +102,15 @@ WATERMARK_TEXT = f"© {COPYRIGHT_HOLDER}"
 ADD_WATERMARK = True                            # flip to False to skip the visible mark
 WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but readable
 
-# Video watermark: the same © mark, baked into clips by ffmpeg. Tuned for the
-# 1920x1080 Hi-8 footage. Tucked into the bottom-right corner BELOW the camcorder
-# date stamp, a letter's height in from the bottom and right edges; kept inside
-# the content so the cropped pillarbox side bars don't clip it.
-VIDEO_WM_FONTSIZE = 20
-VIDEO_WM_RIGHT    = 334    # px: text's right edge, measured from the frame's right
-VIDEO_WM_BOTTOM   = 16     # px: text's bottom, measured from the frame's bottom
+# Video: the 1920x1080 Hi-8 footage is first cropped to strip the ~15% pillarbox
+# side bars AND down to a clean 3:2 (1350x900), so the site can display the clips
+# edge-to-edge with no CSS stretch/clip (which caused a sub-pixel right-edge seam).
+# Only the top is trimmed for the 3:2 — the bottom (camcorder date stamp) is kept.
+VIDEO_CROP        = "1350:900:285:180"  # ffmpeg crop=w:h:x:y (bars off → 3:2, keep bottom)
+# The © watermark sits bottom-right below the date stamp, tuned for the 1350x900 frame.
+VIDEO_WM_FONTSIZE = 17
+VIDEO_WM_RIGHT    = 48     # px: text's right edge, from the cropped frame's right (1350)
+VIDEO_WM_BOTTOM   = 16     # px: text's bottom, from the frame's bottom (900)
 VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
 
@@ -464,7 +466,8 @@ def _transcode_watermarked(src: Path, dest: Path) -> bool:
     import subprocess
     a_text = WATERMARK_OPACITY / 255      # same opacity as the stills
     a_shad = 110 / 255                     # same subtle drop shadow
-    vf = (f"drawtext=textfile=wm.txt:fontfile=font.ttf:fontsize={VIDEO_WM_FONTSIZE}:"
+    vf = (f"crop={VIDEO_CROP},"
+          f"drawtext=textfile=wm.txt:fontfile=font.ttf:fontsize={VIDEO_WM_FONTSIZE}:"
           f"fontcolor=white@{a_text:.3f}:shadowcolor=black@{a_shad:.3f}:"
           f"shadowx=1:shadowy=1:x=w-tw-{VIDEO_WM_RIGHT}:y=h-th-{VIDEO_WM_BOTTOM}")
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
