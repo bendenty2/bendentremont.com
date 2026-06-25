@@ -416,7 +416,7 @@ html, body {
   position: relative;
   aspect-ratio: 3 / 2;
   width: 100%;
-  overflow: hidden;
+  overflow: clip;
   /* No dark backdrop, no edge clip. The scaled video over-fills and fully covers
      the wrapper, so a transparent backdrop lets the faint sub-pixel layer edge
      blend into the (light) page instead of reading as a thin dark line on the
@@ -427,23 +427,22 @@ html, body {
 .tile--video .video-crop-wrapper video {
   /* Fill the wrapper height so the video extends wider than the wrapper.
      scaleX(1.28) pushes the 16:9 pillarbox bars out so they overflow and clip.
-     The extra uniform scale(1.012) + backface-visibility keep the right-edge
-     sub-pixel line from showing at rest — it only re-sampled cleanly once
-     scaled, which is why it used to vanish on hover. */
+     Deliberately NOT promoted to its own GPU layer (no will-change /
+     backface-visibility): that layer, clipped at the wrapper's fractional-pixel
+     right edge, was the source of the thin dark seam that only appeared at ~100%
+     zoom. Without it the overflow clip rasterises pixel-snapped into the parent. */
   position: absolute;
   height: 100%;
   width: auto;
   left: 50%;
-  transform: translateX(-50%) scaleX(1.28) scale(1.012);
+  transform: translateX(-50%) scaleX(1.28);
   transform-origin: center center;
-  backface-visibility: hidden;
-  will-change: transform;
   transition: opacity 180ms ease, transform 220ms ease;
 }
 
 .tile--video:hover .video-crop-wrapper video {
   opacity: 0.88;
-  transform: translateX(-50%) scaleX(1.28) scale(1.024);
+  transform: translateX(-50%) scaleX(1.28) scale(1.012);
 }
 
 .tile-caption {
@@ -714,6 +713,6 @@ html, body {
   .tile:hover img { transform: none; }
   .tile:hover .tile-caption { transform: none; }
   .tile--video:hover .video-crop-wrapper video {
-    transform: translateX(-50%) scaleX(1.28) scale(1.012);
+    transform: translateX(-50%) scaleX(1.28);
   }
 }
