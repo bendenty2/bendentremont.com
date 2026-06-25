@@ -426,24 +426,24 @@ html, body {
 
 .tile--video .video-crop-wrapper video {
   /* Fill the wrapper height so the video extends wider than the wrapper.
-     scaleX(1.28) expands it further so the pillarbox bars (sides of the
-     16:9 frame) overflow and are clipped.  Scale = target / content =
-     1.5 / 1.24 ≈ 1.21.  Net result: bars removed, content fills 3:2.
-     will-change: transform promotes the element to its own GPU compositor
-     layer, eliminating the 1px subpixel rendering artifact at the edge. */
+     scaleX(1.28) pushes the 16:9 pillarbox bars out so they overflow and clip.
+     The extra uniform scale(1.012) + backface-visibility keep the right-edge
+     sub-pixel line from showing at rest — it only re-sampled cleanly once
+     scaled, which is why it used to vanish on hover. */
   position: absolute;
   height: 100%;
   width: auto;
   left: 50%;
-  transform: translateX(-50%) scaleX(1.28);
+  transform: translateX(-50%) scaleX(1.28) scale(1.012);
   transform-origin: center center;
+  backface-visibility: hidden;
   will-change: transform;
   transition: opacity 180ms ease, transform 220ms ease;
 }
 
 .tile--video:hover .video-crop-wrapper video {
   opacity: 0.88;
-  transform: translateX(-50%) scaleX(1.28) scale(1.012);
+  transform: translateX(-50%) scaleX(1.28) scale(1.024);
 }
 
 .tile-caption {
@@ -714,6 +714,6 @@ html, body {
   .tile:hover img { transform: none; }
   .tile:hover .tile-caption { transform: none; }
   .tile--video:hover .video-crop-wrapper video {
-    transform: translateX(-50%) scaleX(1.28);
+    transform: translateX(-50%) scaleX(1.28) scale(1.012);
   }
 }
