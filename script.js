@@ -226,7 +226,7 @@
   // layout stays correct at any viewport width or browser zoom level.
   // Positions: 0=M0, 1=H1, 2=F0, 3=F1, 4=H4, 5=M1, 6=H6
   // Actual px at render time = Math.round(fraction × U_rows × ROW_PX).
-  const TILE_PADDING = [  0.000,   0.000,  -0.048,  -0.161,  -0.097,  -0.061,  -0.177];  // M0 H1 F0 F1 H4 M1 H6
+  const TILE_PADDING = [  0.000,   0.000,  -0.048,  -0.161,  -0.097,  -0.057,  -0.177];  // M0 H1 F0 F1 H4 M1 H6
 
   // Fraction of U_rows to trim from the row-spans of the last two tiles per
   // group (M1 at groupPos 5, H6 at groupPos 6).  The negative TILE_PADDING
