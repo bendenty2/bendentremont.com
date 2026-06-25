@@ -418,10 +418,10 @@ html, body {
   width: 100%;
   background: #111;
   overflow: hidden;
-  /* Clip the horizontal edges to eliminate the subpixel rendering artefact
-     on the right edge of the video's GPU texture.  Right side is clipped more
-     aggressively (6 px) because the artefact sits just inside 2 px. */
-  clip-path: inset(0 6px 0 2px);
+  /* Clip the horizontal edges symmetrically — hides a faint subpixel rendering
+     artefact at the video's GPU-layer edge while keeping the left and right
+     margins EQUAL (was 6px right / 2px left, which read as lopsided). */
+  clip-path: inset(0 4px);
 }
 
 .tile--video .video-crop-wrapper video {
