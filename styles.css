@@ -416,12 +416,12 @@ html, body {
   position: relative;
   aspect-ratio: 3 / 2;
   width: 100%;
-  background: #111;
   overflow: hidden;
-  /* Clip the horizontal edges symmetrically — hides a faint subpixel rendering
-     artefact at the video's GPU-layer edge while keeping the left and right
-     margins EQUAL (was 6px right / 2px left, which read as lopsided). */
-  clip-path: inset(0 4px);
+  /* No dark backdrop, no edge clip. The scaled video over-fills and fully covers
+     the wrapper, so a transparent backdrop lets the faint sub-pixel layer edge
+     blend into the (light) page instead of reading as a thin dark line on the
+     right — and the video runs full width to the tile edges, like the photos. */
+  background: transparent;
 }
 
 .tile--video .video-crop-wrapper video {
