@@ -425,6 +425,8 @@ html, body {
    seam to live on — and the full frame height is shown (no vertical trim),
    matching the original look (incl. its slight horizontal stretch). */
 .tile--video .video-crop-wrapper video {
+  position: absolute;        /* out of flow, so the 5:4 video can't grow the 3:2 wrapper */
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -516,6 +518,8 @@ html, body {
 
 .lightbox-video-wrap video {
   /* Clips are 5:4 (bars cropped); stretch to the 3:2 wrapper with fill (no clip). */
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;

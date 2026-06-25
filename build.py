@@ -107,7 +107,8 @@ WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but r
 # stretches it horizontally to the 3:2 tile via CSS object-fit:fill — same full
 # frame as the original (incl. the slight horizontal stretch), but with no
 # overflow clip, so the sub-pixel edge seam has nowhere to live.
-VIDEO_CROP        = "1350:1080:285:0"  # ffmpeg crop=w:h:x:y — strip side bars, keep full height
+VIDEO_CROP        = "1344:1080:290:0"  # crop=w:h:x:y — strip side bars (a few px past the
+                                       # content edge so no sliver survives), keep full height
 # The © watermark sits bottom-right below the date stamp, tuned for the 1350x1080 frame.
 VIDEO_WM_FONTSIZE = 20
 VIDEO_WM_RIGHT    = 48     # px: text's right edge, from the cropped frame's right (1350)
