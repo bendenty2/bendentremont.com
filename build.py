@@ -102,13 +102,19 @@ WATERMARK_TEXT = f"© {COPYRIGHT_HOLDER}"
 ADD_WATERMARK = True                            # flip to False to skip the visible mark
 WATERMARK_OPACITY = 150                         # 0-255; ~60% feels subtle but readable
 
-# Video watermark: the same © mark, baked into clips by ffmpeg. Tuned for the
-# 1920x1080 Hi-8 footage. Tucked into the bottom-right corner BELOW the camcorder
-# date stamp, a letter's height in from the bottom and right edges; kept inside
-# the content so the cropped pillarbox side bars don't clip it.
+# Video: the 1920x1080 Hi-8 footage is cropped to strip ONLY the ~15% pillarbox
+# side bars (down to the 1350x1080 5:4 content, FULL height kept). The site then
+# stretches it horizontally to the 3:2 tile via CSS object-fit:fill — same full
+# frame as the original (incl. the slight horizontal stretch), but with no
+# overflow clip, so the sub-pixel edge seam has nowhere to live.
+VIDEO_CROP        = "1344:1080:290:0"  # crop=w:h:x:y — strip side bars (a few px past the
+                                       # content edge so no sliver survives), keep full height
+# The © watermark sits bottom-right below the date stamp, tuned for the 1344x1080 frame.
+# (Frame is displayed stretched ~1.2x wide via object-fit:fill, so the source margin
+# below reads ~1.2x larger on screen.)
 VIDEO_WM_FONTSIZE = 20
-VIDEO_WM_RIGHT    = 334    # px: text's right edge, measured from the frame's right
-VIDEO_WM_BOTTOM   = 16     # px: text's bottom, measured from the frame's bottom
+VIDEO_WM_RIGHT    = 13     # px: text's right edge, from the cropped frame's right (1344)
+VIDEO_WM_BOTTOM   = 16     # px: text's bottom, from the frame's bottom (1080)
 VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
 
@@ -464,7 +470,8 @@ def _transcode_watermarked(src: Path, dest: Path) -> bool:
     import subprocess
     a_text = WATERMARK_OPACITY / 255      # same opacity as the stills
     a_shad = 110 / 255                     # same subtle drop shadow
-    vf = (f"drawtext=textfile=wm.txt:fontfile=font.ttf:fontsize={VIDEO_WM_FONTSIZE}:"
+    vf = (f"crop={VIDEO_CROP},"
+          f"drawtext=textfile=wm.txt:fontfile=font.ttf:fontsize={VIDEO_WM_FONTSIZE}:"
           f"fontcolor=white@{a_text:.3f}:shadowcolor=black@{a_shad:.3f}:"
           f"shadowx=1:shadowy=1:x=w-tw-{VIDEO_WM_RIGHT}:y=h-th-{VIDEO_WM_BOTTOM}")
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
