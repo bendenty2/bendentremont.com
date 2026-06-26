@@ -1,12 +1,12 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-26T01:36:35",
+  "generated_at": "2026-06-26T13:16:47",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
     "span": 1,
     "title": "Baltimore Oriole",
-    "thumbnail": "thumbnails/IMG_2237.jpg?v=4c3a0364",
-    "full": "photos/IMG_2237.jpg?v=14b9dd3a",
+    "thumbnail": "thumbnails/IMG_2237.jpg?v=53bd73ec",
+    "full": "photos/IMG_2237.jpg?v=54a725c1",
     "width": 2400,
     "height": 1600,
     "exif": {
@@ -25,8 +25,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2237.jpg?v=4c3a0364",
-      "full": "photos/IMG_2237.jpg?v=14b9dd3a",
+      "thumbnail": "thumbnails/IMG_2237.jpg?v=53bd73ec",
+      "full": "photos/IMG_2237.jpg?v=54a725c1",
       "width": 2400,
       "height": 1600,
       "exif": {
@@ -237,8 +237,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2214.jpg?v=8fe5b390",
-      "full": "photos/IMG_2214.jpg?v=84c09e27",
+      "thumbnail": "thumbnails/IMG_2214.jpg?v=41dd7139",
+      "full": "photos/IMG_2214.jpg?v=f9d4c79c",
       "width": 2400,
       "height": 1600,
       "exif": {
