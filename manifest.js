@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-26T01:32:06",
+  "generated_at": "2026-06-26T01:36:35",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -237,8 +237,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2214.jpg?v=2cefc945",
-      "full": "photos/IMG_2214.jpg?v=bbb78548",
+      "thumbnail": "thumbnails/IMG_2214.jpg?v=8fe5b390",
+      "full": "photos/IMG_2214.jpg?v=84c09e27",
       "width": 2400,
       "height": 1600,
       "exif": {
