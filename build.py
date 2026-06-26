@@ -19,6 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -361,13 +362,18 @@ def _resolve_title(stem: str, exif: dict, titles: dict) -> str | None:
 
 
 def _canonical_stem(stem: str) -> str:
-    """Map a media filename's stem to its canonical id by stripping a DxO
-    PhotoLab edit suffix ('_DxO…'). So an edited copy 'IMG_1009_DxO.JPG' is
+    """Map a media filename's stem to its canonical id by stripping an editor's
+    export suffix: a Lightroom copy suffix ('-1', '-2', …) and/or a DxO PhotoLab
+    suffix ('_DxO…'). So an edited copy 'IMG_1009-1.JPG' or 'IMG_1009_DxO.JPG' is
     treated as 'IMG_1009' — same id, same output URL, same layout.txt / titles
-    entry — letting you keep the suffix to track which photos you've edited."""
+    entry — letting you keep the suffix to track which photos you've edited.
+    (Photo ids are 'IMG_NNNN' with no hyphens, so a trailing '-<n>' is always an
+    edit suffix; video stems carry no such suffix and pass through unchanged.)"""
     low = stem.lower()
     i = low.find("_dxo")
-    return stem[:i] if i != -1 else stem
+    if i != -1:
+        stem = stem[:i]
+    return re.sub(r"-\d+$", "", stem)
 
 
 def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | None:
@@ -530,10 +536,10 @@ def main() -> int:
 
     # ---- Helpers ----------------------------------------------------------------
 
-    # Index every media file by its canonical id (DxO edit suffix + extension
+    # Index every media file by its canonical id (edit suffix + extension
     # stripped), so layout.txt's bare ids resolve whether or not a file carries a
-    # "_DxO…" suffix. If both an original and a _DxO edit share an id, prefer the
-    # edit and warn so the leftover can be cleaned up.
+    # "-<n>" (Lightroom) or "_DxO…" suffix. If an original and an edit share an id,
+    # prefer the edit and warn so the leftover can be cleaned up.
     media_index: dict[str, Path] = {}
     if MEDIA_DIR.exists():
         for p in sorted(MEDIA_DIR.iterdir()):
@@ -544,7 +550,7 @@ def main() -> int:
             if prev is None:
                 media_index[key] = p
             else:
-                edited = p if "_dxo" in p.stem.lower() else prev
+                edited = p if _canonical_stem(p.stem) != p.stem else prev
                 drop   = prev if edited is p else p
                 media_index[key] = edited
                 print(f"  ! id '{key}': using {edited.name}, ignoring {drop.name}")
