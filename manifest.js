@@ -1,12 +1,12 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-26T13:10:58",
+  "generated_at": "2026-06-26T13:16:47",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
     "span": 1,
     "title": "Baltimore Oriole",
-    "thumbnail": "thumbnails/IMG_2237.jpg?v=13ea9564",
-    "full": "photos/IMG_2237.jpg?v=8555373e",
+    "thumbnail": "thumbnails/IMG_2237.jpg?v=53bd73ec",
+    "full": "photos/IMG_2237.jpg?v=54a725c1",
     "width": 2400,
     "height": 1600,
     "exif": {
@@ -25,8 +25,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2237.jpg?v=13ea9564",
-      "full": "photos/IMG_2237.jpg?v=8555373e",
+      "thumbnail": "thumbnails/IMG_2237.jpg?v=53bd73ec",
+      "full": "photos/IMG_2237.jpg?v=54a725c1",
       "width": 2400,
       "height": 1600,
       "exif": {
