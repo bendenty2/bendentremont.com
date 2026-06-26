@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-06-26T01:14:49",
+  "generated_at": "2026-06-26T01:32:06",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -237,8 +237,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2214.jpg?v=caef69f5",
-      "full": "photos/IMG_2214.jpg?v=ec08bcdc",
+      "thumbnail": "thumbnails/IMG_2214.jpg?v=2cefc945",
+      "full": "photos/IMG_2214.jpg?v=bbb78548",
       "width": 2400,
       "height": 1600,
       "exif": {
@@ -275,8 +275,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Cessna",
-      "thumbnail": "thumbnails/IMG_2088.jpg?v=e3ddb064",
-      "full": "photos/IMG_2088.jpg?v=14467976",
+      "thumbnail": "thumbnails/IMG_2088.jpg?v=91b0f477",
+      "full": "photos/IMG_2088.jpg?v=5c5c273d",
       "width": 1600,
       "height": 2400,
       "exif": {
@@ -907,8 +907,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "MacKay Bridge",
-      "thumbnail": "thumbnails/IMG_4210.jpg?v=47f9cf67",
-      "full": "photos/IMG_4210.jpg?v=aa6e391c",
+      "thumbnail": "thumbnails/IMG_4210.jpg?v=3250be79",
+      "full": "photos/IMG_4210.jpg?v=eb5077d8",
       "width": 1600,
       "height": 2400,
       "exif": {
