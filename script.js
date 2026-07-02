@@ -447,7 +447,7 @@
   let gFocal0 = { x: 0, y: 0 }, gCenter = { x: 0, y: 0 }, gStart = { x: 0, y: 0 };
   let gNatW = 0, gNatH = 0;
   let lastTapTime = 0, lastTapX = 0, lastTapY = 0;   // double-tap-to-zoom tracking
-  const Z_MAX = 4, DOUBLE_TAP_MS = 300, DOUBLE_TAP_ZOOM = 2.5;
+  const Z_MAX = 8, DOUBLE_TAP_MS = 300, DOUBLE_TAP_ZOOM = 2.5;
 
   function applyZoom(animate) {
     lightboxImg.style.transition = animate ? "transform 200ms ease" : "none";
