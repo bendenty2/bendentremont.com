@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T02:02:18",
+  "generated_at": "2026-07-02T13:03:59",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -59,6 +59,25 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
+      "id": "IMG_3153",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3153.jpg?v=57b79e6d",
+      "full": "photos/IMG_3153.jpg?v=6f0b8933",
+      "width": 2400,
+      "height": 1600,
+      "exif": {
+        "aperture": "f/5.6",
+        "iso": "ISO 200",
+        "shutter": "1/400s",
+        "focal": "244mm",
+        "camera": "Canon EOS R10",
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-27"
+      }
+    },
+    {
       "id": "IMG_4687",
       "type": "photo",
       "span": 1,
@@ -76,65 +95,174 @@ window.PHOTOSITE_MANIFEST = {
         "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2023-08-07"
       }
-    },
-    {
-      "id": "IMG_8173",
-      "type": "photo",
-      "span": 1,
-      "title": "Sunset in Ecum Secum",
-      "thumbnail": "thumbnails/IMG_8173.jpg?v=e95e6614",
-      "full": "photos/IMG_8173.jpg?v=e73166e8",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 200",
-        "shutter": "1/400s",
-        "focal": "236mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-24"
-      }
     }
   ],
-  "count": 49,
+  "count": 55,
   "photos": [
     {
-      "id": "IMG_8055",
-      "type": "photo",
+      "id": "loop",
+      "type": "loop",
       "span": 1,
-      "title": "American Lady",
-      "thumbnail": "thumbnails/IMG_8055.jpg?v=2a9da0fb",
-      "full": "photos/IMG_8055.jpg?v=51a68146",
+      "intervalMs": 1000,
       "width": 2400,
       "height": 1600,
-      "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 250",
-        "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-27"
-      }
+      "title": "",
+      "frames": [
+        {
+          "id": "IMG_3810",
+          "thumbnail": "thumbnails/loop/IMG_3810.jpg?v=ea522352",
+          "full": "photos/loop/IMG_3810.jpg?v=a8c101a4",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        },
+        {
+          "id": "IMG_3811",
+          "thumbnail": "thumbnails/loop/IMG_3811.jpg?v=ce221c84",
+          "full": "photos/loop/IMG_3811.jpg?v=b19d0772",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        },
+        {
+          "id": "IMG_3812",
+          "thumbnail": "thumbnails/loop/IMG_3812.jpg?v=489f43c0",
+          "full": "photos/loop/IMG_3812.jpg?v=6c2425d1",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        },
+        {
+          "id": "IMG_3813",
+          "thumbnail": "thumbnails/loop/IMG_3813.jpg?v=64900f9c",
+          "full": "photos/loop/IMG_3813.jpg?v=135b8bfd",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        },
+        {
+          "id": "IMG_3814",
+          "thumbnail": "thumbnails/loop/IMG_3814.jpg?v=2cedad93",
+          "full": "photos/loop/IMG_3814.jpg?v=4dd2593a",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        },
+        {
+          "id": "IMG_3815",
+          "thumbnail": "thumbnails/loop/IMG_3815.jpg?v=4eb1c426",
+          "full": "photos/loop/IMG_3815.jpg?v=2db2b66f",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        },
+        {
+          "id": "IMG_3816",
+          "thumbnail": "thumbnails/loop/IMG_3816.jpg?v=35d60ced",
+          "full": "photos/loop/IMG_3816.jpg?v=5e62b3df",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        },
+        {
+          "id": "IMG_3817",
+          "thumbnail": "thumbnails/loop/IMG_3817.jpg?v=b211decb",
+          "full": "photos/loop/IMG_3817.jpg?v=5a896166",
+          "width": 2400,
+          "height": 1600,
+          "title": null,
+          "exif": {
+            "aperture": "f/9",
+            "iso": "ISO 4000",
+            "shutter": "1/1000s",
+            "focal": "660mm",
+            "camera": "Canon EOS R10",
+            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
+            "date": "2026-06-29"
+          }
+        }
+      ]
     },
     {
-      "id": "IMG_2378",
+      "id": "IMG_3328",
       "type": "photo",
       "span": 1,
-      "title": "Mute Swan",
-      "thumbnail": "thumbnails/IMG_2378.jpg?v=4ed36c34",
-      "full": "photos/IMG_2378.jpg?v=5bca4744",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3328.jpg?v=b3540c03",
+      "full": "photos/IMG_3328.jpg?v=b9ef0849",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 640",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "aperture": "f/5.6",
+        "iso": "ISO 100",
+        "shutter": "1/100s",
+        "focal": "283mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-01"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-28"
       }
     },
     {
@@ -214,22 +342,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2088",
+      "id": "IMG_3287",
       "type": "photo",
       "span": 1,
-      "title": "Cessna",
-      "thumbnail": "thumbnails/IMG_2088.jpg?v=91b0f477",
-      "full": "photos/IMG_2088.jpg?v=5c5c273d",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3287.jpg?v=e281be6d",
+      "full": "photos/IMG_3287.jpg?v=6fdab974",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 100",
-        "shutter": "1/320s",
-        "focal": "100mm",
+        "aperture": "f/5.6",
+        "iso": "ISO 1250",
+        "shutter": "1/400s",
+        "focal": "238mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-04-29"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-27"
       }
     },
     {
@@ -252,28 +380,9 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_0782",
-      "type": "photo",
-      "span": 1,
-      "title": "Ladybug",
-      "thumbnail": "thumbnails/IMG_0782.jpg?v=f2989a20",
-      "full": "photos/IMG_0782.jpg?v=fda216c7",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 160",
-        "shutter": "1/125s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-05-17"
-      }
-    },
-    {
       "id": "IMG_1329",
       "type": "photo",
-      "span": 2,
+      "span": 1,
       "title": "Lightning",
       "thumbnail": "thumbnails/IMG_1329.jpg?v=e3d2f1ec",
       "full": "photos/IMG_1329.jpg?v=b069462e",
@@ -290,23 +399,31 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_0603",
+      "id": "IMG_8055",
       "type": "photo",
-      "span": 1,
-      "title": "Wild Turkey",
-      "thumbnail": "thumbnails/IMG_0603.jpg?v=9cf41e51",
-      "full": "photos/IMG_0603.jpg?v=0bcbdcc3",
+      "span": 2,
+      "title": "American Lady",
+      "thumbnail": "thumbnails/IMG_8055.jpg?v=2a9da0fb",
+      "full": "photos/IMG_8055.jpg?v=51a68146",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/6.3",
-        "iso": "ISO 200",
-        "shutter": "1/200s",
-        "focal": "100mm",
+        "aperture": "f/9",
+        "iso": "ISO 250",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-03-29"
+        "date": "2024-07-27"
       }
+    },
+    {
+      "id": "Tape1_clip1_beach",
+      "type": "video",
+      "title": "Crystal Crescent Beach",
+      "src": "videos/Tape1_clip1_beach.mp4?v=7e143c60",
+      "width": null,
+      "height": null
     },
     {
       "id": "IMG_1867",
@@ -328,41 +445,41 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_1637",
+      "id": "IMG_2378",
       "type": "photo",
       "span": 1,
-      "title": "Pacific Sea Nettle",
-      "thumbnail": "thumbnails/IMG_1637.jpg?v=b3eef95a",
-      "full": "photos/IMG_1637.jpg?v=66987058",
+      "title": "Mute Swan",
+      "thumbnail": "thumbnails/IMG_2378.jpg?v=4ed36c34",
+      "full": "photos/IMG_2378.jpg?v=5bca4744",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/8",
-        "iso": "ISO 6400",
-        "shutter": "1/100s",
-        "focal": "259mm",
+        "iso": "ISO 640",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-12-29"
+        "date": "2026-05-01"
       }
     },
     {
-      "id": "IMG_8302",
+      "id": "IMG_3714",
       "type": "photo",
       "span": 1,
-      "title": "Paraglider",
-      "thumbnail": "thumbnails/IMG_8302.jpg?v=06ee2a44",
-      "full": "photos/IMG_8302.jpg?v=9a778bb5",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3714.jpg?v=cf30711a",
+      "full": "photos/IMG_3714.jpg?v=88148787",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 100",
-        "shutter": "1/400s",
-        "focal": "165mm",
+        "aperture": "f/10",
+        "iso": "ISO 200",
+        "shutter": "1/800s",
+        "focal": "324mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-31"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-28"
       }
     },
     {
@@ -385,12 +502,23 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "Tape1_clip1_beach",
-      "type": "video",
-      "title": "Crystal Crescent Beach",
-      "src": "videos/Tape1_clip1_beach.mp4?v=7e143c60",
-      "width": null,
-      "height": null
+      "id": "IMG_8173",
+      "type": "photo",
+      "span": 1,
+      "title": "Sunset in Ecum Secum",
+      "thumbnail": "thumbnails/IMG_8173.jpg?v=e95e6614",
+      "full": "photos/IMG_8173.jpg?v=e73166e8",
+      "width": 2400,
+      "height": 1600,
+      "exif": {
+        "aperture": "f/9",
+        "iso": "ISO 200",
+        "shutter": "1/400s",
+        "focal": "236mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2024-08-24"
+      }
     },
     {
       "id": "IMG_8127",
@@ -564,23 +692,12 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_7533",
-      "type": "photo",
-      "span": 1,
-      "title": "House Sparrow",
-      "thumbnail": "thumbnails/IMG_7533.jpg?v=b0e7f825",
-      "full": "photos/IMG_7533.jpg?v=b246582e",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 400",
-        "shutter": "1/500s",
-        "focal": "300mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-06-16"
-      }
+      "id": "Tape1_clip13_rewind_fire3",
+      "type": "video",
+      "title": "Rewind",
+      "src": "videos/Tape1_clip13_rewind_fire3.mp4?v=b27f6f31",
+      "width": null,
+      "height": null
     },
     {
       "id": "IMG_7163",
@@ -659,12 +776,23 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "Tape1_clip13_rewind_fire3",
-      "type": "video",
-      "title": "Rewind",
-      "src": "videos/Tape1_clip13_rewind_fire3.mp4?v=b27f6f31",
-      "width": null,
-      "height": null
+      "id": "IMG_7533",
+      "type": "photo",
+      "span": 1,
+      "title": "House Sparrow",
+      "thumbnail": "thumbnails/IMG_7533.jpg?v=b0e7f825",
+      "full": "photos/IMG_7533.jpg?v=b246582e",
+      "width": 2400,
+      "height": 1600,
+      "exif": {
+        "aperture": "f/8",
+        "iso": "ISO 400",
+        "shutter": "1/500s",
+        "focal": "300mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2024-06-16"
+      }
     },
     {
       "id": "IMG_4210",
@@ -705,22 +833,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_6876",
+      "id": "IMG_3623",
       "type": "photo",
       "span": 1,
-      "title": "Bains Corner, NB",
-      "thumbnail": "thumbnails/IMG_6876.jpg?v=e7f996de",
-      "full": "photos/IMG_6876.jpg?v=eb801381",
+      "title": "Yellow Warbler",
+      "thumbnail": "thumbnails/IMG_3623.jpg?v=c49c5860",
+      "full": "photos/IMG_3623.jpg?v=1c95623a",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/10",
-        "iso": "ISO 100",
-        "shutter": "1/500s",
-        "focal": "214mm",
+        "aperture": "f/8",
+        "iso": "ISO 250",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-03-02"
+        "date": "2023-05-27"
       }
     },
     {
@@ -762,6 +890,44 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
+      }
+    },
+    {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
+      }
+    },
+    {
       "id": "IMG_4289",
       "type": "photo",
       "span": 1,
@@ -800,6 +966,52 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
+      "id": "Tape1_clip5_fire3",
+      "type": "video",
+      "title": "Camping on the Magaguadavic",
+      "src": "videos/Tape1_clip5_fire3.mp4?v=4642140f",
+      "width": null,
+      "height": null
+    },
+    {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
+      }
+    },
+    {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
+      }
+    },
+    {
       "id": "IMG_4154",
       "type": "photo",
       "span": 1,
@@ -816,25 +1028,6 @@ window.PHOTOSITE_MANIFEST = {
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2023-06-30"
-      }
-    },
-    {
-      "id": "IMG_2757",
-      "type": "photo",
-      "span": 1,
-      "title": "Song Sparrow",
-      "thumbnail": "thumbnails/IMG_2757.jpg?v=51480056",
-      "full": "photos/IMG_2757.jpg?v=2ee0df13",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 1000",
-        "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-04-11"
       }
     },
     {
@@ -857,6 +1050,63 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
+      "id": "IMG_2757",
+      "type": "photo",
+      "span": 1,
+      "title": "Song Sparrow",
+      "thumbnail": "thumbnails/IMG_2757.jpg?v=51480056",
+      "full": "photos/IMG_2757.jpg?v=2ee0df13",
+      "width": 2400,
+      "height": 1600,
+      "exif": {
+        "aperture": "f/8",
+        "iso": "ISO 1000",
+        "shutter": "1/640s",
+        "focal": "400mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2023-04-11"
+      }
+    },
+    {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
+      }
+    },
+    {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
+      }
+    },
+    {
       "id": "IMG_1851",
       "type": "photo",
       "span": 1,
@@ -873,25 +1123,6 @@ window.PHOTOSITE_MANIFEST = {
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2023-02-19"
-      }
-    },
-    {
-      "id": "IMG_0686",
-      "type": "photo",
-      "span": 1,
-      "title": "Big G's",
-      "thumbnail": "thumbnails/IMG_0686.jpg?v=f65c3cb3",
-      "full": "photos/IMG_0686.jpg?v=cff3a686",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/5",
-        "iso": "ISO 2000",
-        "shutter": "1/80s",
-        "focal": "25mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
-        "date": "2023-02-06"
       }
     },
     {
@@ -914,36 +1145,66 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "Tape1_clip5_fire3",
-      "type": "video",
-      "title": "Camping on the Magaguadavic",
-      "src": "videos/Tape1_clip5_fire3.mp4?v=4642140f",
-      "width": null,
-      "height": null
-    },
-    {
-      "id": "IMG_4779",
+      "id": "IMG_0686",
       "type": "photo",
-      "span": 2,
-      "title": "Crow Dispute",
-      "thumbnail": "thumbnails/IMG_4779.jpg?v=51d2830c",
-      "full": "photos/IMG_4779.jpg?v=6fd42640",
+      "span": 1,
+      "title": "Big G's",
+      "thumbnail": "thumbnails/IMG_0686.jpg?v=f65c3cb3",
+      "full": "photos/IMG_0686.jpg?v=cff3a686",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/7.1",
+        "aperture": "f/5",
         "iso": "ISO 2000",
-        "shutter": "1/400s",
-        "focal": "225mm",
+        "shutter": "1/80s",
+        "focal": "25mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-08-07"
+        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
+        "date": "2023-02-06"
+      }
+    },
+    {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
+      }
+    },
+    {
+      "id": "IMG_0000",
+      "type": "photo",
+      "span": 1,
+      "title": null,
+      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
+      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "width": 680,
+      "height": 1021,
+      "exif": {
+        "aperture": null,
+        "iso": null,
+        "shutter": null,
+        "focal": null,
+        "camera": null,
+        "lens": null,
+        "date": null
       }
     },
     {
       "id": "IMG_4670",
       "type": "photo",
-      "span": 2,
+      "span": 1,
       "title": "Black-capped Chickadee",
       "thumbnail": "thumbnails/IMG_4670.jpg?v=2c947b5c",
       "full": "photos/IMG_4670.jpg?v=45388585",
@@ -957,25 +1218,6 @@ window.PHOTOSITE_MANIFEST = {
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2023-08-07"
-      }
-    },
-    {
-      "id": "IMG_3623",
-      "type": "photo",
-      "span": 2,
-      "title": "Yellow Warbler",
-      "thumbnail": "thumbnails/IMG_3623.jpg?v=c49c5860",
-      "full": "photos/IMG_3623.jpg?v=1c95623a",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 250",
-        "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-05-27"
       }
     },
     {

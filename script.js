@@ -78,6 +78,8 @@
   let heroItems = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
+  // setInterval id when a loop item is cycling in the lightbox; null otherwise.
+  let lightboxLoopTimer = null;
   // Element that had focus before the lightbox opened, so we can restore it on close.
   let lastFocusedEl = null;
   // Spec caption for videos (they have no EXIF) — shown in the grid tile and,
@@ -167,10 +169,50 @@
     return tile;
   }
 
+  // A "loop" tile: the media/loop/ frames share one slot and switch instantly
+  // (no fade) every item.intervalMs, ascending and wrapping. Timers are tracked
+  // in loopTimers so renderGrid can clear them before rebuilding the grid.
+  const loopTimers = [];
+  function buildLoopTile(item, index) {
+    const tile = document.createElement("figure");
+    tile.className = "tile tile--loop";
+    tile.dataset.id = item.id;
+
+    const frames = item.frames || [];
+    const img = document.createElement("img");
+    img.alt = item.title || item.id;
+    if (item.width && item.height) { img.width = item.width; img.height = item.height; }
+
+    const caption = buildCaption("");
+    const show = (k) => {
+      const f = frames[k];
+      if (!f) return;
+      img.src = f.thumbnail;
+      caption.textContent = captionText(f.exif || {});
+    };
+
+    // Preload every frame up front so each switch is instantaneous (no flash).
+    frames.forEach(f => { const pre = new Image(); pre.src = f.thumbnail; });
+
+    let k = 0;
+    show(0);
+    if (frames.length > 1) {
+      loopTimers.push(setInterval(() => {
+        k = (k + 1) % frames.length;
+        show(k);
+      }, item.intervalMs || 1000));
+    }
+
+    tile.appendChild(img);
+    tile.appendChild(caption);
+    tile.addEventListener("click", () => openLightboxAt(index));
+    return tile;
+  }
+
   function buildTile(item, index) {
-    return item.type === "video"
-      ? buildVideoTile(item, index)
-      : buildPhotoTile(item, index);
+    if (item.type === "video") return buildVideoTile(item, index);
+    if (item.type === "loop")  return buildLoopTile(item, index);
+    return buildPhotoTile(item, index);
   }
 
   // ---------- Grid layout ----------
@@ -207,6 +249,9 @@
 
   function renderGrid(list) {
     const isNarrow = window.innerWidth <= 700;
+    // Stop loop timers from the previous render before dropping their tiles.
+    loopTimers.forEach(clearInterval);
+    loopTimers.length = 0;
     grid.innerHTML = "";
     grid.style.setProperty("--cols", 2);
     grid.dataset.cols = 2;
@@ -256,8 +301,17 @@
     lightboxVideo.src = "";
   }
 
+  function stopLightboxLoop() {
+    if (lightboxLoopTimer) {
+      clearInterval(lightboxLoopTimer);
+      lightboxLoopTimer = null;
+    }
+  }
+
   function showLightboxItem(item) {
+    stopLightboxLoop();
     const isVideo = item.type === "video";
+    const isLoop  = item.type === "loop";
 
     // Toggle which media element is visible.
     lightboxImg.style.display = isVideo ? "none" : "";
@@ -273,6 +327,29 @@
       lightboxVideo.play().catch(() => {
         // Autoplay blocked — not critical; user can hit play manually.
       });
+      lightboxTitle.textContent = item.title || "";
+      lightboxExif.textContent  = VIDEO_SPEC_LABEL;
+    } else if (isLoop) {
+      // Loop: cycle the full-res frames in the lightbox at the same cadence,
+      // updating the title + specs to match whichever frame is showing.
+      stopLightboxVideo();
+      const frames = item.frames || [];
+      const show = (k) => {
+        const f = frames[k];
+        if (!f) return;
+        lightboxImg.src = f.full;
+        lightboxImg.alt = f.title || item.id;
+        lightboxTitle.textContent = f.title || "";
+        lightboxExif.textContent  = captionText(f.exif || {});
+      };
+      let k = 0;
+      show(0);
+      if (frames.length > 1) {
+        lightboxLoopTimer = setInterval(() => {
+          k = (k + 1) % frames.length;
+          show(k);
+        }, item.intervalMs || 1000);
+      }
     } else {
       // Photo path.
       stopLightboxVideo();
@@ -285,10 +362,10 @@
         preloadFull(items[(currentIndex + 1) % n]);
         preloadFull(items[(currentIndex - 1 + n) % n]);
       }
+      lightboxTitle.textContent = item.title || "";
+      lightboxExif.textContent  = captionText(item.exif || {});
     }
 
-    lightboxTitle.textContent = item.title || "";
-    lightboxExif.textContent  = isVideo ? VIDEO_SPEC_LABEL : captionText(item.exif || {});
     updateNavArrows();
   }
 
@@ -316,6 +393,7 @@
     lightbox.setAttribute("aria-hidden", "true");
     lightboxImg.src = "";
     stopLightboxVideo();
+    stopLightboxLoop();
     currentIndex = -1;
     document.body.style.overflow = "";
     // Return focus to wherever it was before the lightbox opened.
