@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T14:49:46",
+  "generated_at": "2026-07-02T17:54:22",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -560,22 +560,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2620",
+      "id": "IMG_3231",
       "type": "photo",
       "span": 1,
-      "title": "Song Sparrow",
-      "thumbnail": "thumbnails/IMG_2620.jpg?v=8e05b3cb",
-      "full": "photos/IMG_2620.jpg?v=a12bfc6b",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3231.jpg?v=df4b1d51",
+      "full": "photos/IMG_3231.jpg?v=33fdec78",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 2500",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "aperture": "f/6.3",
+        "iso": "ISO 500",
+        "shutter": "1/500s",
+        "focal": "313mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-04-08"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-27"
       }
     },
     {
@@ -891,41 +891,41 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_0000",
+      "id": "IMG_3012",
       "type": "photo",
       "span": 1,
       "title": null,
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
-      "width": 680,
-      "height": 1021,
+      "thumbnail": "thumbnails/IMG_3012.jpg?v=94cc3dff",
+      "full": "photos/IMG_3012.jpg?v=345feb61",
+      "width": 1600,
+      "height": 2400,
       "exif": {
-        "aperture": null,
-        "iso": null,
-        "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "aperture": "f/5.6",
+        "iso": "ISO 12800",
+        "shutter": "1/400s",
+        "focal": "324mm",
+        "camera": "Canon EOS R10",
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-27"
       }
     },
     {
-      "id": "IMG_0000",
+      "id": "IMG_3045",
       "type": "photo",
       "span": 1,
       "title": null,
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
-      "width": 680,
-      "height": 1021,
+      "thumbnail": "thumbnails/IMG_3045.jpg?v=dc02ab1d",
+      "full": "photos/IMG_3045.jpg?v=b85ae60c",
+      "width": 1600,
+      "height": 2400,
       "exif": {
-        "aperture": null,
-        "iso": null,
-        "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "aperture": "f/5.6",
+        "iso": "ISO 500",
+        "shutter": "1/640s",
+        "focal": "335mm",
+        "camera": "Canon EOS R10",
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-27"
       }
     },
     {
@@ -975,22 +975,22 @@ window.PHOTOSITE_MANIFEST = {
       "height": null
     },
     {
-      "id": "IMG_0000",
+      "id": "IMG_1637",
       "type": "photo",
       "span": 1,
-      "title": null,
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
-      "width": 680,
-      "height": 1021,
+      "title": "Pacific Sea Nettle",
+      "thumbnail": "thumbnails/IMG_1637.jpg?v=b3eef95a",
+      "full": "photos/IMG_1637.jpg?v=66987058",
+      "width": 1600,
+      "height": 2400,
       "exif": {
-        "aperture": null,
-        "iso": null,
-        "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "aperture": "f/8",
+        "iso": "ISO 6400",
+        "shutter": "1/100s",
+        "focal": "259mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2025-12-29"
       }
     },
     {
