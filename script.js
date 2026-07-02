@@ -446,7 +446,8 @@
   let gStartDist = 1, gStartScale = 1, gStartTx = 0, gStartTy = 0;
   let gFocal0 = { x: 0, y: 0 }, gCenter = { x: 0, y: 0 }, gStart = { x: 0, y: 0 };
   let gNatW = 0, gNatH = 0;
-  const Z_MAX = 4;
+  let lastTapTime = 0, lastTapX = 0, lastTapY = 0;   // double-tap-to-zoom tracking
+  const Z_MAX = 4, DOUBLE_TAP_MS = 300, DOUBLE_TAP_ZOOM = 2.5;
 
   function applyZoom(animate) {
     lightboxImg.style.transition = animate ? "transform 200ms ease" : "none";
@@ -518,7 +519,30 @@
     }
     if (gMode === "swipe") {
       gMode = null;
-      if (!gMoved) return;                    // plain tap — overlay taps still close (click handler)
+      if (!gMoved) {
+        // Tap at 100% (a tap while zoomed is a 'pan', handled above). A double-
+        // tap on the photo zooms in toward the tapped point; a single tap does
+        // nothing here (overlay taps close via the click handler).
+        const now = Date.now();
+        const r = lightboxImg.getBoundingClientRect();
+        const onImg = zoomable() &&
+          gStart.x >= r.left && gStart.x <= r.right &&
+          gStart.y >= r.top  && gStart.y <= r.bottom;
+        if (onImg && now - lastTapTime < DOUBLE_TAP_MS &&
+            Math.abs(gStart.x - lastTapX) < 40 && Math.abs(gStart.y - lastTapY) < 40) {
+          lastTapTime = 0;                    // consume the pair
+          gNatW = lightboxImg.offsetWidth; gNatH = lightboxImg.offsetHeight;
+          const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          zScale = DOUBLE_TAP_ZOOM;
+          zTx = (gStart.x - cx) * (1 - DOUBLE_TAP_ZOOM);   // keep the tapped point fixed
+          zTy = (gStart.y - cy) * (1 - DOUBLE_TAP_ZOOM);
+          clampPan(); applyZoom(true);
+          lbSwiped = true;
+        } else {
+          lastTapTime = now; lastTapX = gStart.x; lastTapY = gStart.y;
+        }
+        return;
+      }
       lbSwiped = true;                        // any drag suppresses the tap-to-close
       const t = (e.changedTouches && e.changedTouches[0]) || {};
       const dx = (t.clientX || 0) - gStart.x, dy = (t.clientY || 0) - gStart.y;
