@@ -574,8 +574,8 @@
     });
 
     heroSection.appendChild(slideshow);
-    if (heroes.length > 1) heroSection.appendChild(dotsEl);
-    heroSection.appendChild(exifEl);
+    heroSection.appendChild(exifEl);                              // exif sits directly below the photo
+    if (heroes.length > 1) heroSection.appendChild(dotsEl);       // dots below the exif
     heroSection.style.display = "";
 
     showHeroSlide(0);

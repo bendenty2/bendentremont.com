@@ -308,7 +308,13 @@ html, body {
   width: 100%;
   height: auto;
   opacity: 0;
-  transition: opacity 700ms ease;
+  transition: opacity 700ms ease, transform 220ms ease;
+}
+
+/* Hover swell — same subtle scale as the grid tiles, applied to the visible
+   slide (overflow:hidden on the slideshow makes it a gentle zoom-in). */
+.hero-slideshow:hover .hero-img.is-active {
+  transform: scale(1.012);
 }
 
 /* 2nd+ images out of flow — stacked on top of the first. */
@@ -323,13 +329,13 @@ html, body {
   z-index: 1;
 }
 
-/* Dot row */
+/* Dot row — sits below the EXIF caption. */
 .hero-dots {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 14px 0 6px;
+  padding: 2px 0 20px;
 }
 
 .hero-dot {
@@ -354,9 +360,9 @@ html, body {
   transform: scale(1.2);
 }
 
-/* EXIF caption below the dots */
+/* EXIF caption — sits directly below the photo, above the dots. */
 .hero-exif {
-  padding: 2px 0 20px;
+  padding: 14px 0 6px;
   font-family: var(--font-sans);
   font-size: clamp(9px, 0.6vw + 3px, 12px);
   color: var(--muted);
@@ -404,7 +410,6 @@ html, body {
 }
 
 .tile:hover img {
-  opacity: 0.88;
   transform: scale(1.012);
 }
 
@@ -435,7 +440,6 @@ html, body {
 }
 
 .tile--video:hover .video-crop-wrapper video {
-  opacity: 0.88;
   transform: scale(1.012);
 }
 
@@ -691,4 +695,5 @@ html, body {
   .tile:hover img { transform: none; }
   .tile:hover .tile-caption { transform: none; }
   .tile--video:hover .video-crop-wrapper video { transform: none; }
+  .hero-slideshow:hover .hero-img.is-active { transform: none; }
 }

@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T13:28:46",
+  "generated_at": "2026-07-02T14:14:19",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -103,7 +103,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "loop",
       "type": "loop",
       "span": 1,
-      "intervalMs": 400,
+      "intervalMs": 250,
       "width": 2400,
       "height": 1600,
       "title": "",
@@ -757,22 +757,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2400",
+      "id": "IMG_3782",
       "type": "photo",
       "span": 2,
-      "title": "White-breasted Nuthatch",
-      "thumbnail": "thumbnails/IMG_2400.jpg?v=a6acea91",
-      "full": "photos/IMG_2400.jpg?v=ab452e1f",
+      "title": "Bombardier CL-215",
+      "thumbnail": "thumbnails/IMG_3782.jpg?v=c4bba580",
+      "full": "photos/IMG_3782.jpg?v=4039a42d",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/6.3",
-        "iso": "ISO 1250",
-        "shutter": "1/250s",
-        "focal": "123mm",
+        "aperture": "f/7.1",
+        "iso": "ISO 640",
+        "shutter": "1/320s",
+        "focal": "174mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "date": "2023-05-28"
       }
     },
     {
@@ -852,22 +852,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_3782",
+      "id": "IMG_2400",
       "type": "photo",
       "span": 2,
-      "title": "Bombardier CL-215",
-      "thumbnail": "thumbnails/IMG_3782.jpg?v=c4bba580",
-      "full": "photos/IMG_3782.jpg?v=4039a42d",
+      "title": "White-breasted Nuthatch",
+      "thumbnail": "thumbnails/IMG_2400.jpg?v=a6acea91",
+      "full": "photos/IMG_2400.jpg?v=ab452e1f",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/7.1",
-        "iso": "ISO 640",
-        "shutter": "1/320s",
-        "focal": "174mm",
+        "aperture": "f/6.3",
+        "iso": "ISO 1250",
+        "shutter": "1/250s",
+        "focal": "123mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-05-28"
+        "date": "2026-05-02"
       }
     },
     {
