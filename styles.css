@@ -308,7 +308,13 @@ html, body {
   width: 100%;
   height: auto;
   opacity: 0;
-  transition: opacity 700ms ease;
+  transition: opacity 700ms ease, transform 220ms ease;
+}
+
+/* Hover swell — same subtle scale as the grid tiles, applied to the visible
+   slide (overflow:hidden on the slideshow makes it a gentle zoom-in). */
+.hero-slideshow:hover .hero-img.is-active {
+  transform: scale(1.012);
 }
 
 /* 2nd+ images out of flow — stacked on top of the first. */
@@ -323,13 +329,13 @@ html, body {
   z-index: 1;
 }
 
-/* Dot row */
+/* Dot row — sits below the EXIF caption. */
 .hero-dots {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 14px 0 6px;
+  padding: 2px 0 20px;
 }
 
 .hero-dot {
@@ -354,9 +360,9 @@ html, body {
   transform: scale(1.2);
 }
 
-/* EXIF caption below the dots */
+/* EXIF caption — sits directly below the photo, above the dots. */
 .hero-exif {
-  padding: 2px 0 20px;
+  padding: 14px 0 6px;
   font-family: var(--font-sans);
   font-size: clamp(9px, 0.6vw + 3px, 12px);
   color: var(--muted);
@@ -377,8 +383,8 @@ html, body {
   margin: 24px auto 64px;
   padding: 0 var(--grid-side-pad);
   display: grid;
-  grid-template-columns: repeat(var(--cols, 4), 1fr);
-  grid-auto-rows: 4px;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  grid-auto-rows: 1px;
   grid-auto-flow: row dense;
   row-gap: 0;
   column-gap: var(--col-gap);
@@ -404,8 +410,24 @@ html, body {
 }
 
 .tile:hover img {
-  opacity: 0.88;
   transform: scale(1.012);
+}
+
+/* Looping tile — two stacked frames that cross-fade (see buildLoopTile). The
+   wrapper carries the aspect ratio (set inline from the frames); the two images
+   stack absolutely and cross-fade via opacity. The more-specific selector beats
+   the `.tile img { height:auto }` rule above. */
+.loop-frames {
+  position: relative;
+  width: 100%;
+}
+.tile--loop .loop-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* Video tiles in the masonry grid.
@@ -435,7 +457,6 @@ html, body {
 }
 
 .tile--video:hover .video-crop-wrapper video {
-  opacity: 0.88;
   transform: scale(1.012);
 }
 
@@ -481,6 +502,9 @@ html, body {
   z-index: 100;
   padding: 32px;
   cursor: zoom-out;
+  /* The viewer handles its own pinch-zoom/pan (see script.js), so stop the
+     browser's native touch gestures from interfering on mobile. */
+  touch-action: none;
 }
 
 .lightbox.is-open { display: flex; }
@@ -653,10 +677,9 @@ html, body {
   .section-divider,
   .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
 
-  /* Two columns; photos keep their native 3:2 / 2:3 aspect (no cropping), so
-     tiles size to their image. minmax(0,1fr) stops a wide tile from stretching
-     a column past the screen edge. */
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1px; margin-bottom: 24px; }
+  /* 2-column grid + 1px auto-rows now come from the base .grid rule (used on
+     every screen). Phones just want a smaller bottom margin. */
+  .grid { margin-bottom: 24px; }
   .tile { min-width: 0; }
   /* margin-top must match CAP_OFFSET in renderGridMobile. */
   .tile-caption { font-size: 6px; margin-top: 5px; margin-bottom: 0; }
@@ -692,4 +715,5 @@ html, body {
   .tile:hover img { transform: none; }
   .tile:hover .tile-caption { transform: none; }
   .tile--video:hover .video-crop-wrapper video { transform: none; }
+  .hero-slideshow:hover .hero-img.is-active { transform: none; }
 }

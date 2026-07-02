@@ -78,6 +78,8 @@
   let heroItems = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
+  // setInterval id when a loop item is cycling in the lightbox; null otherwise.
+  let lightboxLoopTimer = null;
   // Element that had focus before the lightbox opened, so we can restore it on close.
   let lastFocusedEl = null;
   // Spec caption for videos (they have no EXIF) — shown in the grid tile and,
@@ -167,75 +169,92 @@
     return tile;
   }
 
+  // A "loop" tile: the media/loop/ frames share one slot and switch instantly
+  // (no fade) every item.intervalMs, ascending and wrapping. Timers are tracked
+  // in loopTimers so renderGrid can clear them before rebuilding the grid.
+  const loopTimers = [];
+  function buildLoopTile(item, index) {
+    const tile = document.createElement("figure");
+    tile.className = "tile tile--loop";
+    tile.dataset.id = item.id;
+
+    const frames = item.frames || [];
+    const fadeMs = item.fadeMs || 0;
+
+    // Two stacked layers so consecutive frames cross-fade instead of popping:
+    // the incoming frame fades in on top, and the outgoing one is hidden once
+    // it's fully covered — ready to become the next incoming layer.
+    const wrap = document.createElement("div");
+    wrap.className = "loop-frames";
+    if (item.width && item.height) wrap.style.aspectRatio = `${item.width} / ${item.height}`;
+
+    const layers = [document.createElement("img"), document.createElement("img")];
+    layers.forEach(im => {
+      im.className = "loop-frame";
+      im.alt = item.title || item.id;
+      im.style.transition = `opacity ${fadeMs}ms linear, transform 220ms ease`;
+      wrap.appendChild(im);
+    });
+
+    const caption = buildCaption("");
+    // Preload every frame so each cross-fade starts instantly (no flash).
+    frames.forEach(f => { const pre = new Image(); pre.src = f.thumbnail; });
+
+    if (frames[0]) {
+      layers[0].src = frames[0].thumbnail; layers[0].style.opacity = "1";
+      layers[1].style.opacity = "0";
+      caption.textContent = captionText(frames[0].exif || {});
+    }
+
+    let front = 0, k = 0;
+    if (frames.length > 1) {
+      loopTimers.push(setInterval(() => {
+        k = (k + 1) % frames.length;
+        const f = frames[k], back = 1 - front;
+        layers[back].src = f.thumbnail;
+        layers[back].style.zIndex = "1";
+        layers[front].style.zIndex = "0";
+        layers[back].style.opacity = "1";                        // fade new frame in on top
+        const outgoing = layers[front];
+        setTimeout(() => { outgoing.style.opacity = "0"; }, fadeMs);  // hide once covered
+        caption.textContent = captionText(f.exif || {});
+        front = back;
+      }, item.intervalMs || 1000));
+    }
+
+    tile.appendChild(wrap);
+    tile.appendChild(caption);
+    tile.addEventListener("click", () => openLightboxAt(index));
+    return tile;
+  }
+
   function buildTile(item, index) {
-    return item.type === "video"
-      ? buildVideoTile(item, index)
-      : buildPhotoTile(item, index);
+    if (item.type === "video") return buildVideoTile(item, index);
+    if (item.type === "loop")  return buildLoopTile(item, index);
+    return buildPhotoTile(item, index);
   }
 
-  // ---------- Column-count ----------
+  // ---------- Grid layout ----------
+  // Two-column masonry on every screen. Tiles are emitted in layout.txt order
+  // (no re-bucketing), so layout.txt is WYSIWYG — move a line, move a photo.
+  // Packing is done by `grid-auto-flow: row dense` (see CSS):
+  //   • medium (span 2) → full-width band
+  //   • portrait        → tall single-column tile (native 2:3)
+  //   • landscape/video → short single-column tile (3:2)
+  // A landscape + a portrait stacked in one column balance against a portrait +
+  // a landscape in the other, so [L,P,P,L] blocks interlock to equal height and
+  // the following medium drops in as a full-width band beneath them.
+  // Desktop and mobile run this identical routine; only the column width
+  // (viewport) and the caption reserve differ, so the two views stay in sync.
 
-  function getColumnCount() {
-    // Same 3-column masonry pattern on every screen. On phones the tiles just
-    // get smaller — tap a photo for the full-size view.
-    return 3;
-  }
+  const VIDEO_CROP_RATIO = 1.5;  // 3:2 — matches .video-crop-wrapper's aspect-ratio
 
-  // ---------- Pattern-based grid layout ─────────────────────────────────────
-  // The grid tiles in a repeating 7-item pattern: [M, H, F, F, H, M, H]
-  //
-  //   M = medium landscape  (span 2, total height 2U) — from medium_photos/
-  //   H = half landscape    (span 1, total height  U) — small landscape or video
-  //   F = full portrait     (span 1, total height 2U) — small portrait
-  //
-  // Visualised (3 columns, rows = U-height units):
-  //
-  //   ┌──────────────┬───────┐
-  //   │      M       │   H   │   ← rows 1-2
-  //   │      M       ├───────┤
-  //   │              │   F   │   ← rows 2-3
-  //   ├───────┬───────┤       │
-  //   │   F   │   H   │   F   │   ← rows 3-4
-  //   │   F   ├───────┴───────┤
-  //   │       │      M       │   ← rows 4-5
-  //   ├───────┤      M       │
-  //   │   H   │              │   ← row 5
-  //   └───────┴──────────────┘
-  //
-  // U is derived from the first medium photo in each group:
-  //   medTotalH = (2*colW + colGap) * medAR + CAPTION_H_PHOTO
-  //   U_rows    = Math.round(medTotalH / 2 / ROW_PX)
-  //
-  // Because every span is an exact integer multiple of U_rows (never
-  // independently rounded per tile), there is zero rounding drift between
-  // columns — the pattern tiles with no whitespace.
-  //
-  // Half-height photo tiles (small landscapes) get align-self: center so any
-  // sub-pixel slack is split symmetrically above and below, matching the
-  // visual centering already applied to video tiles.
-
-  const ROW_PX           = 4;    // must match grid-auto-rows in CSS
-  const CAPTION_H_PHOTO  = 19;   // photo caption visual height including margins
-  const CAPTION_H_VIDEO  = 18;   // video empty-caption height (margins only)
-  const VIDEO_CROP_RATIO = 1.5;  // 3:2 — matches CSS aspect-ratio on .video-crop-wrapper
-  const GAP_PX           = 8;    // spacing tuner between groups (increase = more space)
-
-  // Per-position padding as a FRACTION of (U_rows × ROW_PX) within each
-  // group's 7-item sequence.  Using fractions rather than absolute pixels
-  // means the corrections scale automatically with tile height — so the
-  // layout stays correct at any viewport width or browser zoom level.
-  // Positions: 0=M0, 1=H1, 2=F0, 3=F1, 4=H4, 5=M1, 6=H6
-  // Actual px at render time = Math.round(fraction × U_rows × ROW_PX).
-  const TILE_PADDING = [  0.000,   0.000,  -0.048,  -0.161,  -0.097,  -0.057,  -0.177];  // M0 H1 F0 F1 H4 M1 H6
-
-  // Fraction of U_rows to trim from the row-spans of the last two tiles per
-  // group (M1 at groupPos 5, H6 at groupPos 6).  The negative TILE_PADDING
-  // translations pull those tiles up visually without releasing their grid
-  // rows — trimming the spans closes the resulting gap before the next group.
-  // Stored as a fraction of U_rows (not absolute rows) so it scales with
-  // tile height at any viewport width.
-  // Actual rows trimmed = Math.round(fraction × U_rows).
-  const GROUP_END_TRIM = 0.220;
+  // Vertical space reserved below each image for its caption + the gap to the
+  // next tile, in px (grid-auto-rows is 1px, so a tile's row-span ≈ its pixel
+  // height). The SAME reserve on every tile is what balances the two columns;
+  // the two viewports differ only because their caption CSS does.
+  const RESERVE_DESKTOP = 34;
+  const RESERVE_MOBILE  = 21;
 
   function getGridMetrics(cols) {
     const style  = getComputedStyle(grid);
@@ -247,280 +266,32 @@
     return { colW, colGap };
   }
 
-  // Fallback span formula used only for leftover items that don't fit
-  // into a complete pattern group.
-  function tileRowSpan(item, colW, colGap) {
-    const span     = item.span || 1;
-    const displayW = colW * span + colGap * (span - 1);
-    let imgH;
-    if (item.type === "video") {
-      imgH = displayW / VIDEO_CROP_RATIO;
-    } else if (item.width && item.height) {
-      imgH = displayW * item.height / item.width;
-    } else {
-      imgH = displayW;
-    }
-    return Math.round((imgH + CAPTION_H_PHOTO) / ROW_PX) + 2;
-  }
-
-  // ---------- Mobile grid ----------
-  // Phones get a simpler 2-column layout instead of the desktop tiling pattern.
-  // Every photo keeps its native 3:2 / 2:3 aspect (no cropping). Tiles are laid
-  // out as "4-small" interlock blocks (2 portraits + 2 landscapes — each column
-  // is one portrait + one landscape, so the two columns self-balance to equal
-  // height) and full-width "medium" bands, interleaved so no two mediums ever
-  // stack. Videos are dispersed evenly through the landscape slots and shown at
-  // 3:2 like a small landscape. Relies on `grid-auto-flow: row dense` (set in
-  // CSS) to pack the interlock.
-  function renderGridMobile(list) {
+  function renderGrid(list) {
+    const isNarrow = window.innerWidth <= 700;
+    // Stop loop timers from the previous render before dropping their tiles.
+    loopTimers.forEach(clearInterval);
+    loopTimers.length = 0;
     grid.innerHTML = "";
     grid.style.setProperty("--cols", 2);
     grid.dataset.cols = 2;
+
     const { colW, colGap } = getGridMetrics(2);
-    // Tunable vertical-spacing knobs (px). Mobile grid-auto-rows is 1px (see the
-    // mobile CSS) so these land near-exactly. CAP_OFFSET must match the
-    // .tile-caption margin-top in the mobile media query.
-    const MROW       = 1;    // px per grid row on mobile
-    const CAP_OFFSET = 5;    // caption sits this far below its photo
-    const CAP_TEXT   = 8;    // caption text line height (~6px font)
-    const TILE_GAP   = 8;    // empty gap below each tile, before the next one
-    const reserve    = CAP_OFFSET + CAP_TEXT + TILE_GAP;
+    const reserve = isNarrow ? RESERVE_MOBILE : RESERVE_DESKTOP;
 
-    const mediums = [], portraits = [], landscapes = [], videos = [];
-    list.forEach(it => {
-      if (it.type === "video") videos.push(it);
-      else if (it.span === 2) mediums.push(it);
-      else if (!it.width || !it.height || it.height > it.width) portraits.push(it);
-      else landscapes.push(it);
-    });
+    // Heroes are lightbox items 0..N-1; the grid follows in this exact order.
+    items = heroItems.concat(list);
 
-    // (Videos keep their manifest/layout.txt order; they're dispersed through
-    // the landscape slots below in that order.)
-
-    // Too many full-width mediums to space out in 2 columns — demote the extras
-    // to small single-column landscapes so none end up stacked.
-    while (mediums.length > 11) landscapes.push(mediums.pop());
-
-    // Disperse the videos evenly through the landscape stream.
-    const land = landscapes.slice();
-    videos.forEach((v, k) => {
-      const pos = Math.round((k + 1) / (videos.length + 1) * (land.length + 1));
-      land.splice(Math.max(0, Math.min(pos, land.length)), 0, v);
-    });
-
-    // Small-content groups: 4-small interlock blocks (emit order L P P L), then
-    // any leftover landscapes as side-by-side pairs.
-    const smalls = [];
-    let li = 0, pi = 0;
-    while (pi + 1 < portraits.length && li + 1 < land.length) {
-      smalls.push([land[li], portraits[pi], portraits[pi + 1], land[li + 1]]);
-      li += 2; pi += 2;
-    }
-    while (li + 1 < land.length) { smalls.push([land[li], land[li + 1]]); li += 2; }
-
-    // Interleave: small group, medium, small group, medium, …
-    const seq = [];
-    let mi = 0;
-    smalls.forEach(group => {
-      group.forEach(it => seq.push({ item: it, span2: false }));
-      if (mi < mediums.length) seq.push({ item: mediums[mi++], span2: true });
-    });
-    while (mi < mediums.length) seq.push({ item: mediums[mi++], span2: true });
-    while (li < land.length)      seq.push({ item: land[li++], span2: false });
-    while (pi < portraits.length) seq.push({ item: portraits[pi++], span2: false });
-
-    items = heroItems.concat(seq.map(e => e.item));
-
-    seq.forEach(({ item, span2 }, i) => {
-      const tile = buildTile(item, heroItems.length + i);
+    list.forEach((item, i) => {
+      const tile  = buildTile(item, heroItems.length + i);
+      const span2 = item.span === 2;                 // medium → full-width band
       tile.style.gridColumn = span2 ? "span 2" : "span 1";
+
       const dispW = span2 ? (colW * 2 + colGap) : colW;
-      const imgH  = item.type === "video"
-        ? dispW / VIDEO_CROP_RATIO            // videos shown at 3:2
-        : dispW * item.height / item.width;   // photos at native aspect
-      // Reserve image + caption + gap. The same reserve on every tile keeps a
-      // block's two columns equal height.
-      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil((imgH + reserve) / MROW))}`;
-      grid.appendChild(tile);
-    });
-  }
-
-  function renderGrid(list) {
-    if (window.innerWidth <= 700) { renderGridMobile(list); return; }
-    const cols = getColumnCount();
-    grid.innerHTML = "";
-    grid.style.setProperty("--cols", cols);
-    grid.dataset.cols = cols;
-
-    const { colW, colGap } = getGridMetrics(cols);
-    const medDisplayW = colW * 2 + colGap;  // display width of a span-2 tile
-
-    // ── Categorize items ──────────────────────────────────────────────────
-    // Videos are kept in their own bucket so they can be placed precisely.
-    // Photos are split by orientation: portrait → "full", landscape → "halfPhoto".
-    const buckets = { medium: [], full: [], halfPhoto: [], video: [] };
-    list.forEach((item, origIdx) => {
-      let bucket;
-      if (item.span === 2) {
-        bucket = "medium";
-      } else if (item.type === "video") {
-        bucket = "video";
-      } else if (!item.width || !item.height || item.height > item.width) {
-        bucket = "full";       // portrait small
-      } else {
-        bucket = "halfPhoto";  // landscape small
-      }
-      buckets[bucket].push({ item, origIdx });
-    });
-
-    // ── Find how many complete groups we can fill ─────────────────────────
-    // Pattern: [M, H, F, F, H, M, H]  (7 items per group)
-    //   Even groups (0, 2, 4, …): 3 halfPhoto + 0 video
-    //   Odd  groups (1, 3, 5, …): 2 halfPhoto + 1 video  (video at center)
-    //
-    // For g groups:
-    //   halfPhoto needed = ceil(g/2)*3 + floor(g/2)*2
-    //   video     needed = floor(g/2)
-    const maxByMedFull = Math.floor(Math.min(
-      buckets.medium.length   / 2,
-      buckets.full.length     / 2
-    ));
-    let groups = 0;
-    for (let g = maxByMedFull; g >= 0; g--) {
-      const hNeed = Math.ceil(g / 2) * 3 + Math.floor(g / 2) * 2;
-      const vNeed = Math.floor(g / 2);
-      if (hNeed <= buckets.halfPhoto.length && vNeed <= buckets.video.length) {
-        groups = g;
-        break;
-      }
-    }
-
-    const renderGroups = groups;
-
-    const sequence = [];
-    let halfIdx  = 0;
-    let videoIdx = 0;
-
-    for (let g = 0; g < renderGroups; g++) {
-      // Odd groups place a video at the center H slot; even groups use a photo.
-      const isVideoGroup = (g % 2 === 1);
-
-      // ── Compute U: the minimum half-unit that fits every tile without
-      //    clipping.  We peek at all items before consuming any indices.
-      //
-      //    2U tiles (medium + portrait): need  2U ≥ contentH  →  U ≥ contentH/2
-      //    1U tiles (landscape + video): need   U ≥ contentH
-      //
-      //    After finding the tightest bound we add the group-specific gap so the
-      //    hover swell never touches the neighbouring tile.  Math.ceil guarantees
-      //    nothing is clipped.
-      const med0  = buckets.medium   [g * 2    ].item;
-      const med1  = buckets.medium   [g * 2 + 1].item;
-      const port0 = buckets.full     [g * 2    ].item;
-      const port1 = buckets.full     [g * 2 + 1].item;
-      const ph1   = buckets.halfPhoto[halfIdx                       ]?.item; // pos 1
-      const ph4   = isVideoGroup ? buckets.video[videoIdx]?.item             // pos 4 (video, peek)
-                                 : buckets.halfPhoto[halfIdx + 1]?.item;    // pos 4 (photo)
-      const ph6   = buckets.halfPhoto[halfIdx + (isVideoGroup ? 1 : 2)]?.item; // pos 6
-
-      // Total pixel height of a tile displayed at the given width.
-      const ph2U = (item, dispW) => {
-        if (!item || !item.width || !item.height) return dispW * (2/3) + CAPTION_H_PHOTO;
-        return dispW * item.height / item.width + CAPTION_H_PHOTO;
-      };
-      const ph1U = (item) => {
-        if (!item) return 0;
-        if (item.type === "video") return colW / VIDEO_CROP_RATIO + CAPTION_H_VIDEO;
-        if (!item.width || !item.height) return colW * (2/3) + CAPTION_H_PHOTO;
-        return colW * item.height / item.width + CAPTION_H_PHOTO;
-      };
-
-      const U_content = Math.max(
-        ph2U(med0,  medDisplayW) / 2,   // medium needs 2U ≥ its height
-        ph2U(med1,  medDisplayW) / 2,
-        ph2U(port0, colW)        / 2,   // portrait needs 2U ≥ its height
-        ph2U(port1, colW)        / 2,
-        ph1U(ph1),                       // half-photo at pos 1
-        ph1U(ph4),                       // video or half-photo at pos 4
-        ph1U(ph6),                       // half-photo at pos 6
-      );
-      const gapPx  = GAP_PX;
-      const U_rows = Math.max(1, Math.ceil((U_content + gapPx) / ROW_PX));
-
-      // ── Consume items (advance bucket indices) ──────────────────────────
-      const h1 = { ...buckets.halfPhoto[halfIdx++], role: "half", U_rows };
-      const h4 = isVideoGroup
-        ? { ...buckets.video    [videoIdx++], role: "half", U_rows }
-        : { ...buckets.halfPhoto[halfIdx++],  role: "half", U_rows };
-      const h6 = { ...buckets.halfPhoto[halfIdx++], role: "half", U_rows };
-
-      // groupPos 0-6 maps to: M0, H1, F0, F1, H4/H4v, M1, H6
-      [
-        { ...buckets.medium[g * 2],     role: "medium", U_rows, groupPos: 0, isVideoGroup },
-        { ...h1,                                                  groupPos: 1, isVideoGroup },
-        { ...buckets.full  [g * 2],     role: "full",   U_rows, groupPos: 2, isVideoGroup },
-        { ...buckets.full  [g * 2 + 1], role: "full",   U_rows, groupPos: 3, isVideoGroup },
-        { ...h4,                                                  groupPos: 4, isVideoGroup },
-        { ...buckets.medium[g * 2 + 1], role: "medium", U_rows, groupPos: 5, isVideoGroup },
-        { ...h6,                                                  groupPos: 6, isVideoGroup },
-      ].forEach(e => sequence.push(e));
-    }
-
-    // Append any leftover items that didn't fill a complete pattern group.
-    [
-      ...buckets.medium  .slice(groups * 2),
-      ...buckets.full    .slice(groups * 2),
-      ...buckets.halfPhoto.slice(halfIdx),
-      ...buckets.video   .slice(videoIdx),
-    ].forEach(entry => sequence.push({ ...entry, role: "leftover", U_rows: null }));
-
-    // ── Update global items array to match visual order ───────────────────
-    // Heroes are lightbox items 0..N-1; the grid follows.
-    items = heroItems.concat(sequence.map(e => e.item));
-
-    // ── Render tiles ───────────────────────────────────────────────────────
-    sequence.forEach(({ item, role, U_rows, groupPos, isVideoGroup }, seqIdx) => {
-      const tile = buildTile(item, heroItems.length + seqIdx);
-
-      // groupPos 5 (M1) and 6 (H6) are the bottom tiles of every group.
-      // Trim their row spans to close the visual gap that negative TILE_PADDING
-      // translations create (tiles move up but grid rows stay allocated).
-      // trimRows scales with U_rows so the correction stays proportional at
-      // any viewport width or zoom level.
-      // Desktop only: the trim closes a gap created by the negative TILE_PADDING
-      // nudges. On mobile tiles cover-fill, so we skip both nudges and trim.
-      const trimRows = (window.innerWidth > 700 && (groupPos === 5 || groupPos === 6))
-        ? Math.round((GROUP_END_TRIM || 0) * U_rows)
-        : 0;
-
-      if (role === "medium") {
-        tile.style.gridColumn = "span 2";
-        tile.style.gridRowEnd = `span ${2 * U_rows - trimRows}`;
-      } else if (role === "full") {
-        tile.style.gridColumn = "span 1";
-        tile.style.gridRowEnd = `span ${2 * U_rows}`;
-      } else if (role === "half") {
-        tile.style.gridColumn = "span 1";
-        tile.style.gridRowEnd = `span ${Math.max(1, U_rows - trimRows)}`;
-        if (item.type !== "video") tile.classList.add("tile--half");
-      } else {
-        // Leftover: old per-item formula as a safe fallback.
-        const span = item.span || 1;
-        tile.style.gridColumn = `span ${span}`;
-        tile.style.gridRowEnd = `span ${tileRowSpan(item, colW, colGap)}`;
-      }
-
-      // Per-position vertical nudge: TILE_PADDING fractions scaled by U_rows so
-      // they hold at any viewport width. Desktop only — mobile cover-fills its
-      // tiles (no slack), so no nudge is needed.
-      let appliedPadPx = 0;
-      if (groupPos !== undefined && window.innerWidth > 700) {
-        const frac = TILE_PADDING[groupPos] ?? 0;
-        appliedPadPx = frac ? Math.round(frac * U_rows * ROW_PX) : 0;
-      }
-      if (appliedPadPx) {
-        tile.style.transform = `translateY(${appliedPadPx}px)`;
-      }
+      let imgH;
+      if (item.type === "video")          imgH = dispW / VIDEO_CROP_RATIO;   // 3:2
+      else if (item.width && item.height) imgH = dispW * item.height / item.width;
+      else                                imgH = dispW;                      // unknown aspect
+      tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil(imgH + reserve))}`;
 
       grid.appendChild(tile);
     });
@@ -549,8 +320,19 @@
     lightboxVideo.src = "";
   }
 
+  function stopLightboxLoop() {
+    if (lightboxLoopTimer) {
+      clearInterval(lightboxLoopTimer);
+      lightboxLoopTimer = null;
+    }
+  }
+
   function showLightboxItem(item) {
+    stopLightboxLoop();
+    resetZoom(false);                 // every photo opens at 100%
+
     const isVideo = item.type === "video";
+    const isLoop  = item.type === "loop";
 
     // Toggle which media element is visible.
     lightboxImg.style.display = isVideo ? "none" : "";
@@ -566,6 +348,29 @@
       lightboxVideo.play().catch(() => {
         // Autoplay blocked — not critical; user can hit play manually.
       });
+      lightboxTitle.textContent = item.title || "";
+      lightboxExif.textContent  = VIDEO_SPEC_LABEL;
+    } else if (isLoop) {
+      // Loop: cycle the full-res frames in the lightbox at the same cadence,
+      // updating the title + specs to match whichever frame is showing.
+      stopLightboxVideo();
+      const frames = item.frames || [];
+      const show = (k) => {
+        const f = frames[k];
+        if (!f) return;
+        lightboxImg.src = f.full;
+        lightboxImg.alt = f.title || item.id;
+        lightboxTitle.textContent = f.title || "";
+        lightboxExif.textContent  = captionText(f.exif || {});
+      };
+      let k = 0;
+      show(0);
+      if (frames.length > 1) {
+        lightboxLoopTimer = setInterval(() => {
+          k = (k + 1) % frames.length;
+          show(k);
+        }, item.intervalMs || 1000);
+      }
     } else {
       // Photo path.
       stopLightboxVideo();
@@ -578,10 +383,10 @@
         preloadFull(items[(currentIndex + 1) % n]);
         preloadFull(items[(currentIndex - 1 + n) % n]);
       }
+      lightboxTitle.textContent = item.title || "";
+      lightboxExif.textContent  = captionText(item.exif || {});
     }
 
-    lightboxTitle.textContent = item.title || "";
-    lightboxExif.textContent  = isVideo ? VIDEO_SPEC_LABEL : captionText(item.exif || {});
     updateNavArrows();
   }
 
@@ -609,6 +414,8 @@
     lightbox.setAttribute("aria-hidden", "true");
     lightboxImg.src = "";
     stopLightboxVideo();
+    stopLightboxLoop();
+    resetZoom(false);
     currentIndex = -1;
     document.body.style.overflow = "";
     // Return focus to wherever it was before the lightbox opened.
@@ -626,20 +433,122 @@
     showLightboxItem(items[currentIndex]);
   }
 
-  // Touch (mobile only): swipe left = next, right = previous — same as the
-  // arrows, bounded (no wrap). A swipe suppresses the tap-to-close.
-  let lbTouchX = 0, lbTouchY = 0, lbSwiped = false;
+  // ── Touch: custom pinch-zoom + pan for the lightbox photo (mobile only) ─────
+  // The viewer owns its zoom via a CSS transform on the image (not the browser's
+  // page zoom), so we can reliably pinch to zoom the photo, drag to pan it on a
+  // static backdrop, TAP to snap back to 100%, and swipe to change photos only
+  // at 100%. touch-action:none (CSS) keeps native pinch/pan from interfering.
+  // Desktop (mouse) is untouched — every handler bails above 700px.
+  let lbSwiped = false;
+  let zScale = 1, zTx = 0, zTy = 0;             // current photo transform
+  let gMode = null;                             // 'pinch' | 'pan' | 'swipe' | null
+  let gMoved = false;
+  let gStartDist = 1, gStartScale = 1, gStartTx = 0, gStartTy = 0;
+  let gFocal0 = { x: 0, y: 0 }, gCenter = { x: 0, y: 0 }, gStart = { x: 0, y: 0 };
+  let gNatW = 0, gNatH = 0;
+  let lastTapTime = 0, lastTapX = 0, lastTapY = 0;   // double-tap-to-zoom tracking
+  const Z_MAX = 6, DOUBLE_TAP_MS = 300, DOUBLE_TAP_ZOOM = 2.5;
+
+  function applyZoom(animate) {
+    lightboxImg.style.transition = animate ? "transform 200ms ease" : "none";
+    lightboxImg.style.transform  = `translate(${zTx}px, ${zTy}px) scale(${zScale})`;
+  }
+  function resetZoom(animate) { zScale = 1; zTx = 0; zTy = 0; applyZoom(animate); }
+  function clampPan() {
+    // Keep the scaled image from being dragged past its own edges.
+    const maxX = Math.max(0, (gNatW * zScale - window.innerWidth)  / 2);
+    const maxY = Math.max(0, (gNatH * zScale - window.innerHeight) / 2);
+    zTx = Math.max(-maxX, Math.min(maxX, zTx));
+    zTy = Math.max(-maxY, Math.min(maxY, zTy));
+  }
+  const zoomable = () => lightboxImg.style.display !== "none";  // photos + loop, not video
+
   lightbox.addEventListener("touchstart", (e) => {
-    const t = e.changedTouches[0];
-    lbTouchX = t.clientX; lbTouchY = t.clientY; lbSwiped = false;
+    if (window.innerWidth > 700) return;
+    lbSwiped = false; gMoved = false;
+    gNatW = lightboxImg.offsetWidth; gNatH = lightboxImg.offsetHeight;
+    if (e.touches.length === 2 && zoomable()) {
+      gMode = "pinch";
+      const [a, b] = e.touches;
+      gStartDist  = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) || 1;
+      gStartScale = zScale; gStartTx = zTx; gStartTy = zTy;
+      gFocal0 = { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+      const r = lightboxImg.getBoundingClientRect();
+      gCenter = { x: r.left + r.width / 2 - zTx, y: r.top + r.height / 2 - zTy };
+    } else if (e.touches.length === 1) {
+      const t = e.touches[0];
+      gStart = { x: t.clientX, y: t.clientY };
+      gStartTx = zTx; gStartTy = zTy;
+      gMode = (zoomable() && zScale > 1) ? "pan" : "swipe";
+    }
   }, { passive: true });
+
+  lightbox.addEventListener("touchmove", (e) => {
+    if (window.innerWidth > 700) return;
+    if (gMode === "pinch" && e.touches.length >= 2) {
+      e.preventDefault();
+      const [a, b] = e.touches;
+      const dist  = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      const focal = { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+      const s = Math.max(1, Math.min(Z_MAX, gStartScale * (dist / gStartDist)));
+      zScale = s;
+      zTx = focal.x - gCenter.x - (s / gStartScale) * (gFocal0.x - gCenter.x - gStartTx);
+      zTy = focal.y - gCenter.y - (s / gStartScale) * (gFocal0.y - gCenter.y - gStartTy);
+      clampPan(); applyZoom(false); gMoved = true;
+    } else if (gMode === "pan" && e.touches.length === 1) {
+      e.preventDefault();
+      const t = e.touches[0];
+      zTx = gStartTx + (t.clientX - gStart.x);
+      zTy = gStartTy + (t.clientY - gStart.y);
+      clampPan(); applyZoom(false); gMoved = true;
+    } else if (gMode === "swipe" && e.touches.length === 1) {
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - gStart.x) > 10 || Math.abs(t.clientY - gStart.y) > 10) gMoved = true;
+    }
+  }, { passive: false });
+
   lightbox.addEventListener("touchend", (e) => {
-    if (window.innerWidth > 700) return;                 // mobile only
-    const t = e.changedTouches[0];
-    const dx = t.clientX - lbTouchX, dy = t.clientY - lbTouchY;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-      lbSwiped = true;
-      step(dx < 0 ? 1 : -1);                             // left=next, right=prev
+    if (window.innerWidth > 700) return;
+    if (gMode === "pinch") {
+      if (zScale <= 1.02) resetZoom(true);
+      lbSwiped = true; gMode = null; return;
+    }
+    if (gMode === "pan") {
+      if (!gMoved) resetZoom(true);           // a tap while zoomed → back to 100%
+      lbSwiped = true; gMode = null; return;
+    }
+    if (gMode === "swipe") {
+      gMode = null;
+      if (!gMoved) {
+        // Tap at 100% (a tap while zoomed is a 'pan', handled above). A double-
+        // tap on the photo zooms in toward the tapped point; a single tap does
+        // nothing here (overlay taps close via the click handler).
+        const now = Date.now();
+        const r = lightboxImg.getBoundingClientRect();
+        const onImg = zoomable() &&
+          gStart.x >= r.left && gStart.x <= r.right &&
+          gStart.y >= r.top  && gStart.y <= r.bottom;
+        if (onImg && now - lastTapTime < DOUBLE_TAP_MS &&
+            Math.abs(gStart.x - lastTapX) < 40 && Math.abs(gStart.y - lastTapY) < 40) {
+          lastTapTime = 0;                    // consume the pair
+          gNatW = lightboxImg.offsetWidth; gNatH = lightboxImg.offsetHeight;
+          const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          zScale = DOUBLE_TAP_ZOOM;
+          zTx = (gStart.x - cx) * (1 - DOUBLE_TAP_ZOOM);   // keep the tapped point fixed
+          zTy = (gStart.y - cy) * (1 - DOUBLE_TAP_ZOOM);
+          clampPan(); applyZoom(true);
+          lbSwiped = true;
+        } else {
+          lastTapTime = now; lastTapX = gStart.x; lastTapY = gStart.y;
+        }
+        return;
+      }
+      lbSwiped = true;                        // any drag suppresses the tap-to-close
+      const t = (e.changedTouches && e.changedTouches[0]) || {};
+      const dx = (t.clientX || 0) - gStart.x, dy = (t.clientY || 0) - gStart.y;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        step(dx < 0 ? 1 : -1);                // left = next, right = prev (100% only)
+      }
     }
   }, { passive: true });
 
@@ -789,8 +698,8 @@
     });
 
     heroSection.appendChild(slideshow);
-    if (heroes.length > 1) heroSection.appendChild(dotsEl);
-    heroSection.appendChild(exifEl);
+    heroSection.appendChild(exifEl);                              // exif sits directly below the photo
+    if (heroes.length > 1) heroSection.appendChild(dotsEl);       // dots below the exif
     heroSection.style.display = "";
 
     showHeroSlide(0);

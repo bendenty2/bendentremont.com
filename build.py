@@ -118,6 +118,14 @@ VIDEO_WM_RIGHT    = 13     # px: text's right edge, from the cropped frame's rig
 VIDEO_WM_BOTTOM   = 16     # px: text's bottom, from the frame's bottom (1080)
 VIDEO_CRF         = 23     # libx264 quality for the re-encode
 
+# Looping in-tile slideshow: a `loop` line in layout.txt points at media/loop/,
+# whose images share one grid tile and reveal one at a time (ascending filename
+# order, wrapping). The frames are processed like normal stills (watermark, two
+# sizes, content-hash) into photos/loop/ + thumbnails/loop/.
+LOOP_DIRNAME     = "loop"
+LOOP_INTERVAL_MS = 500     # ms each frame is shown before switching to the next
+LOOP_FADE_MS     = 0       # cross-fade duration between frames (0 = instant switch)
+
 
 # --------------------------------------------------------------------------
 # EXIF helpers
@@ -421,16 +429,90 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
         "full":      f"photos/{full_name}?v={full_v}",
         "width":     w,
         "height":    h,
-        "exif": {
-            "aperture": _format_aperture(exif.get("FNumber")),
-            "iso":      _format_iso(exif.get("ISOSpeedRatings")
-                                    or exif.get("PhotographicSensitivity")),
-            "shutter":  _format_shutter(exif.get("ExposureTime")),
-            "focal":    _format_focal(exif.get("FocalLength")),
-            "camera":   exif.get("Model"),
-            "lens":     exif.get("LensModel"),
-            "date":     _format_date(exif),
-        },
+        "exif":      _exif_fields(exif),
+    }
+
+
+def _exif_fields(exif: dict) -> dict:
+    # The caption/spec fields the site reads off each photo. Shared by stills and
+    # loop frames.
+    return {
+        "aperture": _format_aperture(exif.get("FNumber")),
+        "iso":      _format_iso(exif.get("ISOSpeedRatings")
+                                or exif.get("PhotographicSensitivity")),
+        "shutter":  _format_shutter(exif.get("ExposureTime")),
+        "focal":    _format_focal(exif.get("FocalLength")),
+        "camera":   exif.get("Model"),
+        "lens":     exif.get("LensModel"),
+        "date":     _format_date(exif),
+    }
+
+
+def process_loop(loop_dir: Path, titles: dict | None = None, span: int = 1) -> dict | None:
+    # Build one "loop" manifest item from every image in media/loop/. Each frame
+    # is resized + watermarked like a normal still (into photos/loop/ +
+    # thumbnails/loop/); the frames array is ordered ascending by filename so the
+    # tile can cycle through them.
+    frame_srcs = sorted(
+        p for p in loop_dir.iterdir()
+        if p.is_file() and p.suffix.lower() in SUPPORTED_EXTS
+    )
+    if not frame_srcs:
+        print(f"  ! loop: no images found in {loop_dir}")
+        return None
+
+    out_thumbs = THUMBS_DIR / LOOP_DIRNAME
+    out_full   = PHOTOS_DIR / LOOP_DIRNAME
+    out_thumbs.mkdir(exist_ok=True)
+    out_full.mkdir(exist_ok=True)
+
+    frames: list[dict] = []
+    for src in frame_srcs:
+        try:
+            src_img = Image.open(src)
+        except Exception as e:
+            print(f"  ! loop skip {src.name}: cannot open ({e})")
+            continue
+        exif = _named_exif(src_img)
+        img  = ImageOps.exif_transpose(src_img)
+        if img is src_img:
+            img = img.copy()
+        src_img.close()
+
+        stem = _canonical_stem(src.stem)
+        name = f"{stem}.jpg"
+        thumb = _watermark(_resize_long_edge(img, THUMB_LONG_EDGE), WATERMARK_TEXT)
+        full  = _watermark(_resize_long_edge(img, FULL_LONG_EDGE),  WATERMARK_TEXT)
+        _save_jpeg(thumb, out_thumbs / name, THUMB_QUALITY, exif_bytes=_COPYRIGHT_EXIF)
+        _save_jpeg(full,  out_full   / name, FULL_QUALITY,  exif_bytes=_COPYRIGHT_EXIF)
+
+        tv = hashlib.md5((out_thumbs / name).read_bytes()).hexdigest()[:8]
+        fv = hashlib.md5((out_full   / name).read_bytes()).hexdigest()[:8]
+        w, h = full.size
+        frames.append({
+            "id":        stem,
+            "thumbnail": f"thumbnails/{LOOP_DIRNAME}/{name}?v={tv}",
+            "full":      f"photos/{LOOP_DIRNAME}/{name}?v={fv}",
+            "width":     w,
+            "height":    h,
+            "title":     _resolve_title(stem, exif, titles or {}),
+            "exif":      _exif_fields(exif),
+        })
+
+    if not frames:
+        return None
+
+    print(f"  [loop] {len(frames)} frames ({frame_srcs[0].name} … {frame_srcs[-1].name})")
+    return {
+        "id":         "loop",
+        "type":       "loop",
+        "span":       span,
+        "intervalMs": LOOP_INTERVAL_MS,
+        "fadeMs":     LOOP_FADE_MS,
+        "width":      frames[0]["width"],   # tile sizes off the first frame
+        "height":     frames[0]["height"],
+        "title":      "",
+        "frames":     frames,
     }
 
 
@@ -540,10 +622,18 @@ def main() -> int:
     # stripped), so layout.txt's bare ids resolve whether or not a file carries a
     # "-<n>" (Lightroom) or "_DxO…" suffix. If an original and an edit share an id,
     # prefer the edit and warn so the leftover can be cleaned up.
+    # Recurse into organisational subfolders (e.g. tapes/, landscape/, portrait/)
+    # so files can be tidied into folders without breaking their layout.txt
+    # references — but skip archive/ (deliberately not displayed), loop/ (handled
+    # by process_loop) and gear/ (copied verbatim to site/gear/, see below).
+    SKIP_SUBDIRS = {"archive", "gear", LOOP_DIRNAME}
     media_index: dict[str, Path] = {}
     if MEDIA_DIR.exists():
-        for p in sorted(MEDIA_DIR.iterdir()):
+        for p in sorted(MEDIA_DIR.rglob("*")):
             if not (p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS)):
+                continue
+            rel = p.relative_to(MEDIA_DIR)
+            if len(rel.parts) > 1 and rel.parts[0] in SKIP_SUBDIRS:
                 continue
             key  = _canonical_stem(p.stem)
             prev = media_index.get(key)
@@ -574,6 +664,21 @@ def main() -> int:
             parts = line.split()
             name  = parts[0]
             tag   = " ".join(parts[1:]).lower()
+            # `loop` is the media/loop/ folder rendered as one cycling tile.
+            if name.lower() == LOOP_DIRNAME:
+                loop_dir = MEDIA_DIR / LOOP_DIRNAME
+                if not loop_dir.is_dir():
+                    print(f"  ! layout.txt line {lineno}: no '{LOOP_DIRNAME}/' "
+                          f"folder in {MEDIA_DIR.name}/")
+                    continue
+                if tag == "medium":
+                    role = "medium"
+                elif tag in ("small portrait", "portrait"):
+                    role = "small_portrait"
+                else:
+                    role = "small_landscape"
+                entries.append((loop_dir, role, "loop", "loop"))
+                continue
             src   = _resolve_source(name)
             if not src:
                 print(f"  ! layout.txt line {lineno}: no file for '{name}'")
@@ -636,6 +741,21 @@ def main() -> int:
     THUMBS_DIR.mkdir(exist_ok=True)
     PHOTOS_DIR.mkdir(exist_ok=True)
     VIDEOS_DIR.mkdir(exist_ok=True)
+
+    # Gear clips: the "About" page plays media/gear/*.mp4 from the site's gear/
+    # folder (referenced directly in index.html). They're product renders, not
+    # photos, so just copy any that changed — no resize/watermark/manifest.
+    gear_src = MEDIA_DIR / "gear"
+    if gear_src.is_dir():
+        import shutil
+        gear_out = SITE_DIR / "gear"
+        gear_out.mkdir(exist_ok=True)
+        for g in sorted(gear_src.iterdir()):
+            if g.is_file() and g.suffix.lower() in VIDEO_EXTS:
+                dest = gear_out / g.name
+                if not dest.exists() or g.stat().st_mtime > dest.stat().st_mtime:
+                    shutil.copy2(g, dest)
+                    print(f"  [gear] {g.name}")
 
     # ---- Titles sidecar --------------------------------------------------------
 
@@ -705,6 +825,10 @@ def main() -> int:
     for src, span, item_type, lbl in work_items:
         if item_type == "photo":
             entry = stem_to_entry.get(src.stem)
+            if entry:
+                entries.append(entry)
+        elif item_type == "loop":
+            entry = process_loop(src, titles=titles, span=span)
             if entry:
                 entries.append(entry)
         else:
