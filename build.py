@@ -124,7 +124,7 @@ VIDEO_CRF         = 23     # libx264 quality for the re-encode
 # sizes, content-hash) into photos/loop/ + thumbnails/loop/.
 LOOP_DIRNAME     = "loop"
 LOOP_INTERVAL_MS = 500     # ms each frame is shown before switching to the next
-LOOP_FADE_MS     = 100     # cross-fade duration between frames (0 = instant switch)
+LOOP_FADE_MS     = 0       # cross-fade duration between frames (0 = instant switch)
 
 
 # --------------------------------------------------------------------------
@@ -622,10 +622,11 @@ def main() -> int:
     # stripped), so layout.txt's bare ids resolve whether or not a file carries a
     # "-<n>" (Lightroom) or "_DxO…" suffix. If an original and an edit share an id,
     # prefer the edit and warn so the leftover can be cleaned up.
-    # Recurse into organisational subfolders (e.g. tapes/) so files can be tidied
-    # into folders without breaking their layout.txt references — but skip
-    # archive/ (deliberately not displayed) and loop/ (handled by process_loop).
-    SKIP_SUBDIRS = {"archive", LOOP_DIRNAME}
+    # Recurse into organisational subfolders (e.g. tapes/, landscape/, portrait/)
+    # so files can be tidied into folders without breaking their layout.txt
+    # references — but skip archive/ (deliberately not displayed), loop/ (handled
+    # by process_loop) and gear/ (copied verbatim to site/gear/, see below).
+    SKIP_SUBDIRS = {"archive", "gear", LOOP_DIRNAME}
     media_index: dict[str, Path] = {}
     if MEDIA_DIR.exists():
         for p in sorted(MEDIA_DIR.rglob("*")):
@@ -740,6 +741,21 @@ def main() -> int:
     THUMBS_DIR.mkdir(exist_ok=True)
     PHOTOS_DIR.mkdir(exist_ok=True)
     VIDEOS_DIR.mkdir(exist_ok=True)
+
+    # Gear clips: the "About" page plays media/gear/*.mp4 from the site's gear/
+    # folder (referenced directly in index.html). They're product renders, not
+    # photos, so just copy any that changed — no resize/watermark/manifest.
+    gear_src = MEDIA_DIR / "gear"
+    if gear_src.is_dir():
+        import shutil
+        gear_out = SITE_DIR / "gear"
+        gear_out.mkdir(exist_ok=True)
+        for g in sorted(gear_src.iterdir()):
+            if g.is_file() and g.suffix.lower() in VIDEO_EXTS:
+                dest = gear_out / g.name
+                if not dest.exists() or g.stat().st_mtime > dest.stat().st_mtime:
+                    shutil.copy2(g, dest)
+                    print(f"  [gear] {g.name}")
 
     # ---- Titles sidecar --------------------------------------------------------
 

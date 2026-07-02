@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T18:41:35",
+  "generated_at": "2026-07-02T19:04:49",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -104,7 +104,7 @@ window.PHOTOSITE_MANIFEST = {
       "type": "loop",
       "span": 1,
       "intervalMs": 500,
-      "fadeMs": 100,
+      "fadeMs": 0,
       "width": 2400,
       "height": 1600,
       "title": "",
@@ -324,22 +324,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_1831",
+      "id": "IMG_8055",
       "type": "photo",
       "span": 1,
-      "title": "Shore",
-      "thumbnail": "thumbnails/IMG_1831.jpg?v=db14fc39",
-      "full": "photos/IMG_1831.jpg?v=1eaa1879",
+      "title": "American Lady",
+      "thumbnail": "thumbnails/IMG_8055.jpg?v=2a9da0fb",
+      "full": "photos/IMG_8055.jpg?v=51a68146",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 100",
-        "shutter": "1/320s",
-        "focal": "100mm",
+        "aperture": "f/9",
+        "iso": "ISO 250",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-02-16"
+        "date": "2024-07-27"
       }
     },
     {
@@ -400,22 +400,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_8055",
+      "id": "IMG_3231",
       "type": "photo",
       "span": 2,
-      "title": "American Lady",
-      "thumbnail": "thumbnails/IMG_8055.jpg?v=2a9da0fb",
-      "full": "photos/IMG_8055.jpg?v=51a68146",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3231.jpg?v=df4b1d51",
+      "full": "photos/IMG_3231.jpg?v=33fdec78",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 250",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "aperture": "f/6.3",
+        "iso": "ISO 500",
+        "shutter": "1/500s",
+        "focal": "313mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-27"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-27"
       }
     },
     {
@@ -560,22 +560,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_3231",
+      "id": "IMG_1831",
       "type": "photo",
       "span": 1,
-      "title": null,
-      "thumbnail": "thumbnails/IMG_3231.jpg?v=df4b1d51",
-      "full": "photos/IMG_3231.jpg?v=33fdec78",
+      "title": "Shore",
+      "thumbnail": "thumbnails/IMG_1831.jpg?v=db14fc39",
+      "full": "photos/IMG_1831.jpg?v=1eaa1879",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/6.3",
-        "iso": "ISO 500",
-        "shutter": "1/500s",
-        "focal": "313mm",
+        "aperture": "f/8",
+        "iso": "ISO 100",
+        "shutter": "1/320s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2026-02-16"
       }
     },
     {
@@ -720,22 +720,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_7178",
+      "id": "IMG_8340",
       "type": "photo",
       "span": 1,
-      "title": "Black-capped Chickadee",
-      "thumbnail": "thumbnails/IMG_7178.jpg?v=f6d15643",
-      "full": "photos/IMG_7178.jpg?v=dcd61ac2",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
+      "full": "photos/IMG_8340.jpg?v=12c25b77",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 125",
-        "shutter": "1/1250s",
-        "focal": "373mm",
+        "aperture": "f/7.1",
+        "iso": "ISO 100",
+        "shutter": "1/250s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-05-05"
+        "date": "2024-08-31"
       }
     },
     {
@@ -796,22 +796,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_4210",
+      "id": "IMG_3012",
       "type": "photo",
       "span": 1,
-      "title": "MacKay Bridge",
-      "thumbnail": "thumbnails/IMG_4210.jpg?v=3250be79",
-      "full": "photos/IMG_4210.jpg?v=eb5077d8",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3012.jpg?v=94cc3dff",
+      "full": "photos/IMG_3012.jpg?v=345feb61",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/6.3",
-        "iso": "ISO 100",
-        "shutter": "1/200s",
-        "focal": "100mm",
+        "aperture": "f/5.6",
+        "iso": "ISO 12800",
+        "shutter": "1/400s",
+        "focal": "324mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-07-02"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-27"
       }
     },
     {
@@ -891,22 +891,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_3012",
+      "id": "IMG_4210",
       "type": "photo",
       "span": 1,
-      "title": null,
-      "thumbnail": "thumbnails/IMG_3012.jpg?v=94cc3dff",
-      "full": "photos/IMG_3012.jpg?v=345feb61",
+      "title": "MacKay Bridge",
+      "thumbnail": "thumbnails/IMG_4210.jpg?v=3250be79",
+      "full": "photos/IMG_4210.jpg?v=eb5077d8",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/5.6",
-        "iso": "ISO 12800",
-        "shutter": "1/400s",
-        "focal": "324mm",
+        "aperture": "f/6.3",
+        "iso": "ISO 100",
+        "shutter": "1/200s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2023-07-02"
       }
     },
     {
@@ -994,22 +994,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_8340",
+      "id": "IMG_7178",
       "type": "photo",
       "span": 1,
-      "title": null,
-      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
-      "full": "photos/IMG_8340.jpg?v=12c25b77",
+      "title": "Black-capped Chickadee",
+      "thumbnail": "thumbnails/IMG_7178.jpg?v=f6d15643",
+      "full": "photos/IMG_7178.jpg?v=dcd61ac2",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/7.1",
-        "iso": "ISO 100",
-        "shutter": "1/250s",
-        "focal": "100mm",
+        "aperture": "f/8",
+        "iso": "ISO 125",
+        "shutter": "1/1250s",
+        "focal": "373mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-31"
+        "date": "2024-05-05"
       }
     },
     {
