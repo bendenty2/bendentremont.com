@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T19:47:24",
+  "generated_at": "2026-07-02T19:55:21",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -739,22 +739,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2468",
+      "id": "IMG_2757",
       "type": "photo",
       "span": 1,
-      "title": "Wood Duck",
-      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
-      "full": "photos/IMG_2468.jpg?v=a1845b2d",
+      "title": "Song Sparrow",
+      "thumbnail": "thumbnails/IMG_2757.jpg?v=51480056",
+      "full": "photos/IMG_2757.jpg?v=2ee0df13",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 1600",
+        "aperture": "f/8",
+        "iso": "ISO 1000",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "date": "2023-04-11"
       }
     },
     {
@@ -872,22 +872,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_5767",
+      "id": "IMG_0686",
       "type": "photo",
       "span": 1,
-      "title": "Blue Jay",
-      "thumbnail": "thumbnails/IMG_5767.jpg?v=0a3bb63e",
-      "full": "photos/IMG_5767.jpg?v=531ee672",
+      "title": "Big G's",
+      "thumbnail": "thumbnails/IMG_0686.jpg?v=f65c3cb3",
+      "full": "photos/IMG_0686.jpg?v=cff3a686",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 640",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "aperture": "f/5",
+        "iso": "ISO 2000",
+        "shutter": "1/80s",
+        "focal": "25mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-11-06"
+        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
+        "date": "2023-02-06"
       }
     },
     {
@@ -1051,22 +1051,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2757",
+      "id": "IMG_2468",
       "type": "photo",
       "span": 1,
-      "title": "Song Sparrow",
-      "thumbnail": "thumbnails/IMG_2757.jpg?v=51480056",
-      "full": "photos/IMG_2757.jpg?v=2ee0df13",
+      "title": "Wood Duck",
+      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
+      "full": "photos/IMG_2468.jpg?v=a1845b2d",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 1000",
+        "aperture": "f/9",
+        "iso": "ISO 1600",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-04-11"
+        "date": "2026-05-02"
       }
     },
     {
@@ -1146,22 +1146,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_0686",
+      "id": "IMG_5767",
       "type": "photo",
       "span": 1,
-      "title": "Big G's",
-      "thumbnail": "thumbnails/IMG_0686.jpg?v=f65c3cb3",
-      "full": "photos/IMG_0686.jpg?v=cff3a686",
+      "title": "Blue Jay",
+      "thumbnail": "thumbnails/IMG_5767.jpg?v=0a3bb63e",
+      "full": "photos/IMG_5767.jpg?v=531ee672",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/5",
-        "iso": "ISO 2000",
-        "shutter": "1/80s",
-        "focal": "25mm",
+        "aperture": "f/9",
+        "iso": "ISO 640",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
-        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
-        "date": "2023-02-06"
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2023-11-06"
       }
     },
     {
