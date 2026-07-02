@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T19:04:49",
+  "generated_at": "2026-07-02T19:38:31",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -465,22 +465,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2468",
+      "id": "IMG_1998",
       "type": "photo",
       "span": 1,
-      "title": "Wood Duck",
-      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
-      "full": "photos/IMG_2468.jpg?v=a1845b2d",
+      "title": "Dunlin",
+      "thumbnail": "thumbnails/IMG_1998.jpg?v=21aa76a1",
+      "full": "photos/IMG_1998.jpg?v=16e74e69",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
-        "iso": "ISO 1600",
+        "iso": "ISO 1250",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "date": "2023-02-19"
       }
     },
     {
@@ -560,22 +560,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_1831",
+      "id": "IMG_2468",
       "type": "photo",
       "span": 1,
-      "title": "Shore",
-      "thumbnail": "thumbnails/IMG_1831.jpg?v=db14fc39",
-      "full": "photos/IMG_1831.jpg?v=1eaa1879",
+      "title": "Wood Duck",
+      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
+      "full": "photos/IMG_2468.jpg?v=a1845b2d",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 100",
-        "shutter": "1/320s",
-        "focal": "100mm",
+        "aperture": "f/9",
+        "iso": "ISO 1600",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-02-16"
+        "date": "2026-05-02"
       }
     },
     {
@@ -1032,22 +1032,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_1998",
+      "id": "IMG_1831",
       "type": "photo",
       "span": 2,
-      "title": "Dunlin",
-      "thumbnail": "thumbnails/IMG_1998.jpg?v=21aa76a1",
-      "full": "photos/IMG_1998.jpg?v=16e74e69",
+      "title": "Shore",
+      "thumbnail": "thumbnails/IMG_1831.jpg?v=db14fc39",
+      "full": "photos/IMG_1831.jpg?v=1eaa1879",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 1250",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "aperture": "f/8",
+        "iso": "ISO 100",
+        "shutter": "1/320s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-02-19"
+        "date": "2026-02-16"
       }
     },
     {
