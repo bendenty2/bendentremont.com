@@ -502,6 +502,9 @@ html, body {
   z-index: 100;
   padding: 32px;
   cursor: zoom-out;
+  /* The viewer handles its own pinch-zoom/pan (see script.js), so stop the
+     browser's native touch gestures from interfering on mobile. */
+  touch-action: none;
 }
 
 .lightbox.is-open { display: flex; }

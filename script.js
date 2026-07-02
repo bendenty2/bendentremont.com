@@ -329,6 +329,8 @@
 
   function showLightboxItem(item) {
     stopLightboxLoop();
+    resetZoom(false);                 // every photo opens at 100%
+
     const isVideo = item.type === "video";
     const isLoop  = item.type === "loop";
 
@@ -413,6 +415,7 @@
     lightboxImg.src = "";
     stopLightboxVideo();
     stopLightboxLoop();
+    resetZoom(false);
     currentIndex = -1;
     document.body.style.overflow = "";
     // Return focus to wherever it was before the lightbox opened.
@@ -430,29 +433,98 @@
     showLightboxItem(items[currentIndex]);
   }
 
-  // Touch (mobile only): swipe left = next, right = previous — same as the
-  // arrows, bounded (no wrap). A swipe suppresses the tap-to-close.
-  let lbTouchX = 0, lbTouchY = 0, lbSwiped = false;
+  // ── Touch: custom pinch-zoom + pan for the lightbox photo (mobile only) ─────
+  // The viewer owns its zoom via a CSS transform on the image (not the browser's
+  // page zoom), so we can reliably pinch to zoom the photo, drag to pan it on a
+  // static backdrop, TAP to snap back to 100%, and swipe to change photos only
+  // at 100%. touch-action:none (CSS) keeps native pinch/pan from interfering.
+  // Desktop (mouse) is untouched — every handler bails above 700px.
+  let lbSwiped = false;
+  let zScale = 1, zTx = 0, zTy = 0;             // current photo transform
+  let gMode = null;                             // 'pinch' | 'pan' | 'swipe' | null
+  let gMoved = false;
+  let gStartDist = 1, gStartScale = 1, gStartTx = 0, gStartTy = 0;
+  let gFocal0 = { x: 0, y: 0 }, gCenter = { x: 0, y: 0 }, gStart = { x: 0, y: 0 };
+  let gNatW = 0, gNatH = 0;
+  const Z_MAX = 4;
+
+  function applyZoom(animate) {
+    lightboxImg.style.transition = animate ? "transform 200ms ease" : "none";
+    lightboxImg.style.transform  = `translate(${zTx}px, ${zTy}px) scale(${zScale})`;
+  }
+  function resetZoom(animate) { zScale = 1; zTx = 0; zTy = 0; applyZoom(animate); }
+  function clampPan() {
+    // Keep the scaled image from being dragged past its own edges.
+    const maxX = Math.max(0, (gNatW * zScale - window.innerWidth)  / 2);
+    const maxY = Math.max(0, (gNatH * zScale - window.innerHeight) / 2);
+    zTx = Math.max(-maxX, Math.min(maxX, zTx));
+    zTy = Math.max(-maxY, Math.min(maxY, zTy));
+  }
+  const zoomable = () => lightboxImg.style.display !== "none";  // photos + loop, not video
+
   lightbox.addEventListener("touchstart", (e) => {
-    const t = e.changedTouches[0];
-    lbTouchX = t.clientX; lbTouchY = t.clientY; lbSwiped = false;
-  }, { passive: true });
-  lightbox.addEventListener("touchend", (e) => {
-    if (window.innerWidth > 700) return;                 // mobile only
-    const t = e.changedTouches[0];
-    const dx = t.clientX - lbTouchX, dy = t.clientY - lbTouchY;
-    // When the page is pinch-zoomed, a drag is the browser panning the zoomed
-    // photo for closer inspection — don't flip to another photo, and mark it as
-    // a swipe so it isn't treated as a tap-to-close either. Photo-changing only
-    // happens at normal (un-zoomed) scale.
-    const zoomed = window.visualViewport && window.visualViewport.scale > 1.01;
-    if (zoomed) {
-      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) lbSwiped = true;
-      return;
+    if (window.innerWidth > 700) return;
+    lbSwiped = false; gMoved = false;
+    gNatW = lightboxImg.offsetWidth; gNatH = lightboxImg.offsetHeight;
+    if (e.touches.length === 2 && zoomable()) {
+      gMode = "pinch";
+      const [a, b] = e.touches;
+      gStartDist  = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) || 1;
+      gStartScale = zScale; gStartTx = zTx; gStartTy = zTy;
+      gFocal0 = { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+      const r = lightboxImg.getBoundingClientRect();
+      gCenter = { x: r.left + r.width / 2 - zTx, y: r.top + r.height / 2 - zTy };
+    } else if (e.touches.length === 1) {
+      const t = e.touches[0];
+      gStart = { x: t.clientX, y: t.clientY };
+      gStartTx = zTx; gStartTy = zTy;
+      gMode = (zoomable() && zScale > 1) ? "pan" : "swipe";
     }
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-      lbSwiped = true;
-      step(dx < 0 ? 1 : -1);                             // left=next, right=prev
+  }, { passive: true });
+
+  lightbox.addEventListener("touchmove", (e) => {
+    if (window.innerWidth > 700) return;
+    if (gMode === "pinch" && e.touches.length >= 2) {
+      e.preventDefault();
+      const [a, b] = e.touches;
+      const dist  = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      const focal = { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+      const s = Math.max(1, Math.min(Z_MAX, gStartScale * (dist / gStartDist)));
+      zScale = s;
+      zTx = focal.x - gCenter.x - (s / gStartScale) * (gFocal0.x - gCenter.x - gStartTx);
+      zTy = focal.y - gCenter.y - (s / gStartScale) * (gFocal0.y - gCenter.y - gStartTy);
+      clampPan(); applyZoom(false); gMoved = true;
+    } else if (gMode === "pan" && e.touches.length === 1) {
+      e.preventDefault();
+      const t = e.touches[0];
+      zTx = gStartTx + (t.clientX - gStart.x);
+      zTy = gStartTy + (t.clientY - gStart.y);
+      clampPan(); applyZoom(false); gMoved = true;
+    } else if (gMode === "swipe" && e.touches.length === 1) {
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - gStart.x) > 10 || Math.abs(t.clientY - gStart.y) > 10) gMoved = true;
+    }
+  }, { passive: false });
+
+  lightbox.addEventListener("touchend", (e) => {
+    if (window.innerWidth > 700) return;
+    if (gMode === "pinch") {
+      if (zScale <= 1.02) resetZoom(true);
+      lbSwiped = true; gMode = null; return;
+    }
+    if (gMode === "pan") {
+      if (!gMoved) resetZoom(true);           // a tap while zoomed → back to 100%
+      lbSwiped = true; gMode = null; return;
+    }
+    if (gMode === "swipe") {
+      gMode = null;
+      if (!gMoved) return;                    // plain tap — overlay taps still close (click handler)
+      lbSwiped = true;                        // any drag suppresses the tap-to-close
+      const t = (e.changedTouches && e.changedTouches[0]) || {};
+      const dx = (t.clientX || 0) - gStart.x, dy = (t.clientY || 0) - gStart.y;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        step(dx < 0 ? 1 : -1);                // left = next, right = prev (100% only)
+      }
     }
   }, { passive: true });
 
