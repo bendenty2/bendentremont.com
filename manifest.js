@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T13:03:59",
+  "generated_at": "2026-07-02T13:28:46",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -103,7 +103,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "loop",
       "type": "loop",
       "span": 1,
-      "intervalMs": 1000,
+      "intervalMs": 400,
       "width": 2400,
       "height": 1600,
       "title": "",
@@ -247,22 +247,22 @@ window.PHOTOSITE_MANIFEST = {
       ]
     },
     {
-      "id": "IMG_3328",
+      "id": "IMG_3287",
       "type": "photo",
       "span": 1,
       "title": null,
-      "thumbnail": "thumbnails/IMG_3328.jpg?v=b3540c03",
-      "full": "photos/IMG_3328.jpg?v=b9ef0849",
+      "thumbnail": "thumbnails/IMG_3287.jpg?v=e281be6d",
+      "full": "photos/IMG_3287.jpg?v=6fdab974",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/5.6",
-        "iso": "ISO 100",
-        "shutter": "1/100s",
-        "focal": "283mm",
+        "iso": "ISO 1250",
+        "shutter": "1/400s",
+        "focal": "238mm",
         "camera": "Canon EOS R10",
         "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-28"
+        "date": "2026-06-27"
       }
     },
     {
@@ -342,22 +342,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_3287",
+      "id": "IMG_3328",
       "type": "photo",
       "span": 1,
       "title": null,
-      "thumbnail": "thumbnails/IMG_3287.jpg?v=e281be6d",
-      "full": "photos/IMG_3287.jpg?v=6fdab974",
+      "thumbnail": "thumbnails/IMG_3328.jpg?v=b3540c03",
+      "full": "photos/IMG_3328.jpg?v=b9ef0849",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/5.6",
-        "iso": "ISO 1250",
-        "shutter": "1/400s",
-        "focal": "238mm",
+        "iso": "ISO 100",
+        "shutter": "1/100s",
+        "focal": "283mm",
         "camera": "Canon EOS R10",
         "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "date": "2026-06-28"
       }
     },
     {
@@ -464,22 +464,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_3714",
+      "id": "IMG_2468",
       "type": "photo",
       "span": 1,
-      "title": null,
-      "thumbnail": "thumbnails/IMG_3714.jpg?v=cf30711a",
-      "full": "photos/IMG_3714.jpg?v=88148787",
+      "title": "Wood Duck",
+      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
+      "full": "photos/IMG_2468.jpg?v=a1845b2d",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/10",
-        "iso": "ISO 200",
-        "shutter": "1/800s",
-        "focal": "324mm",
+        "aperture": "f/9",
+        "iso": "ISO 1600",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-28"
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2026-05-02"
       }
     },
     {
@@ -578,22 +578,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2301",
+      "id": "IMG_3714",
       "type": "photo",
       "span": 2,
-      "title": "Red-winged Blackbird",
-      "thumbnail": "thumbnails/IMG_2301.jpg?v=d97569da",
-      "full": "photos/IMG_2301.jpg?v=23801a99",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_3714.jpg?v=cf30711a",
+      "full": "photos/IMG_3714.jpg?v=88148787",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 6400",
-        "shutter": "1/400s",
-        "focal": "400mm",
+        "aperture": "f/10",
+        "iso": "ISO 200",
+        "shutter": "1/800s",
+        "focal": "324mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-01"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-28"
       }
     },
     {
@@ -673,22 +673,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2400",
+      "id": "IMG_2301",
       "type": "photo",
       "span": 2,
-      "title": "White-breasted Nuthatch",
-      "thumbnail": "thumbnails/IMG_2400.jpg?v=a6acea91",
-      "full": "photos/IMG_2400.jpg?v=ab452e1f",
+      "title": "Red-winged Blackbird",
+      "thumbnail": "thumbnails/IMG_2301.jpg?v=d97569da",
+      "full": "photos/IMG_2301.jpg?v=23801a99",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/6.3",
-        "iso": "ISO 1250",
-        "shutter": "1/250s",
-        "focal": "123mm",
+        "aperture": "f/8",
+        "iso": "ISO 6400",
+        "shutter": "1/400s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "date": "2026-05-01"
       }
     },
     {
@@ -757,19 +757,19 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2468",
+      "id": "IMG_2400",
       "type": "photo",
       "span": 2,
-      "title": "Wood Duck",
-      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
-      "full": "photos/IMG_2468.jpg?v=a1845b2d",
+      "title": "White-breasted Nuthatch",
+      "thumbnail": "thumbnails/IMG_2400.jpg?v=a6acea91",
+      "full": "photos/IMG_2400.jpg?v=ab452e1f",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 1600",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "aperture": "f/6.3",
+        "iso": "ISO 1250",
+        "shutter": "1/250s",
+        "focal": "123mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
         "date": "2026-05-02"
@@ -1031,22 +1031,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_8502",
+      "id": "IMG_1998",
       "type": "photo",
       "span": 2,
-      "title": "Black-capped Chickadee",
-      "thumbnail": "thumbnails/IMG_8502.jpg?v=4c839b5a",
-      "full": "photos/IMG_8502.jpg?v=f96ca022",
+      "title": "Dunlin",
+      "thumbnail": "thumbnails/IMG_1998.jpg?v=21aa76a1",
+      "full": "photos/IMG_1998.jpg?v=16e74e69",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 6400",
+        "aperture": "f/9",
+        "iso": "ISO 1250",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-09-11"
+        "date": "2023-02-19"
       }
     },
     {
@@ -1221,22 +1221,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_1998",
+      "id": "IMG_8502",
       "type": "photo",
       "span": 2,
-      "title": "Dunlin",
-      "thumbnail": "thumbnails/IMG_1998.jpg?v=21aa76a1",
-      "full": "photos/IMG_1998.jpg?v=16e74e69",
+      "title": "Black-capped Chickadee",
+      "thumbnail": "thumbnails/IMG_8502.jpg?v=4c839b5a",
+      "full": "photos/IMG_8502.jpg?v=f96ca022",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 1250",
+        "aperture": "f/8",
+        "iso": "ISO 6400",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-02-19"
+        "date": "2024-09-11"
       }
     }
   ]

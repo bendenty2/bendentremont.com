@@ -123,7 +123,7 @@ VIDEO_CRF         = 23     # libx264 quality for the re-encode
 # order, wrapping). The frames are processed like normal stills (watermark, two
 # sizes, content-hash) into photos/loop/ + thumbnails/loop/.
 LOOP_DIRNAME     = "loop"
-LOOP_INTERVAL_MS = 1000    # ms each frame is shown before switching to the next
+LOOP_INTERVAL_MS = 400     # ms each frame is shown before switching to the next
 
 
 # --------------------------------------------------------------------------
@@ -620,10 +620,17 @@ def main() -> int:
     # stripped), so layout.txt's bare ids resolve whether or not a file carries a
     # "-<n>" (Lightroom) or "_DxO…" suffix. If an original and an edit share an id,
     # prefer the edit and warn so the leftover can be cleaned up.
+    # Recurse into organisational subfolders (e.g. tapes/) so files can be tidied
+    # into folders without breaking their layout.txt references — but skip
+    # archive/ (deliberately not displayed) and loop/ (handled by process_loop).
+    SKIP_SUBDIRS = {"archive", LOOP_DIRNAME}
     media_index: dict[str, Path] = {}
     if MEDIA_DIR.exists():
-        for p in sorted(MEDIA_DIR.iterdir()):
+        for p in sorted(MEDIA_DIR.rglob("*")):
             if not (p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS)):
+                continue
+            rel = p.relative_to(MEDIA_DIR)
+            if len(rel.parts) > 1 and rel.parts[0] in SKIP_SUBDIRS:
                 continue
             key  = _canonical_stem(p.stem)
             prev = media_index.get(key)
