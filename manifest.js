@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T17:54:22",
+  "generated_at": "2026-07-02T17:58:15",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -994,22 +994,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_0000",
+      "id": "IMG_8340",
       "type": "photo",
       "span": 1,
       "title": null,
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
-      "width": 680,
-      "height": 1021,
+      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
+      "full": "photos/IMG_8340.jpg?v=12c25b77",
+      "width": 1600,
+      "height": 2400,
       "exif": {
-        "aperture": null,
-        "iso": null,
-        "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "aperture": "f/7.1",
+        "iso": "ISO 100",
+        "shutter": "1/250s",
+        "focal": "100mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2024-08-31"
       }
     },
     {
