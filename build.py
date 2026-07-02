@@ -123,8 +123,8 @@ VIDEO_CRF         = 23     # libx264 quality for the re-encode
 # order, wrapping). The frames are processed like normal stills (watermark, two
 # sizes, content-hash) into photos/loop/ + thumbnails/loop/.
 LOOP_DIRNAME     = "loop"
-LOOP_INTERVAL_MS = 500     # ms each frame is shown before switching to the next
-LOOP_FADE_MS     = 250     # cross-fade duration between frames (0 = instant switch)
+LOOP_INTERVAL_MS = 300     # ms each frame is shown before switching to the next
+LOOP_FADE_MS     = 100     # cross-fade duration between frames (0 = instant switch)
 
 
 # --------------------------------------------------------------------------
