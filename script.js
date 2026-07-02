@@ -179,31 +179,50 @@
     tile.dataset.id = item.id;
 
     const frames = item.frames || [];
-    const img = document.createElement("img");
-    img.alt = item.title || item.id;
-    if (item.width && item.height) { img.width = item.width; img.height = item.height; }
+    const fadeMs = item.fadeMs || 0;
+
+    // Two stacked layers so consecutive frames cross-fade instead of popping:
+    // the incoming frame fades in on top, and the outgoing one is hidden once
+    // it's fully covered — ready to become the next incoming layer.
+    const wrap = document.createElement("div");
+    wrap.className = "loop-frames";
+    if (item.width && item.height) wrap.style.aspectRatio = `${item.width} / ${item.height}`;
+
+    const layers = [document.createElement("img"), document.createElement("img")];
+    layers.forEach(im => {
+      im.className = "loop-frame";
+      im.alt = item.title || item.id;
+      im.style.transition = `opacity ${fadeMs}ms linear, transform 220ms ease`;
+      wrap.appendChild(im);
+    });
 
     const caption = buildCaption("");
-    const show = (k) => {
-      const f = frames[k];
-      if (!f) return;
-      img.src = f.thumbnail;
-      caption.textContent = captionText(f.exif || {});
-    };
-
-    // Preload every frame up front so each switch is instantaneous (no flash).
+    // Preload every frame so each cross-fade starts instantly (no flash).
     frames.forEach(f => { const pre = new Image(); pre.src = f.thumbnail; });
 
-    let k = 0;
-    show(0);
+    if (frames[0]) {
+      layers[0].src = frames[0].thumbnail; layers[0].style.opacity = "1";
+      layers[1].style.opacity = "0";
+      caption.textContent = captionText(frames[0].exif || {});
+    }
+
+    let front = 0, k = 0;
     if (frames.length > 1) {
       loopTimers.push(setInterval(() => {
         k = (k + 1) % frames.length;
-        show(k);
+        const f = frames[k], back = 1 - front;
+        layers[back].src = f.thumbnail;
+        layers[back].style.zIndex = "1";
+        layers[front].style.zIndex = "0";
+        layers[back].style.opacity = "1";                        // fade new frame in on top
+        const outgoing = layers[front];
+        setTimeout(() => { outgoing.style.opacity = "0"; }, fadeMs);  // hide once covered
+        caption.textContent = captionText(f.exif || {});
+        front = back;
       }, item.intervalMs || 1000));
     }
 
-    tile.appendChild(img);
+    tile.appendChild(wrap);
     tile.appendChild(caption);
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
@@ -422,6 +441,15 @@
     if (window.innerWidth > 700) return;                 // mobile only
     const t = e.changedTouches[0];
     const dx = t.clientX - lbTouchX, dy = t.clientY - lbTouchY;
+    // When the page is pinch-zoomed, a drag is the browser panning the zoomed
+    // photo for closer inspection — don't flip to another photo, and mark it as
+    // a swipe so it isn't treated as a tap-to-close either. Photo-changing only
+    // happens at normal (un-zoomed) scale.
+    const zoomed = window.visualViewport && window.visualViewport.scale > 1.01;
+    if (zoomed) {
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) lbSwiped = true;
+      return;
+    }
     if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
       lbSwiped = true;
       step(dx < 0 ? 1 : -1);                             // left=next, right=prev

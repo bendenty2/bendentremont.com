@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T14:14:19",
+  "generated_at": "2026-07-02T14:35:25",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -103,7 +103,8 @@ window.PHOTOSITE_MANIFEST = {
       "id": "loop",
       "type": "loop",
       "span": 1,
-      "intervalMs": 250,
+      "intervalMs": 300,
+      "fadeMs": 100,
       "width": 2400,
       "height": 1600,
       "title": "",

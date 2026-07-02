@@ -413,6 +413,23 @@ html, body {
   transform: scale(1.012);
 }
 
+/* Looping tile — two stacked frames that cross-fade (see buildLoopTile). The
+   wrapper carries the aspect ratio (set inline from the frames); the two images
+   stack absolutely and cross-fade via opacity. The more-specific selector beats
+   the `.tile img { height:auto }` rule above. */
+.loop-frames {
+  position: relative;
+  width: 100%;
+}
+.tile--loop .loop-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* Video tiles in the masonry grid.
    Displayed at 3:2 to match the half-photo tiles — the footage is squished
    vertically (object-fit: fill) rather than cropped, so no bars are removed. */

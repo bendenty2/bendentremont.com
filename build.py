@@ -123,7 +123,8 @@ VIDEO_CRF         = 23     # libx264 quality for the re-encode
 # order, wrapping). The frames are processed like normal stills (watermark, two
 # sizes, content-hash) into photos/loop/ + thumbnails/loop/.
 LOOP_DIRNAME     = "loop"
-LOOP_INTERVAL_MS = 250     # ms each frame is shown before switching to the next
+LOOP_INTERVAL_MS = 300     # ms each frame is shown before switching to the next
+LOOP_FADE_MS     = 100     # cross-fade duration between frames (0 = instant switch)
 
 
 # --------------------------------------------------------------------------
@@ -507,6 +508,7 @@ def process_loop(loop_dir: Path, titles: dict | None = None, span: int = 1) -> d
         "type":       "loop",
         "span":       span,
         "intervalMs": LOOP_INTERVAL_MS,
+        "fadeMs":     LOOP_FADE_MS,
         "width":      frames[0]["width"],   # tile sizes off the first frame
         "height":     frames[0]["height"],
         "title":      "",
