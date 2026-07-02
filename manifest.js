@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T19:38:31",
+  "generated_at": "2026-07-02T19:47:24",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -560,22 +560,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_2468",
+      "id": "IMG_7379",
       "type": "photo",
       "span": 1,
-      "title": "Wood Duck",
-      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
-      "full": "photos/IMG_2468.jpg?v=a1845b2d",
+      "title": "Northern Lights",
+      "thumbnail": "thumbnails/IMG_7379.jpg?v=04c7ad95",
+      "full": "photos/IMG_7379.jpg?v=13c97689",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
+        "aperture": "f/4.5",
         "iso": "ISO 1600",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "shutter": "30s",
+        "focal": "18mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
+        "date": "2024-05-12"
       }
     },
     {
@@ -598,22 +598,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_7985",
+      "id": "IMG_3623",
       "type": "photo",
       "span": 1,
-      "title": "Widow Skimmer",
-      "thumbnail": "thumbnails/IMG_7985.jpg?v=7999864d",
-      "full": "photos/IMG_7985.jpg?v=bdf41abe",
+      "title": "Yellow Warbler",
+      "thumbnail": "thumbnails/IMG_3623.jpg?v=c49c5860",
+      "full": "photos/IMG_3623.jpg?v=1c95623a",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 640",
+        "aperture": "f/8",
+        "iso": "ISO 250",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-27"
+        "date": "2023-05-27"
       }
     },
     {
@@ -739,22 +739,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_7379",
+      "id": "IMG_2468",
       "type": "photo",
       "span": 1,
-      "title": "Northern Lights",
-      "thumbnail": "thumbnails/IMG_7379.jpg?v=04c7ad95",
-      "full": "photos/IMG_7379.jpg?v=13c97689",
+      "title": "Wood Duck",
+      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
+      "full": "photos/IMG_2468.jpg?v=a1845b2d",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/4.5",
+        "aperture": "f/9",
         "iso": "ISO 1600",
-        "shutter": "30s",
-        "focal": "18mm",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
-        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
-        "date": "2024-05-12"
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2026-05-02"
       }
     },
     {
@@ -834,22 +834,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_3623",
+      "id": "IMG_7985",
       "type": "photo",
       "span": 1,
-      "title": "Yellow Warbler",
-      "thumbnail": "thumbnails/IMG_3623.jpg?v=c49c5860",
-      "full": "photos/IMG_3623.jpg?v=1c95623a",
+      "title": "Widow Skimmer",
+      "thumbnail": "thumbnails/IMG_7985.jpg?v=7999864d",
+      "full": "photos/IMG_7985.jpg?v=bdf41abe",
       "width": 2400,
       "height": 1600,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 250",
+        "aperture": "f/9",
+        "iso": "ISO 640",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-05-27"
+        "date": "2024-07-27"
       }
     },
     {
