@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T21:17:20",
+  "generated_at": "2026-07-02T21:48:46",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
