@@ -624,8 +624,9 @@ def main() -> int:
     # prefer the edit and warn so the leftover can be cleaned up.
     # Recurse into organisational subfolders (e.g. tapes/, landscape/, portrait/)
     # so files can be tidied into folders without breaking their layout.txt
-    # references — but skip archive/ (deliberately not displayed), loop/ (handled
-    # by process_loop) and gear/ (copied verbatim to site/gear/, see below).
+    # references — but skip, at ANY depth, archive/ (deliberately not displayed;
+    # may be nested, e.g. landscape/archive/), loop/ (handled by process_loop)
+    # and gear/ (copied verbatim to site/gear/, see below).
     SKIP_SUBDIRS = {"archive", "gear", LOOP_DIRNAME}
     media_index: dict[str, Path] = {}
     if MEDIA_DIR.exists():
@@ -633,7 +634,7 @@ def main() -> int:
             if not (p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS)):
                 continue
             rel = p.relative_to(MEDIA_DIR)
-            if len(rel.parts) > 1 and rel.parts[0] in SKIP_SUBDIRS:
+            if set(rel.parts[:-1]) & SKIP_SUBDIRS:   # any parent dir is a skip folder
                 continue
             key  = _canonical_stem(p.stem)
             prev = media_index.get(key)

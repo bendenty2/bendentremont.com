@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T19:55:21",
+  "generated_at": "2026-07-02T21:04:30",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -427,41 +427,41 @@ window.PHOTOSITE_MANIFEST = {
       "height": null
     },
     {
-      "id": "IMG_1867",
+      "id": "IMG_8340",
       "type": "photo",
       "span": 1,
-      "title": "Lighthouse",
-      "thumbnail": "thumbnails/IMG_1867.jpg?v=801ba820",
-      "full": "photos/IMG_1867.jpg?v=50454216",
+      "title": null,
+      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
+      "full": "photos/IMG_8340.jpg?v=12c25b77",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 200",
-        "shutter": "1/500s",
-        "focal": "300mm",
+        "aperture": "f/7.1",
+        "iso": "ISO 100",
+        "shutter": "1/250s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-02-16"
+        "date": "2024-08-31"
       }
     },
     {
-      "id": "IMG_2378",
+      "id": "IMG_8127",
       "type": "photo",
       "span": 1,
-      "title": "Mute Swan",
-      "thumbnail": "thumbnails/IMG_2378.jpg?v=4ed36c34",
-      "full": "photos/IMG_2378.jpg?v=5bca4744",
+      "title": "Sailboat",
+      "thumbnail": "thumbnails/IMG_8127.jpg?v=6b1ca1ce",
+      "full": "photos/IMG_8127.jpg?v=82fc33ca",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 640",
-        "shutter": "1/640s",
-        "focal": "400mm",
+        "aperture": "f/7.1",
+        "iso": "ISO 500",
+        "shutter": "1/320s",
+        "focal": "200mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-01"
+        "date": "2024-08-23"
       }
     },
     {
@@ -522,22 +522,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_8127",
+      "id": "IMG_2378",
       "type": "photo",
       "span": 1,
-      "title": "Sailboat",
-      "thumbnail": "thumbnails/IMG_8127.jpg?v=6b1ca1ce",
-      "full": "photos/IMG_8127.jpg?v=82fc33ca",
+      "title": "Mute Swan",
+      "thumbnail": "thumbnails/IMG_2378.jpg?v=4ed36c34",
+      "full": "photos/IMG_2378.jpg?v=5bca4744",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/7.1",
-        "iso": "ISO 500",
-        "shutter": "1/320s",
-        "focal": "200mm",
+        "aperture": "f/8",
+        "iso": "ISO 640",
+        "shutter": "1/640s",
+        "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-23"
+        "date": "2026-05-01"
       }
     },
     {
@@ -720,22 +720,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_8340",
+      "id": "IMG_1867",
       "type": "photo",
       "span": 1,
-      "title": null,
-      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
-      "full": "photos/IMG_8340.jpg?v=12c25b77",
+      "title": "Lighthouse",
+      "thumbnail": "thumbnails/IMG_1867.jpg?v=801ba820",
+      "full": "photos/IMG_1867.jpg?v=50454216",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/7.1",
-        "iso": "ISO 100",
-        "shutter": "1/250s",
-        "focal": "100mm",
+        "aperture": "f/9",
+        "iso": "ISO 200",
+        "shutter": "1/500s",
+        "focal": "300mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-31"
+        "date": "2026-02-16"
       }
     },
     {
