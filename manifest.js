@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T21:48:46",
+  "generated_at": "2026-07-02T22:13:29",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -343,22 +343,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_3328",
+      "id": "IMG_8340",
       "type": "photo",
       "span": 1,
       "title": null,
-      "thumbnail": "thumbnails/IMG_3328.jpg?v=b3540c03",
-      "full": "photos/IMG_3328.jpg?v=b9ef0849",
+      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
+      "full": "photos/IMG_8340.jpg?v=12c25b77",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/5.6",
+        "aperture": "f/7.1",
         "iso": "ISO 100",
-        "shutter": "1/100s",
-        "focal": "283mm",
+        "shutter": "1/250s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-28"
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2024-08-31"
       }
     },
     {
@@ -427,22 +427,22 @@ window.PHOTOSITE_MANIFEST = {
       "height": null
     },
     {
-      "id": "IMG_8340",
+      "id": "IMG_3328",
       "type": "photo",
       "span": 1,
       "title": null,
-      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
-      "full": "photos/IMG_8340.jpg?v=12c25b77",
+      "thumbnail": "thumbnails/IMG_3328.jpg?v=b3540c03",
+      "full": "photos/IMG_3328.jpg?v=b9ef0849",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/7.1",
+        "aperture": "f/5.6",
         "iso": "ISO 100",
-        "shutter": "1/250s",
-        "focal": "100mm",
+        "shutter": "1/100s",
+        "focal": "283mm",
         "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-31"
+        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
+        "date": "2026-06-28"
       }
     },
     {
