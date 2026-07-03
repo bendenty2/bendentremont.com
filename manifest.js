@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T22:13:29",
+  "generated_at": "2026-07-02T22:18:58",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -419,12 +419,23 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "Tape1_clip1_beach",
-      "type": "video",
-      "title": "Crystal Crescent Beach",
-      "src": "videos/Tape1_clip1_beach.mp4?v=7e143c60",
-      "width": null,
-      "height": null
+      "id": "IMG_1998",
+      "type": "photo",
+      "span": 1,
+      "title": "Dunlin",
+      "thumbnail": "thumbnails/IMG_1998.jpg?v=21aa76a1",
+      "full": "photos/IMG_1998.jpg?v=16e74e69",
+      "width": 2400,
+      "height": 1600,
+      "exif": {
+        "aperture": "f/9",
+        "iso": "ISO 1250",
+        "shutter": "1/640s",
+        "focal": "400mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2023-02-19"
+      }
     },
     {
       "id": "IMG_3328",
@@ -465,23 +476,12 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_1998",
-      "type": "photo",
-      "span": 1,
-      "title": "Dunlin",
-      "thumbnail": "thumbnails/IMG_1998.jpg?v=21aa76a1",
-      "full": "photos/IMG_1998.jpg?v=16e74e69",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 1250",
-        "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-02-19"
-      }
+      "id": "Tape1_clip1_beach",
+      "type": "video",
+      "title": "Crystal Crescent Beach",
+      "src": "videos/Tape1_clip1_beach.mp4?v=7e143c60",
+      "width": null,
+      "height": null
     },
     {
       "id": "IMG_2214",
@@ -929,23 +929,12 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_4289",
-      "type": "photo",
-      "span": 1,
-      "title": "Landing at Stanfield",
-      "thumbnail": "thumbnails/IMG_4289.jpg?v=62cdc04a",
-      "full": "photos/IMG_4289.jpg?v=57412954",
-      "width": 2400,
-      "height": 1600,
-      "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 125",
-        "shutter": "1/200s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-07-03"
-      }
+      "id": "Tape1_clip5_fire3",
+      "type": "video",
+      "title": "Camping on the Magaguadavic",
+      "src": "videos/Tape1_clip5_fire3.mp4?v=4642140f",
+      "width": null,
+      "height": null
     },
     {
       "id": "IMG_0642",
@@ -967,12 +956,23 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "Tape1_clip5_fire3",
-      "type": "video",
-      "title": "Camping on the Magaguadavic",
-      "src": "videos/Tape1_clip5_fire3.mp4?v=4642140f",
-      "width": null,
-      "height": null
+      "id": "IMG_4289",
+      "type": "photo",
+      "span": 1,
+      "title": "Landing at Stanfield",
+      "thumbnail": "thumbnails/IMG_4289.jpg?v=62cdc04a",
+      "full": "photos/IMG_4289.jpg?v=57412954",
+      "width": 2400,
+      "height": 1600,
+      "exif": {
+        "aperture": "f/8",
+        "iso": "ISO 125",
+        "shutter": "1/200s",
+        "focal": "400mm",
+        "camera": "Canon EOS R10",
+        "lens": "RF100-400mm F5.6-8 IS USM",
+        "date": "2023-07-03"
+      }
     },
     {
       "id": "IMG_1637",
