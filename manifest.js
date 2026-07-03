@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-02T21:04:30",
+  "generated_at": "2026-07-02T21:17:20",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -446,22 +446,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_8127",
+      "id": "IMG_6008",
       "type": "photo",
       "span": 1,
-      "title": "Sailboat",
-      "thumbnail": "thumbnails/IMG_8127.jpg?v=6b1ca1ce",
-      "full": "photos/IMG_8127.jpg?v=82fc33ca",
+      "title": "Halifax Harbour",
+      "thumbnail": "thumbnails/IMG_6008.jpg?v=9be19716",
+      "full": "photos/IMG_6008.jpg?v=9e988228",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/7.1",
-        "iso": "ISO 500",
-        "shutter": "1/320s",
-        "focal": "200mm",
+        "aperture": "f/5.6",
+        "iso": "ISO 640",
+        "shutter": "1/160s",
+        "focal": "100mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-23"
+        "date": "2023-12-16"
       }
     },
     {
@@ -541,22 +541,22 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_0920",
+      "id": "IMG_7746",
       "type": "photo",
       "span": 1,
-      "title": "Alder Flycatcher",
-      "thumbnail": "thumbnails/IMG_0920.jpg?v=06d5067a",
-      "full": "photos/IMG_0920.jpg?v=23bd7391",
+      "title": "Bald Eagle",
+      "thumbnail": "thumbnails/IMG_7746.jpg?v=d6e917fd",
+      "full": "photos/IMG_7746.jpg?v=5be9e287",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/8",
-        "iso": "ISO 200",
+        "aperture": "f/9",
+        "iso": "ISO 1000",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-06-01"
+        "date": "2024-07-13"
       }
     },
     {
@@ -617,41 +617,41 @@ window.PHOTOSITE_MANIFEST = {
       }
     },
     {
-      "id": "IMG_7746",
+      "id": "IMG_0920",
       "type": "photo",
       "span": 1,
-      "title": "Bald Eagle",
-      "thumbnail": "thumbnails/IMG_7746.jpg?v=d6e917fd",
-      "full": "photos/IMG_7746.jpg?v=5be9e287",
+      "title": "Alder Flycatcher",
+      "thumbnail": "thumbnails/IMG_0920.jpg?v=06d5067a",
+      "full": "photos/IMG_0920.jpg?v=23bd7391",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/9",
-        "iso": "ISO 1000",
+        "aperture": "f/8",
+        "iso": "ISO 200",
         "shutter": "1/640s",
         "focal": "400mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-13"
+        "date": "2025-06-01"
       }
     },
     {
-      "id": "IMG_6008",
+      "id": "IMG_8127",
       "type": "photo",
       "span": 1,
-      "title": "Halifax Harbour",
-      "thumbnail": "thumbnails/IMG_6008.jpg?v=9be19716",
-      "full": "photos/IMG_6008.jpg?v=9e988228",
+      "title": "Sailboat",
+      "thumbnail": "thumbnails/IMG_8127.jpg?v=6b1ca1ce",
+      "full": "photos/IMG_8127.jpg?v=82fc33ca",
       "width": 1600,
       "height": 2400,
       "exif": {
-        "aperture": "f/5.6",
-        "iso": "ISO 640",
-        "shutter": "1/160s",
-        "focal": "100mm",
+        "aperture": "f/7.1",
+        "iso": "ISO 500",
+        "shutter": "1/320s",
+        "focal": "200mm",
         "camera": "Canon EOS R10",
         "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-12-16"
+        "date": "2024-08-23"
       }
     },
     {
