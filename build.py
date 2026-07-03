@@ -624,8 +624,9 @@ def main() -> int:
     # prefer the edit and warn so the leftover can be cleaned up.
     # Recurse into organisational subfolders (e.g. tapes/, landscape/, portrait/)
     # so files can be tidied into folders without breaking their layout.txt
-    # references — but skip archive/ (deliberately not displayed), loop/ (handled
-    # by process_loop) and gear/ (copied verbatim to site/gear/, see below).
+    # references — but skip, at ANY depth, archive/ (deliberately not displayed;
+    # may be nested, e.g. landscape/archive/), loop/ (handled by process_loop)
+    # and gear/ (copied verbatim to site/gear/, see below).
     SKIP_SUBDIRS = {"archive", "gear", LOOP_DIRNAME}
     media_index: dict[str, Path] = {}
     if MEDIA_DIR.exists():
@@ -633,7 +634,7 @@ def main() -> int:
             if not (p.is_file() and p.suffix.lower() in (SUPPORTED_EXTS | VIDEO_EXTS)):
                 continue
             rel = p.relative_to(MEDIA_DIR)
-            if len(rel.parts) > 1 and rel.parts[0] in SKIP_SUBDIRS:
+            if set(rel.parts[:-1]) & SKIP_SUBDIRS:   # any parent dir is a skip folder
                 continue
             key  = _canonical_stem(p.stem)
             prev = media_index.get(key)
@@ -703,20 +704,57 @@ def main() -> int:
 
     # ---- Discover sources -------------------------------------------------------
 
-    # Page order comes entirely from layout.txt: hero-tagged lines become the
-    # slideshow, the rest become grid tiles, all in file order.
-    work_items: list[tuple]  = []    # grid: (Path, span, item_type, label)
+    # layout.txt lists hero-tagged lines first (the slideshow), then the grid
+    # items BUCKETED BY TYPE: all landscape-like items (small landscapes + videos
+    # + the loop), then all small portraits, then all mediums — each in the order
+    # they should appear WITHIN their type. The grid packs 5-item groups
+    # [L P P L M], so we re-interleave the buckets back into that visual order:
+    #   group g = land[2g], port[2g], port[2g+1], land[2g+1], med[g]
+    # so the manifest (and lightbox) end up in true visual order and the renderer
+    # stays a straight WYSIWYG pass. Items that don't complete a group are
+    # appended in type order.
+    work_items: list[tuple]  = []    # grid: (Path, span, item_type, label) — VISUAL order
     hero_sources: list[Path] = []    # heroes in display order
     grid_roles: dict[str, str] = {}  # stem -> declared role, for a sanity check
+
+    grid_entries: list[tuple] = []   # (src, role, item_type, name) in file order
     if LAYOUT_FILE.exists():
         for src, role, item_type, name in _read_layout():
             if role == "hero":
                 hero_sources.append(src)
             else:
-                span = 2 if role == "medium" else 1
-                work_items.append((src, span, item_type, name))
-                if item_type == "photo":
-                    grid_roles[src.stem] = role
+                grid_entries.append((src, role, item_type, name))
+
+    def _bucket(e):
+        _src, role, item_type, _name = e
+        if item_type in ("video", "loop") or role == "small_landscape":
+            return "L"
+        if role == "small_portrait":
+            return "P"
+        if role == "medium":
+            return "M"
+        return None
+    landlike = [e for e in grid_entries if _bucket(e) == "L"]
+    ports    = [e for e in grid_entries if _bucket(e) == "P"]
+    meds     = [e for e in grid_entries if _bucket(e) == "M"]
+    other    = [e for e in grid_entries if _bucket(e) is None]
+
+    n_groups = min(len(landlike) // 2, len(ports) // 2, len(meds))
+    ordered  = []
+    for g in range(n_groups):
+        ordered += [landlike[2*g], ports[2*g], ports[2*g + 1], landlike[2*g + 1], meds[g]]
+    leftovers = landlike[2*n_groups:] + ports[2*n_groups:] + meds[n_groups:] + other
+    if leftovers:
+        print(f"  ~ layout.txt: {len(leftovers)} item(s) don't complete a 5-item "
+              f"[L P P L M] group ({len(landlike)}L/{len(ports)}P/{len(meds)}M) — "
+              f"appended after {n_groups} full groups")
+    ordered += leftovers
+
+    for src, role, item_type, name in ordered:
+        span = 2 if role == "medium" else 1
+        work_items.append((src, span, item_type, name))
+        if item_type == "photo":
+            grid_roles[src.stem] = role
 
     if not hero_sources and not work_items:
         sys.stderr.write(
