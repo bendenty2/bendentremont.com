@@ -9,6 +9,11 @@
    ------------------------------------------------------------ */
 
 (() => {
+  // Always open at the top on refresh — by default browsers restore the previous
+  // scroll position on reload, which lands you mid-grid. Opt out and snap to top.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.addEventListener("load", () => window.scrollTo(0, 0));
+
   // ---------- View switching (pics / about) ----------
   // The sidebar buttons each carry a data-view attribute; clicking one
   // toggles which <section class="view"> is visible. The site always opens on
