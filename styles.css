@@ -24,6 +24,16 @@
 
 * { box-sizing: border-box; }
 
+html {
+  /* Always reserve the scrollbar's space so the viewport width can't shift when
+     the (tall) grid makes the scrollbar appear. Otherwise the grid renders at the
+     no-scrollbar width, then the classic Windows/desktop scrollbar narrows the
+     page ~15px — images reflow but the masonry row-spans don't, throwing the
+     gutters and photo bottoms off. Mobile already looked perfect because it uses
+     overlay scrollbars (no width shift). */
+  scrollbar-gutter: stable;
+}
+
 html, body {
   margin: 0;
   padding: 0;
