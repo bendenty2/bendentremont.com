@@ -103,11 +103,22 @@
       .join(CAPTION_SEP);
   }
 
-  function buildCaption(text) {
+  // Grid caption: the photo's title on the left, its specs on the right.
+  function buildDualCaption(title, specs) {
     const div = document.createElement("div");
     div.className = "tile-caption";
-    div.textContent = text;
+    const t = document.createElement("span");
+    t.className = "cap-title";
+    t.textContent = title || "";
+    const s = document.createElement("span");
+    s.className = "cap-specs";
+    s.textContent = specs || "";
+    div.append(t, s);
     return div;
+  }
+  function setCaption(cap, title, specs) {
+    const t = cap.querySelector(".cap-title"); if (t) t.textContent = title || "";
+    const s = cap.querySelector(".cap-specs"); if (s) s.textContent = specs || "";
   }
 
   // ---------- Hover-preload (photos only) ----------
@@ -138,7 +149,7 @@
     }
 
     tile.appendChild(img);
-    tile.appendChild(buildCaption(captionText(item.exif || {})));
+    tile.appendChild(buildDualCaption(item.title, captionText(item.exif || {})));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     tile.addEventListener("mouseenter", () => preloadFull(item), { once: true });
@@ -166,9 +177,9 @@
     cropWrap.appendChild(video);
 
     tile.appendChild(cropWrap);
-    // Videos have no EXIF specs like the R10 stills, so the grid caption is a
-    // fixed format label. The real title still shows in the lightbox on click.
-    tile.appendChild(buildCaption(VIDEO_SPEC_LABEL));
+    // Videos have no EXIF specs like the R10 stills, so the "specs" slot is the
+    // fixed format label; the title (if any) sits on the left like the photos.
+    tile.appendChild(buildDualCaption(item.title, VIDEO_SPEC_LABEL));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
@@ -201,14 +212,14 @@
       wrap.appendChild(im);
     });
 
-    const caption = buildCaption("");
+    const caption = buildDualCaption("", "");
     // Preload every frame so each cross-fade starts instantly (no flash).
     frames.forEach(f => { const pre = new Image(); pre.src = f.thumbnail; });
 
     if (frames[0]) {
       layers[0].src = frames[0].thumbnail; layers[0].style.opacity = "1";
       layers[1].style.opacity = "0";
-      caption.textContent = captionText(frames[0].exif || {});
+      setCaption(caption, frames[0].title, captionText(frames[0].exif || {}));
     }
 
     let front = 0, k = 0;
@@ -222,7 +233,7 @@
         layers[back].style.opacity = "1";                        // fade new frame in on top
         const outgoing = layers[front];
         setTimeout(() => { outgoing.style.opacity = "0"; }, fadeMs);  // hide once covered
-        caption.textContent = captionText(f.exif || {});
+        setCaption(caption, f.title, captionText(f.exif || {}));
         front = back;
       }, item.intervalMs || 1000));
     }
@@ -646,25 +657,83 @@
     const slideshow = document.createElement("div");
     slideshow.className = "hero-slideshow";
 
-    // Tap the hero to open it in the lightbox (then arrow on into the rest of the
-    // catalogue). On touch (mobile only), a horizontal swipe cycles slides
-    // instead — left = next, right = previous (both wrap). Desktop keeps the
-    // auto-advance + clickable dots; no swipe there.
+    // Tap the hero to open it in the lightbox. On touch (mobile only), drag
+    // horizontally to SLIDE between photos Instagram-style — you see slivers of
+    // both neighbours mid-drag — snapping to the next/prev (both wrap) on release.
+    // The AUTO-advance keeps its fade (showHeroSlide); only the manual gesture
+    // slides. Desktop fires no touch events, so it's untouched.
     let swipeStartX = 0, swipeStartY = 0, didSwipe = false;
+    let heroDragging = false, heroNeighbor = -1;
+    const heroW = () => slideshow.clientWidth || 1;
+
+    function clearHeroImg(img) {
+      img.style.transition = ""; img.style.transform = "";
+      img.style.opacity = ""; img.style.zIndex = "";
+    }
+    function finishHeroSlide(landingIdx) {
+      showHeroSlide(landingIdx);             // is-active/dots/exif for the landing slide
+      heroSlides.forEach(s => {              // snap every img back to the crossfade-stack state,
+        s.img.style.transition = "none";     // instantly (no fade artifact)
+        s.img.style.transform = ""; s.img.style.opacity = ""; s.img.style.zIndex = "";
+      });
+      void slideshow.offsetWidth;            // flush, then restore CSS transitions for the next fade
+      heroSlides.forEach(s => { s.img.style.transition = ""; });
+      startHeroTimer();                      // resume auto-advance
+    }
+
     slideshow.addEventListener("touchstart", (e) => {
       const t = e.changedTouches[0];
-      swipeStartX = t.clientX; swipeStartY = t.clientY; didSwipe = false;
+      swipeStartX = t.clientX; swipeStartY = t.clientY;
+      didSwipe = false; heroDragging = false; heroNeighbor = -1;
     }, { passive: true });
-    slideshow.addEventListener("touchend", (e) => {
-      if (window.innerWidth > 700) return;                 // mobile only
+
+    slideshow.addEventListener("touchmove", (e) => {
+      if (window.innerWidth > 700 || heroSlides.length < 2) return;
       const t = e.changedTouches[0];
       const dx = t.clientX - swipeStartX, dy = t.clientY - swipeStartY;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-        didSwipe = true;                                   // suppress tap-to-open
-        showHeroSlide(heroActiveIdx + (dx < 0 ? 1 : -1));  // left=next, right=prev
-        startHeroTimer();                                  // reset auto-advance
+      if (!heroDragging) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;  // wait for a clear horizontal drag
+        heroDragging = true; didSwipe = true;
+        clearInterval(heroTimer);            // pause auto-advance while dragging
+      }
+      e.preventDefault();                    // lock to horizontal (passive:false below)
+      const w = heroW(), n = heroSlides.length;
+      const nIdx = dx < 0 ? (heroActiveIdx + 1) % n : (heroActiveIdx - 1 + n) % n;
+      if (heroNeighbor !== -1 && heroNeighbor !== nIdx) clearHeroImg(heroSlides[heroNeighbor].img);
+      heroNeighbor = nIdx;
+      const active = heroSlides[heroActiveIdx].img, neighbor = heroSlides[nIdx].img;
+      const off = dx < 0 ? w : -w;           // neighbour's off-screen home (from the right for next)
+      active.style.transition = "none";
+      active.style.transform = `translateX(${dx}px)`;
+      active.style.opacity = "1"; active.style.zIndex = "2";
+      neighbor.style.transition = "none";
+      neighbor.style.transform = `translateX(${dx + off}px)`;
+      neighbor.style.opacity = "1"; neighbor.style.zIndex = "1";
+    }, { passive: false });
+
+    slideshow.addEventListener("touchend", (e) => {
+      if (!heroDragging) return;             // a tap (or vertical scroll) — click opens the lightbox
+      heroDragging = false;
+      const active = heroSlides[heroActiveIdx].img;
+      const neighbor = heroNeighbor !== -1 ? heroSlides[heroNeighbor].img : null;
+      const dx = e.changedTouches[0].clientX - swipeStartX;
+      const w = heroW();
+      const commit = neighbor && Math.abs(dx) > Math.min(60, w * 0.18);
+      const off = dx < 0 ? w : -w, DUR = 260;
+      active.style.transition = `transform ${DUR}ms ease`;
+      if (neighbor) neighbor.style.transition = `transform ${DUR}ms ease`;
+      if (commit) {
+        active.style.transform = `translateX(${-off}px)`;   // active slides fully out
+        neighbor.style.transform = "translateX(0px)";       // neighbour to centre
+        const landing = heroNeighbor;
+        setTimeout(() => finishHeroSlide(landing), DUR);
+      } else {
+        active.style.transform = "translateX(0px)";         // snap back
+        if (neighbor) neighbor.style.transform = `translateX(${off}px)`;
+        setTimeout(() => finishHeroSlide(heroActiveIdx), DUR);
       }
     }, { passive: true });
+
     slideshow.addEventListener("click", () => {
       if (!didSwipe) openLightboxAt(heroActiveIdx);
     });

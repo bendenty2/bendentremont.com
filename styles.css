@@ -475,12 +475,26 @@ html, body {
   font-size: clamp(8px, 0.55vw + 3.5px, 10.5px);
   color: var(--muted);
   letter-spacing: 0.03em;
-  text-align: center;
   line-height: 1.25;
+  /* Title on the left, specs on the right, on one line under the photo. */
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  transition: transform 220ms ease;   /* slides down to match image swell */
+}
+/* Title takes the slack and ellipsises if long; specs keep their full width. */
+.cap-title {
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: transform 220ms ease;   /* slides down to match image swell */
+  min-width: 0;
+}
+.cap-specs {
+  text-align: right;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 /* When the tile is hovered the photo scales up ~1.2%, growing ~3 px at its
@@ -636,6 +650,9 @@ html, body {
 
   /* The hero ignores the grid margins and runs nearly full-width. */
   .hero-section { padding: 0 16px; }
+  /* Clip the manual swipe-slide to the frame (desktop stays overflow:visible so
+     the hover swell can grow outward — there's no hover/slide on mobile). */
+  .hero-slideshow { overflow: hidden; }
 
   .topbar {
     padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right))
