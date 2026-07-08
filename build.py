@@ -2,8 +2,8 @@
 PhotoSite build script.
 
 Scans the source photo folder, extracts EXIF data (aperture, ISO, shutter
-speed, focal length, plus camera/lens/date for safekeeping), generates
-web-sized images and thumbnails into the project, and writes a manifest.json
+speed, focal length), generates web-sized WebP images and thumbnails into the
+project, and writes a manifest.json
 that the static site reads.
 
 Re-run this any time you add or remove a photo in the source folder.
@@ -83,6 +83,11 @@ FULL_LONG_EDGE = 2400    # lightbox view
 # JPEG quality.
 THUMB_QUALITY = 82
 FULL_QUALITY = 88
+
+# Output format for stills. WebP is ~25–35% smaller than JPEG at matching visual
+# quality, is universally supported, and preserves the baked-in © watermark
+# (pixels) and EXIF Copyright/Artist tags. Switch back to "jpg" here to revert.
+IMAGE_EXT = "webp"
 
 # File extensions we'll try to ingest.
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".webp"}
@@ -202,17 +207,6 @@ def _format_focal(focal) -> str | None:
     return f"{int(round(f))}mm"
 
 
-def _format_date(exif: dict) -> str | None:
-    raw = exif.get("DateTimeOriginal") or exif.get("DateTime")
-    if not raw:
-        return None
-    try:
-        dt = datetime.strptime(str(raw), "%Y:%m:%d %H:%M:%S")
-        return dt.strftime("%Y-%m-%d")
-    except ValueError:
-        return str(raw)
-
-
 # --------------------------------------------------------------------------
 # Image processing
 # --------------------------------------------------------------------------
@@ -230,15 +224,20 @@ def _resize_long_edge(img: Image.Image, long_edge: int) -> Image.Image:
     return img.resize((new_w, new_h), Image.LANCZOS)
 
 
-def _save_jpeg(img: Image.Image, path: Path, quality: int,
-               exif_bytes: bytes | None = None) -> None:
+def _save_image(img: Image.Image, path: Path, quality: int,
+                exif_bytes: bytes | None = None) -> None:
+    # Writes WebP or JPEG based on the file extension. WebP uses method=6 (the
+    # slowest/best compression) — this is a build step, so encode time is free.
     if img.mode in ("RGBA", "P"):
         img = img.convert("RGB")
     path.parent.mkdir(parents=True, exist_ok=True)
-    kwargs = dict(quality=quality, optimize=True, progressive=True)
+    if path.suffix.lower() == ".webp":
+        kwargs = dict(quality=quality, method=6)
+    else:
+        kwargs = dict(quality=quality, optimize=True, progressive=True)
     if exif_bytes:
         kwargs["exif"] = exif_bytes
-    img.save(path, "JPEG", **kwargs)
+    img.save(path, path.suffix.lstrip(".").upper().replace("JPG", "JPEG"), **kwargs)
 
 
 # ---------- Watermark ----------
@@ -400,8 +399,8 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
     src_img.close()
 
     stem = _canonical_stem(src.stem)
-    thumb_name = f"{stem}.jpg"
-    full_name  = f"{stem}.jpg"
+    thumb_name = f"{stem}.{IMAGE_EXT}"
+    full_name  = f"{stem}.{IMAGE_EXT}"
 
     thumb = _resize_long_edge(img, THUMB_LONG_EDGE)
     full  = _resize_long_edge(img, FULL_LONG_EDGE)
@@ -409,8 +408,8 @@ def process_one(src: Path, titles: dict | None = None, span: int = 1) -> dict | 
     thumb = _watermark(thumb, WATERMARK_TEXT)
     full  = _watermark(full,  WATERMARK_TEXT)
 
-    _save_jpeg(thumb, THUMBS_DIR / thumb_name, THUMB_QUALITY, exif_bytes=_COPYRIGHT_EXIF)
-    _save_jpeg(full,  PHOTOS_DIR / full_name,  FULL_QUALITY,  exif_bytes=_COPYRIGHT_EXIF)
+    _save_image(thumb, THUMBS_DIR / thumb_name, THUMB_QUALITY, exif_bytes=_COPYRIGHT_EXIF)
+    _save_image(full,  PHOTOS_DIR / full_name,  FULL_QUALITY,  exif_bytes=_COPYRIGHT_EXIF)
 
     # Content-hash cache-bust: a re-edited photo keeps the same filename/URL, so
     # without this the browser/CDN would serve the stale cached copy. The 8-char
@@ -442,9 +441,6 @@ def _exif_fields(exif: dict) -> dict:
                                 or exif.get("PhotographicSensitivity")),
         "shutter":  _format_shutter(exif.get("ExposureTime")),
         "focal":    _format_focal(exif.get("FocalLength")),
-        "camera":   exif.get("Model"),
-        "lens":     exif.get("LensModel"),
-        "date":     _format_date(exif),
     }
 
 
@@ -492,11 +488,11 @@ def process_loop(loop_dir: Path, titles: dict | None = None, span: int = 1) -> d
         src_img.close()
 
         stem = _canonical_stem(src.stem)
-        name = f"{stem}.jpg"
+        name = f"{stem}.{IMAGE_EXT}"
         thumb = _watermark(_resize_long_edge(img, THUMB_LONG_EDGE), WATERMARK_TEXT)
         full  = _watermark(_resize_long_edge(img, FULL_LONG_EDGE),  WATERMARK_TEXT)
-        _save_jpeg(thumb, out_thumbs / name, THUMB_QUALITY, exif_bytes=_COPYRIGHT_EXIF)
-        _save_jpeg(full,  out_full   / name, FULL_QUALITY,  exif_bytes=_COPYRIGHT_EXIF)
+        _save_image(thumb, out_thumbs / name, THUMB_QUALITY, exif_bytes=_COPYRIGHT_EXIF)
+        _save_image(full,  out_full   / name, FULL_QUALITY,  exif_bytes=_COPYRIGHT_EXIF)
 
         tv = hashlib.md5((out_thumbs / name).read_bytes()).hexdigest()[:8]
         fv = hashlib.md5((out_full   / name).read_bytes()).hexdigest()[:8]
@@ -576,7 +572,7 @@ def _transcode_watermarked(src: Path, dest: Path) -> bool:
           f"shadowx=1:shadowy=1:x=w-tw-{VIDEO_WM_RIGHT}:y=h-th-{VIDEO_WM_BOTTOM}")
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
            "-i", str(src), "-vf", vf,
-           "-c:v", "libx264", "-crf", str(VIDEO_CRF), "-preset", "medium",
+           "-c:v", "libx264", "-crf", str(VIDEO_CRF), "-preset", "slow",
            "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart",
            str(dest)]
     try:
@@ -935,8 +931,11 @@ def main() -> int:
 
     valid_photo_stems = {_canonical_stem(p.stem) for p in all_photo_sources}
     for d in (THUMBS_DIR, PHOTOS_DIR):
-        for leftover in d.glob("*.jpg"):
-            if leftover.stem not in valid_photo_stems:
+        for leftover in list(d.glob("*.jpg")) + list(d.glob("*.webp")):
+            # Prune outputs whose source is gone, plus any left in a format we no
+            # longer emit (e.g. old .jpg after the switch to WebP).
+            if (leftover.stem not in valid_photo_stems
+                    or leftover.suffix.lower() != f".{IMAGE_EXT}"):
                 print(f"  - removing stale {leftover.relative_to(SITE_DIR)}")
                 leftover.unlink()
 
