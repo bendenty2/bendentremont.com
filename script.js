@@ -41,7 +41,15 @@
   }
 
   sidebarLinks.forEach(b => {
-    b.addEventListener("click", () => setActiveView(b.dataset.view));
+    b.addEventListener("click", () => {
+      setActiveView(b.dataset.view);
+      // The Photos tab also snaps to the top of the grid (like the brand button),
+      // so tapping it while scrolled down brings you back up. (A no-op when
+      // already at the top.)
+      if (b.dataset.view === "pics") {
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+      }
+    });
   });
 
   // Brand in the top-left returns to the top of the photo view.
