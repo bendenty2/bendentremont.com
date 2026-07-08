@@ -335,13 +335,13 @@ html, body {
   z-index: 1;
 }
 
-/* Dot row — sits below the EXIF caption. */
+/* Dot row — sits directly below the hero photo. */
 .hero-dots {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 2px 0 20px;
+  padding: 14px 0 20px;
 }
 
 .hero-dot {
@@ -364,17 +364,6 @@ html, body {
   background: var(--fg);
   border-color: var(--fg);
   transform: scale(1.2);
-}
-
-/* EXIF caption — sits directly below the photo, above the dots. */
-.hero-exif {
-  padding: 14px 0 6px;
-  font-family: var(--font-sans);
-  font-size: clamp(9px, 0.6vw + 3px, 12px);
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  text-align: center;
-  transition: opacity 250ms ease;
 }
 
 /* ---------- Masonry grid ----------
@@ -444,7 +433,9 @@ html, body {
   position: relative;
   aspect-ratio: 3 / 2;
   width: 100%;
-  overflow: clip;            /* only matters for the hover swell */
+  /* overflow visible so the hover swell grows the frame outward like the photos
+     (the video fills the wrapper exactly at rest, so nothing spills until hover). */
+  overflow: visible;
 }
 
 /* The clips have the pillarbox bars cropped out (5:4) by build.py; the site
@@ -464,36 +455,6 @@ html, body {
 
 .tile--video:hover .video-crop-wrapper video {
   transform: scale(1.012);
-}
-
-.tile-caption {
-  margin-top: 4px;
-  margin-bottom: 2px;
-  font-family: var(--font-sans);
-  /* Scales with viewport so captions stay proportional to photo size.
-     At ~1300px+ it caps at 10.5px; at ~700px it floors at 8px. */
-  font-size: clamp(8px, 0.55vw + 3.5px, 10.5px);
-  color: var(--muted);
-  letter-spacing: 0.03em;
-  text-align: center;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: transform 220ms ease;   /* slides down to match image swell */
-}
-
-/* When the tile is hovered the photo scales up ~1.2%, growing ~3 px at its
-   bottom edge.  Nudging the caption down by the same amount keeps the gap
-   between image and text visually constant. */
-.tile:hover .tile-caption {
-  transform: translateY(3px);
-}
-
-/* Video tiles have no caption text — add bottom margin to keep the vertical
-   rhythm consistent with photo tiles (which have ~14px of caption text). */
-.tile--video .tile-caption {
-  margin-bottom: 14px;
 }
 
 /* ---------- Lightbox ---------- */
@@ -636,6 +597,11 @@ html, body {
 
   /* The hero ignores the grid margins and runs nearly full-width. */
   .hero-section { padding: 0 16px; }
+  /* Clip the manual swipe-slide to the frame (desktop stays overflow:visible so
+     the hover swell can grow outward — there's no hover/slide on mobile). */
+  .hero-slideshow { overflow: hidden; }
+  /* Roomier spacing above and below the nav dots (dots keep their default size). */
+  .hero-dots { padding: 16px 0 16px; }
 
   .topbar {
     padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right))
@@ -682,16 +648,16 @@ html, body {
   .gear-col--r10   { order: 2; }
   .gear-col--scl   { order: 3; }
 
-  /* Dividers span the content width with no edge overhang (avoid h-overflow). */
-  .section-divider,
+  /* Hero divider: pull in slightly so it's just a touch longer than the hero
+     photo (not edge-to-edge), and sit a bit closer to the grid below. */
+  #view-pics .section-divider { margin: -4px 10px 8px; }
+  /* About full-width rules stay edge-to-edge (avoid h-overflow). */
   .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
 
   /* 2-column grid + 1px auto-rows now come from the base .grid rule (used on
      every screen). Phones just want a smaller bottom margin. */
-  .grid { margin-bottom: 24px; }
+  .grid { margin-top: 12px; margin-bottom: 24px; }
   .tile { min-width: 0; }
-  /* margin-top must match CAP_OFFSET in renderGridMobile. */
-  .tile-caption { font-size: 6px; margin-top: 5px; margin-bottom: 0; }
 
   /* Desktop stretches the 5:4 clips to 3:2; on mobile keep the no-stretch look
      instead — crop to the 3:2 slot, anchored to the bottom so the timestamp (and
@@ -722,7 +688,6 @@ html, body {
     animation-iteration-count: 1 !important;
   }
   .tile:hover img { transform: none; }
-  .tile:hover .tile-caption { transform: none; }
   .tile--video:hover .video-crop-wrapper video { transform: none; }
   .hero-slideshow:hover .hero-img.is-active { transform: none; }
 }

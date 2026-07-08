@@ -103,12 +103,6 @@
       .join(CAPTION_SEP);
   }
 
-  function buildCaption(text) {
-    const div = document.createElement("div");
-    div.className = "tile-caption";
-    div.textContent = text;
-    return div;
-  }
 
   // ---------- Hover-preload (photos only) ----------
   // Kick off the full-size image download when a tile is first hovered so
@@ -138,7 +132,6 @@
     }
 
     tile.appendChild(img);
-    tile.appendChild(buildCaption(captionText(item.exif || {})));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     tile.addEventListener("mouseenter", () => preloadFull(item), { once: true });
@@ -166,9 +159,6 @@
     cropWrap.appendChild(video);
 
     tile.appendChild(cropWrap);
-    // Videos have no EXIF specs like the R10 stills, so the grid caption is a
-    // fixed format label. The real title still shows in the lightbox on click.
-    tile.appendChild(buildCaption(VIDEO_SPEC_LABEL));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
@@ -201,14 +191,12 @@
       wrap.appendChild(im);
     });
 
-    const caption = buildCaption("");
     // Preload every frame so each cross-fade starts instantly (no flash).
     frames.forEach(f => { const pre = new Image(); pre.src = f.thumbnail; });
 
     if (frames[0]) {
       layers[0].src = frames[0].thumbnail; layers[0].style.opacity = "1";
       layers[1].style.opacity = "0";
-      caption.textContent = captionText(frames[0].exif || {});
     }
 
     let front = 0, k = 0;
@@ -222,13 +210,11 @@
         layers[back].style.opacity = "1";                        // fade new frame in on top
         const outgoing = layers[front];
         setTimeout(() => { outgoing.style.opacity = "0"; }, fadeMs);  // hide once covered
-        caption.textContent = captionText(f.exif || {});
         front = back;
       }, item.intervalMs || 1000));
     }
 
     tile.appendChild(wrap);
-    tile.appendChild(caption);
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
   }
@@ -254,13 +240,6 @@
 
   const VIDEO_CROP_RATIO = 1.5;  // 3:2 — matches .video-crop-wrapper's aspect-ratio
 
-  // Vertical space reserved below each image for its caption + the gap to the
-  // next tile, in px (grid-auto-rows is 1px, so a tile's row-span ≈ its pixel
-  // height). The SAME reserve on every tile is what balances the two columns;
-  // the two viewports differ only because their caption CSS does.
-  const RESERVE_DESKTOP = 34;
-  const RESERVE_MOBILE  = 21;
-
   function getGridMetrics(cols) {
     const style  = getComputedStyle(grid);
     const padL   = parseFloat(style.paddingLeft)  || 0;
@@ -272,7 +251,6 @@
   }
 
   function renderGrid(list) {
-    const isNarrow = window.innerWidth <= 700;
     // Stop loop timers from the previous render before dropping their tiles.
     loopTimers.forEach(clearInterval);
     loopTimers.length = 0;
@@ -281,7 +259,10 @@
     grid.dataset.cols = 2;
 
     const { colW, colGap } = getGridMetrics(2);
-    const reserve = isNarrow ? RESERVE_MOBILE : RESERVE_DESKTOP;
+    // Vertical gap below each image = the column gap, so the grid gutters are
+    // equal horizontally and vertically. (grid-auto-rows is 1px, so a row-span ≈
+    // a pixel height; the same reserve on every tile balances the two columns.)
+    const reserve = colGap;
 
     // Heroes are lightbox items 0..N-1; the grid follows in this exact order.
     items = heroItems.concat(list);
@@ -599,18 +580,6 @@
   let heroSlides   = [];            // { item, img, dot } per hero photo
   let heroActiveIdx = 0;
   let heroTimer    = null;
-  let heroExifEl   = null;          // cached #hero-exif element (set on build)
-
-  function updateHeroExif(item) {
-    if (!heroExifEl) return;
-    // Fade out → swap text → fade in.
-    heroExifEl.style.opacity = "0";
-    setTimeout(() => {
-      heroExifEl.textContent = captionText(item.exif || {});
-      heroExifEl.style.opacity = "1";
-    }, 200);
-  }
-
   function showHeroSlide(index) {
     const n = heroSlides.length;
     if (!n) return;
@@ -619,7 +588,6 @@
       s.img.classList.toggle("is-active", i === heroActiveIdx);
       if (s.dot) s.dot.classList.toggle("is-active", i === heroActiveIdx);
     });
-    updateHeroExif(heroSlides[heroActiveIdx].item);
   }
 
   function prefersReducedMotion() {
@@ -646,36 +614,89 @@
     const slideshow = document.createElement("div");
     slideshow.className = "hero-slideshow";
 
-    // Tap the hero to open it in the lightbox (then arrow on into the rest of the
-    // catalogue). On touch (mobile only), a horizontal swipe cycles slides
-    // instead — left = next, right = previous (both wrap). Desktop keeps the
-    // auto-advance + clickable dots; no swipe there.
+    // Tap the hero to open it in the lightbox. On touch (mobile only), drag
+    // horizontally to SLIDE between photos Instagram-style — you see slivers of
+    // both neighbours mid-drag — snapping to the next/prev (both wrap) on release.
+    // The AUTO-advance keeps its fade (showHeroSlide); only the manual gesture
+    // slides. Desktop fires no touch events, so it's untouched.
     let swipeStartX = 0, swipeStartY = 0, didSwipe = false;
+    let heroDragging = false, heroNeighbor = -1;
+    const heroW = () => slideshow.clientWidth || 1;
+
+    function clearHeroImg(img) {
+      img.style.transition = ""; img.style.transform = "";
+      img.style.opacity = ""; img.style.zIndex = "";
+    }
+    function finishHeroSlide(landingIdx) {
+      showHeroSlide(landingIdx);             // is-active/dots/exif for the landing slide
+      heroSlides.forEach(s => {              // snap every img back to the crossfade-stack state,
+        s.img.style.transition = "none";     // instantly (no fade artifact)
+        s.img.style.transform = ""; s.img.style.opacity = ""; s.img.style.zIndex = "";
+      });
+      void slideshow.offsetWidth;            // flush, then restore CSS transitions for the next fade
+      heroSlides.forEach(s => { s.img.style.transition = ""; });
+      startHeroTimer();                      // resume auto-advance
+    }
+
     slideshow.addEventListener("touchstart", (e) => {
       const t = e.changedTouches[0];
-      swipeStartX = t.clientX; swipeStartY = t.clientY; didSwipe = false;
+      swipeStartX = t.clientX; swipeStartY = t.clientY;
+      didSwipe = false; heroDragging = false; heroNeighbor = -1;
     }, { passive: true });
-    slideshow.addEventListener("touchend", (e) => {
-      if (window.innerWidth > 700) return;                 // mobile only
+
+    slideshow.addEventListener("touchmove", (e) => {
+      if (window.innerWidth > 700 || heroSlides.length < 2) return;
       const t = e.changedTouches[0];
       const dx = t.clientX - swipeStartX, dy = t.clientY - swipeStartY;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-        didSwipe = true;                                   // suppress tap-to-open
-        showHeroSlide(heroActiveIdx + (dx < 0 ? 1 : -1));  // left=next, right=prev
-        startHeroTimer();                                  // reset auto-advance
+      if (!heroDragging) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;  // wait for a clear horizontal drag
+        heroDragging = true; didSwipe = true;
+        clearInterval(heroTimer);            // pause auto-advance while dragging
+      }
+      e.preventDefault();                    // lock to horizontal (passive:false below)
+      const w = heroW(), n = heroSlides.length;
+      const nIdx = dx < 0 ? (heroActiveIdx + 1) % n : (heroActiveIdx - 1 + n) % n;
+      if (heroNeighbor !== -1 && heroNeighbor !== nIdx) clearHeroImg(heroSlides[heroNeighbor].img);
+      heroNeighbor = nIdx;
+      const active = heroSlides[heroActiveIdx].img, neighbor = heroSlides[nIdx].img;
+      const off = dx < 0 ? w : -w;           // neighbour's off-screen home (from the right for next)
+      active.style.transition = "none";
+      active.style.transform = `translateX(${dx}px)`;
+      active.style.opacity = "1"; active.style.zIndex = "2";
+      neighbor.style.transition = "none";
+      neighbor.style.transform = `translateX(${dx + off}px)`;
+      neighbor.style.opacity = "1"; neighbor.style.zIndex = "1";
+    }, { passive: false });
+
+    slideshow.addEventListener("touchend", (e) => {
+      if (!heroDragging) return;             // a tap (or vertical scroll) — click opens the lightbox
+      heroDragging = false;
+      const active = heroSlides[heroActiveIdx].img;
+      const neighbor = heroNeighbor !== -1 ? heroSlides[heroNeighbor].img : null;
+      const dx = e.changedTouches[0].clientX - swipeStartX;
+      const w = heroW();
+      const commit = neighbor && Math.abs(dx) > Math.min(60, w * 0.18);
+      const off = dx < 0 ? w : -w, DUR = 260;
+      active.style.transition = `transform ${DUR}ms ease`;
+      if (neighbor) neighbor.style.transition = `transform ${DUR}ms ease`;
+      if (commit) {
+        active.style.transform = `translateX(${-off}px)`;   // active slides fully out
+        neighbor.style.transform = "translateX(0px)";       // neighbour to centre
+        const landing = heroNeighbor;
+        setTimeout(() => finishHeroSlide(landing), DUR);
+      } else {
+        active.style.transform = "translateX(0px)";         // snap back
+        if (neighbor) neighbor.style.transform = `translateX(${off}px)`;
+        setTimeout(() => finishHeroSlide(heroActiveIdx), DUR);
       }
     }, { passive: true });
+
     slideshow.addEventListener("click", () => {
       if (!didSwipe) openLightboxAt(heroActiveIdx);
     });
 
     const dotsEl = document.createElement("div");
     dotsEl.className = "hero-dots";
-
-    const exifEl = document.createElement("div");
-    exifEl.id = "hero-exif";
-    exifEl.className = "hero-exif";
-    heroExifEl = exifEl;
 
     heroes.forEach((h, i) => {
       const img = document.createElement("img");
@@ -702,8 +723,7 @@
     });
 
     heroSection.appendChild(slideshow);
-    heroSection.appendChild(exifEl);                              // exif sits directly below the photo
-    if (heroes.length > 1) heroSection.appendChild(dotsEl);       // dots below the exif
+    if (heroes.length > 1) heroSection.appendChild(dotsEl);       // dots below the photo
     heroSection.style.display = "";
 
     showHeroSlide(0);
