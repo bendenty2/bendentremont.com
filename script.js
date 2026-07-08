@@ -41,7 +41,16 @@
   }
 
   sidebarLinks.forEach(b => {
-    b.addEventListener("click", () => setActiveView(b.dataset.view));
+    b.addEventListener("click", () => {
+      const target = b.dataset.view;
+      const view   = document.getElementById("view-" + target);
+      const switching = !view || !view.classList.contains("is-active");
+      setActiveView(target);
+      // Always land at the top of the tab you clicked. Switching views jumps
+      // instantly (the new view should just appear at the top); clicking the tab
+      // you're already on scrolls up smoothly, like the brand button.
+      window.scrollTo({ top: 0, behavior: (switching || prefersReducedMotion()) ? "auto" : "smooth" });
+    });
   });
 
   // Brand in the top-left returns to the top of the photo view.
