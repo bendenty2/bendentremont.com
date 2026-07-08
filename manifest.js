@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-08T01:26:21",
+  "generated_at": "2026-07-08T01:44:35",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -441,7 +441,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "IMG_3328",
       "type": "photo",
       "span": 1,
-      "title": "Turkey in Odd Places",
+      "title": "Pine-Roosted Turkey",
       "thumbnail": "thumbnails/IMG_3328.jpg?v=b3540c03",
       "full": "photos/IMG_3328.jpg?v=b9ef0849",
       "width": 1600,
@@ -704,7 +704,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "IMG_7163",
       "type": "photo",
       "span": 1,
-      "title": "Engine Cowling",
+      "title": "Cowling",
       "thumbnail": "thumbnails/IMG_7163.jpg?v=43a6448e",
       "full": "photos/IMG_7163.jpg?v=842bdaef",
       "width": 1600,
@@ -913,7 +913,7 @@ window.PHOTOSITE_MANIFEST = {
       "id": "IMG_3045",
       "type": "photo",
       "span": 1,
-      "title": "Do You Have Any Grapes?",
+      "title": "Mallard",
       "thumbnail": "thumbnails/IMG_3045.jpg?v=dc02ab1d",
       "full": "photos/IMG_3045.jpg?v=b85ae60c",
       "width": 1600,
