@@ -600,9 +600,8 @@ html, body {
   /* Clip the manual swipe-slide to the frame (desktop stays overflow:visible so
      the hover swell can grow outward — there's no hover/slide on mobile). */
   .hero-slideshow { overflow: hidden; }
-  /* Smaller nav dots, tighter spacing above and below them. */
-  .hero-dots { padding: 8px 0 10px; }
-  .hero-dot { width: 6px; height: 6px; }
+  /* Roomier spacing above and below the nav dots (dots keep their default size). */
+  .hero-dots { padding: 16px 0 16px; }
 
   .topbar {
     padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right))
@@ -651,13 +650,13 @@ html, body {
 
   /* Hero divider: pull in slightly so it's just a touch longer than the hero
      photo (not edge-to-edge), and sit a bit closer to the grid below. */
-  #view-pics .section-divider { margin: -4px 10px 16px; }
+  #view-pics .section-divider { margin: -4px 10px 8px; }
   /* About full-width rules stay edge-to-edge (avoid h-overflow). */
   .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
 
   /* 2-column grid + 1px auto-rows now come from the base .grid rule (used on
      every screen). Phones just want a smaller bottom margin. */
-  .grid { margin-bottom: 24px; }
+  .grid { margin-top: 12px; margin-bottom: 24px; }
   .tile { min-width: 0; }
 
   /* Desktop stretches the 5:4 clips to 3:2; on mobile keep the no-stretch look
