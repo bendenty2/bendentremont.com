@@ -600,6 +600,9 @@ html, body {
   /* Clip the manual swipe-slide to the frame (desktop stays overflow:visible so
      the hover swell can grow outward — there's no hover/slide on mobile). */
   .hero-slideshow { overflow: hidden; }
+  /* Smaller nav dots, tighter spacing above and below them. */
+  .hero-dots { padding: 8px 0 10px; }
+  .hero-dot { width: 6px; height: 6px; }
 
   .topbar {
     padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right))
@@ -646,8 +649,10 @@ html, body {
   .gear-col--r10   { order: 2; }
   .gear-col--scl   { order: 3; }
 
-  /* Dividers span the content width with no edge overhang (avoid h-overflow). */
-  .section-divider,
+  /* Hero divider: pull in slightly so it's just a touch longer than the hero
+     photo (not edge-to-edge), and sit a bit closer to the grid below. */
+  #view-pics .section-divider { margin: -4px 10px 16px; }
+  /* About full-width rules stay edge-to-edge (avoid h-overflow). */
   .about-panel .section-divider--full { margin-left: 0; margin-right: 0; }
 
   /* 2-column grid + 1px auto-rows now come from the base .grid rule (used on
