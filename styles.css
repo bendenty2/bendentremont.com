@@ -194,6 +194,8 @@ html, body {
 
 .about-text { margin: 0 0 12px; }
 .about-text:last-child { margin-bottom: 0; }
+/* Contact copy sits a touch smaller than the rest of the About text (15px). */
+.about-block--contact .about-text { font-size: 13.5px; }
 
 .about-list {
   margin: 0;
