@@ -42,13 +42,14 @@
 
   sidebarLinks.forEach(b => {
     b.addEventListener("click", () => {
-      setActiveView(b.dataset.view);
-      // The Photos tab also snaps to the top of the grid (like the brand button),
-      // so tapping it while scrolled down brings you back up. (A no-op when
-      // already at the top.)
-      if (b.dataset.view === "pics") {
-        window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
-      }
+      const target = b.dataset.view;
+      const view   = document.getElementById("view-" + target);
+      const switching = !view || !view.classList.contains("is-active");
+      setActiveView(target);
+      // Always land at the top of the tab you clicked. Switching views jumps
+      // instantly (the new view should just appear at the top); clicking the tab
+      // you're already on scrolls up smoothly, like the brand button.
+      window.scrollTo({ top: 0, behavior: (switching || prefersReducedMotion()) ? "auto" : "smooth" });
     });
   });
 
