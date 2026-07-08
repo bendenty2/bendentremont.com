@@ -1,5 +1,5 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-07T22:41:45",
+  "generated_at": "2026-07-08T01:26:21",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
@@ -115,7 +115,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3810.jpg?v=c08b9f31",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
@@ -132,7 +132,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3811.jpg?v=036befb1",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
@@ -149,7 +149,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3812.jpg?v=27154836",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
@@ -166,7 +166,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3813.jpg?v=3490110f",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
@@ -183,7 +183,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3814.jpg?v=b57686c7",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
@@ -200,7 +200,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3815.jpg?v=a0c620c7",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
@@ -217,7 +217,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3816.jpg?v=89a98f79",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
@@ -234,7 +234,7 @@ window.PHOTOSITE_MANIFEST = {
           "full": "photos/loop/IMG_3817.jpg?v=1c26dac1",
           "width": 2400,
           "height": 1600,
-          "title": null,
+          "title": "Departing Billy Bishop",
           "exif": {
             "aperture": "f/9",
             "iso": "ISO 4000",
