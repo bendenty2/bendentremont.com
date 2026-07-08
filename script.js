@@ -103,23 +103,6 @@
       .join(CAPTION_SEP);
   }
 
-  // Grid caption: the photo's title on the left, its specs on the right.
-  function buildDualCaption(title, specs) {
-    const div = document.createElement("div");
-    div.className = "tile-caption";
-    const t = document.createElement("span");
-    t.className = "cap-title";
-    t.textContent = title || "";
-    const s = document.createElement("span");
-    s.className = "cap-specs";
-    s.textContent = specs || "";
-    div.append(t, s);
-    return div;
-  }
-  function setCaption(cap, title, specs) {
-    const t = cap.querySelector(".cap-title"); if (t) t.textContent = title || "";
-    const s = cap.querySelector(".cap-specs"); if (s) s.textContent = specs || "";
-  }
 
   // ---------- Hover-preload (photos only) ----------
   // Kick off the full-size image download when a tile is first hovered so
@@ -149,7 +132,6 @@
     }
 
     tile.appendChild(img);
-    tile.appendChild(buildDualCaption(item.title, captionText(item.exif || {})));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     tile.addEventListener("mouseenter", () => preloadFull(item), { once: true });
@@ -177,9 +159,6 @@
     cropWrap.appendChild(video);
 
     tile.appendChild(cropWrap);
-    // Videos have no EXIF specs like the R10 stills, so the "specs" slot is the
-    // fixed format label; the title (if any) sits on the left like the photos.
-    tile.appendChild(buildDualCaption(item.title, VIDEO_SPEC_LABEL));
 
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
@@ -212,14 +191,12 @@
       wrap.appendChild(im);
     });
 
-    const caption = buildDualCaption("", "");
     // Preload every frame so each cross-fade starts instantly (no flash).
     frames.forEach(f => { const pre = new Image(); pre.src = f.thumbnail; });
 
     if (frames[0]) {
       layers[0].src = frames[0].thumbnail; layers[0].style.opacity = "1";
       layers[1].style.opacity = "0";
-      setCaption(caption, frames[0].title, captionText(frames[0].exif || {}));
     }
 
     let front = 0, k = 0;
@@ -233,13 +210,11 @@
         layers[back].style.opacity = "1";                        // fade new frame in on top
         const outgoing = layers[front];
         setTimeout(() => { outgoing.style.opacity = "0"; }, fadeMs);  // hide once covered
-        setCaption(caption, f.title, captionText(f.exif || {}));
         front = back;
       }, item.intervalMs || 1000));
     }
 
     tile.appendChild(wrap);
-    tile.appendChild(caption);
     tile.addEventListener("click", () => openLightboxAt(index));
     return tile;
   }
@@ -265,12 +240,12 @@
 
   const VIDEO_CROP_RATIO = 1.5;  // 3:2 — matches .video-crop-wrapper's aspect-ratio
 
-  // Vertical space reserved below each image for its caption + the gap to the
-  // next tile, in px (grid-auto-rows is 1px, so a tile's row-span ≈ its pixel
-  // height). The SAME reserve on every tile is what balances the two columns;
-  // the two viewports differ only because their caption CSS does.
-  const RESERVE_DESKTOP = 34;
-  const RESERVE_MOBILE  = 21;
+  // Vertical gap reserved below each image before the next tile, in px (grid-
+  // auto-rows is 1px, so a tile's row-span ≈ its pixel height). Captions were
+  // removed (they live only in the lightbox now), so this is pure spacing. The
+  // SAME reserve on every tile is what balances the two columns.
+  const RESERVE_DESKTOP = 20;
+  const RESERVE_MOBILE  = 10;
 
   function getGridMetrics(cols) {
     const style  = getComputedStyle(grid);
@@ -610,18 +585,6 @@
   let heroSlides   = [];            // { item, img, dot } per hero photo
   let heroActiveIdx = 0;
   let heroTimer    = null;
-  let heroExifEl   = null;          // cached #hero-exif element (set on build)
-
-  function updateHeroExif(item) {
-    if (!heroExifEl) return;
-    // Fade out → swap text → fade in.
-    heroExifEl.style.opacity = "0";
-    setTimeout(() => {
-      heroExifEl.textContent = captionText(item.exif || {});
-      heroExifEl.style.opacity = "1";
-    }, 200);
-  }
-
   function showHeroSlide(index) {
     const n = heroSlides.length;
     if (!n) return;
@@ -630,7 +593,6 @@
       s.img.classList.toggle("is-active", i === heroActiveIdx);
       if (s.dot) s.dot.classList.toggle("is-active", i === heroActiveIdx);
     });
-    updateHeroExif(heroSlides[heroActiveIdx].item);
   }
 
   function prefersReducedMotion() {
@@ -741,11 +703,6 @@
     const dotsEl = document.createElement("div");
     dotsEl.className = "hero-dots";
 
-    const exifEl = document.createElement("div");
-    exifEl.id = "hero-exif";
-    exifEl.className = "hero-exif";
-    heroExifEl = exifEl;
-
     heroes.forEach((h, i) => {
       const img = document.createElement("img");
       img.src     = h.full;
@@ -771,8 +728,7 @@
     });
 
     heroSection.appendChild(slideshow);
-    heroSection.appendChild(exifEl);                              // exif sits directly below the photo
-    if (heroes.length > 1) heroSection.appendChild(dotsEl);       // dots below the exif
+    if (heroes.length > 1) heroSection.appendChild(dotsEl);       // dots below the photo
     heroSection.style.display = "";
 
     showHeroSlide(0);

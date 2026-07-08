@@ -335,13 +335,13 @@ html, body {
   z-index: 1;
 }
 
-/* Dot row — sits below the EXIF caption. */
+/* Dot row — sits directly below the hero photo. */
 .hero-dots {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 2px 0 20px;
+  padding: 14px 0 20px;
 }
 
 .hero-dot {
@@ -364,17 +364,6 @@ html, body {
   background: var(--fg);
   border-color: var(--fg);
   transform: scale(1.2);
-}
-
-/* EXIF caption — sits directly below the photo, above the dots. */
-.hero-exif {
-  padding: 14px 0 6px;
-  font-family: var(--font-sans);
-  font-size: clamp(9px, 0.6vw + 3px, 12px);
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  text-align: center;
-  transition: opacity 250ms ease;
 }
 
 /* ---------- Masonry grid ----------
@@ -464,50 +453,6 @@ html, body {
 
 .tile--video:hover .video-crop-wrapper video {
   transform: scale(1.012);
-}
-
-.tile-caption {
-  margin-top: 4px;
-  margin-bottom: 2px;
-  font-family: var(--font-sans);
-  /* Scales with viewport so captions stay proportional to photo size.
-     At ~1300px+ it caps at 10.5px; at ~700px it floors at 8px. */
-  font-size: clamp(8px, 0.55vw + 3.5px, 10.5px);
-  color: var(--muted);
-  letter-spacing: 0.03em;
-  line-height: 1.25;
-  /* Title on the left, specs on the right, on one line under the photo. */
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  transition: transform 220ms ease;   /* slides down to match image swell */
-}
-/* Title takes the slack and ellipsises if long; specs keep their full width. */
-.cap-title {
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-.cap-specs {
-  text-align: right;
-  white-space: nowrap;
-  flex: 0 0 auto;
-}
-
-/* When the tile is hovered the photo scales up ~1.2%, growing ~3 px at its
-   bottom edge.  Nudging the caption down by the same amount keeps the gap
-   between image and text visually constant. */
-.tile:hover .tile-caption {
-  transform: translateY(3px);
-}
-
-/* Video tiles have no caption text — add bottom margin to keep the vertical
-   rhythm consistent with photo tiles (which have ~14px of caption text). */
-.tile--video .tile-caption {
-  margin-bottom: 14px;
 }
 
 /* ---------- Lightbox ---------- */
@@ -707,8 +652,6 @@ html, body {
      every screen). Phones just want a smaller bottom margin. */
   .grid { margin-bottom: 24px; }
   .tile { min-width: 0; }
-  /* margin-top must match CAP_OFFSET in renderGridMobile. */
-  .tile-caption { font-size: 6px; margin-top: 5px; margin-bottom: 0; }
 
   /* Desktop stretches the 5:4 clips to 3:2; on mobile keep the no-stretch look
      instead — crop to the 3:2 slot, anchored to the bottom so the timestamp (and
@@ -739,7 +682,6 @@ html, body {
     animation-iteration-count: 1 !important;
   }
   .tile:hover img { transform: none; }
-  .tile:hover .tile-caption { transform: none; }
   .tile--video:hover .video-crop-wrapper video { transform: none; }
   .hero-slideshow:hover .hero-img.is-active { transform: none; }
 }
