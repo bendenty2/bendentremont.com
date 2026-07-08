@@ -433,7 +433,9 @@ html, body {
   position: relative;
   aspect-ratio: 3 / 2;
   width: 100%;
-  overflow: clip;            /* only matters for the hover swell */
+  /* overflow visible so the hover swell grows the frame outward like the photos
+     (the video fills the wrapper exactly at rest, so nothing spills until hover). */
+  overflow: visible;
 }
 
 /* The clips have the pillarbox bars cropped out (5:4) by build.py; the site

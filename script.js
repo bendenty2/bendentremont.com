@@ -240,13 +240,6 @@
 
   const VIDEO_CROP_RATIO = 1.5;  // 3:2 — matches .video-crop-wrapper's aspect-ratio
 
-  // Vertical gap reserved below each image before the next tile, in px (grid-
-  // auto-rows is 1px, so a tile's row-span ≈ its pixel height). Captions were
-  // removed (they live only in the lightbox now), so this is pure spacing. The
-  // SAME reserve on every tile is what balances the two columns.
-  const RESERVE_DESKTOP = 20;
-  const RESERVE_MOBILE  = 10;
-
   function getGridMetrics(cols) {
     const style  = getComputedStyle(grid);
     const padL   = parseFloat(style.paddingLeft)  || 0;
@@ -258,7 +251,6 @@
   }
 
   function renderGrid(list) {
-    const isNarrow = window.innerWidth <= 700;
     // Stop loop timers from the previous render before dropping their tiles.
     loopTimers.forEach(clearInterval);
     loopTimers.length = 0;
@@ -267,7 +259,10 @@
     grid.dataset.cols = 2;
 
     const { colW, colGap } = getGridMetrics(2);
-    const reserve = isNarrow ? RESERVE_MOBILE : RESERVE_DESKTOP;
+    // Vertical gap below each image = the column gap, so the grid gutters are
+    // equal horizontally and vertically. (grid-auto-rows is 1px, so a row-span ≈
+    // a pixel height; the same reserve on every tile balances the two columns.)
+    const reserve = colGap;
 
     // Heroes are lightbox items 0..N-1; the grid follows in this exact order.
     items = heroItems.concat(list);
