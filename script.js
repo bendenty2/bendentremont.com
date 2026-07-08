@@ -589,10 +589,24 @@
   let heroSlides   = [];            // { item, img, dot } per hero photo
   let heroActiveIdx = 0;
   let heroTimer    = null;
+  // Heroes 2..n aren't loaded up front — that would add a full-res image each to
+  // the initial payload for slides you won't see for seconds. Load a slide the
+  // first time it's needed, and always pre-load the NEXT one so the fade is ready.
+  function ensureHeroLoaded(index) {
+    const n = heroSlides.length;
+    if (!n) return;
+    const s = heroSlides[((index % n) + n) % n];
+    if (s && s.img.dataset.src) {
+      s.img.src = s.img.dataset.src;
+      delete s.img.dataset.src;
+    }
+  }
   function showHeroSlide(index) {
     const n = heroSlides.length;
     if (!n) return;
     heroActiveIdx = ((index % n) + n) % n;
+    ensureHeroLoaded(heroActiveIdx);
+    ensureHeroLoaded(heroActiveIdx + 1);   // pre-load the upcoming slide
     heroSlides.forEach((s, i) => {
       s.img.classList.toggle("is-active", i === heroActiveIdx);
       if (s.dot) s.dot.classList.toggle("is-active", i === heroActiveIdx);
@@ -667,6 +681,7 @@
       const nIdx = dx < 0 ? (heroActiveIdx + 1) % n : (heroActiveIdx - 1 + n) % n;
       if (heroNeighbor !== -1 && heroNeighbor !== nIdx) clearHeroImg(heroSlides[heroNeighbor].img);
       heroNeighbor = nIdx;
+      ensureHeroLoaded(nIdx);                // load the neighbour sliver on demand
       const active = heroSlides[heroActiveIdx].img, neighbor = heroSlides[nIdx].img;
       const off = dx < 0 ? w : -w;           // neighbour's off-screen home (from the right for next)
       active.style.transition = "none";
@@ -709,10 +724,14 @@
 
     heroes.forEach((h, i) => {
       const img = document.createElement("img");
-      img.src     = h.full;
       img.alt     = h.title || `Featured photo ${i + 1}`;
       img.className = "hero-img";
-      img.loading   = i === 0 ? "eager" : "lazy";
+      if (i === 0) {
+        img.src = h.full;           // first hero is the LCP — load immediately
+        img.loading = "eager";
+      } else {
+        img.dataset.src = h.full;   // deferred; ensureHeroLoaded() sets src on demand
+      }
       slideshow.appendChild(img);
 
       let dot = null;

@@ -1,22 +1,19 @@
 window.PHOTOSITE_MANIFEST = {
-  "generated_at": "2026-07-08T01:44:35",
+  "generated_at": "2026-07-08T02:28:13",
   "hero": {
     "id": "IMG_2237",
     "type": "photo",
     "span": 1,
     "title": "Baltimore Oriole",
-    "thumbnail": "thumbnails/IMG_2237.jpg?v=53bd73ec",
-    "full": "photos/IMG_2237.jpg?v=54a725c1",
+    "thumbnail": "thumbnails/IMG_2237.webp?v=04e97af2",
+    "full": "photos/IMG_2237.webp?v=d13e18fa",
     "width": 2400,
     "height": 1600,
     "exif": {
       "aperture": "f/8",
       "iso": "ISO 1600",
       "shutter": "1/640s",
-      "focal": "400mm",
-      "camera": "Canon EOS R10",
-      "lens": "RF100-400mm F5.6-8 IS USM",
-      "date": "2026-05-01"
+      "focal": "400mm"
     }
   },
   "heroes": [
@@ -25,18 +22,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2237.jpg?v=53bd73ec",
-      "full": "photos/IMG_2237.jpg?v=54a725c1",
+      "thumbnail": "thumbnails/IMG_2237.webp?v=04e97af2",
+      "full": "photos/IMG_2237.webp?v=d13e18fa",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 1600",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-01"
+        "focal": "400mm"
       }
     },
     {
@@ -44,18 +38,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "American Toad",
-      "thumbnail": "thumbnails/IMG_1009.jpg?v=3c570867",
-      "full": "photos/IMG_1009.jpg?v=03f901df",
+      "thumbnail": "thumbnails/IMG_1009.webp?v=2f60c7b8",
+      "full": "photos/IMG_1009.webp?v=170cc7b7",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 400",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-06-01"
+        "focal": "400mm"
       }
     },
     {
@@ -63,18 +54,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Red-tailed Hawks",
-      "thumbnail": "thumbnails/IMG_3153.jpg?v=57b79e6d",
-      "full": "photos/IMG_3153.jpg?v=6f0b8933",
+      "thumbnail": "thumbnails/IMG_3153.webp?v=3bc3ca09",
+      "full": "photos/IMG_3153.webp?v=6647af94",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/5.6",
         "iso": "ISO 200",
         "shutter": "1/400s",
-        "focal": "244mm",
-        "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "focal": "244mm"
       }
     },
     {
@@ -82,18 +70,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "American Red Squirrel",
-      "thumbnail": "thumbnails/IMG_4687.jpg?v=02eae4f7",
-      "full": "photos/IMG_4687.jpg?v=20bf89b9",
+      "thumbnail": "thumbnails/IMG_4687.webp?v=b209ca27",
+      "full": "photos/IMG_4687.webp?v=efc55fb8",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 640",
         "shutter": "1/400s",
-        "focal": "248mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-08-07"
+        "focal": "248mm"
       }
     }
   ],
@@ -111,8 +96,8 @@ window.PHOTOSITE_MANIFEST = {
       "frames": [
         {
           "id": "IMG_3810",
-          "thumbnail": "thumbnails/loop/IMG_3810.jpg?v=2e2c9198",
-          "full": "photos/loop/IMG_3810.jpg?v=c08b9f31",
+          "thumbnail": "thumbnails/loop/IMG_3810.webp?v=4eb6e93d",
+          "full": "photos/loop/IMG_3810.webp?v=f68b3297",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -120,16 +105,13 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         },
         {
           "id": "IMG_3811",
-          "thumbnail": "thumbnails/loop/IMG_3811.jpg?v=c6371bee",
-          "full": "photos/loop/IMG_3811.jpg?v=036befb1",
+          "thumbnail": "thumbnails/loop/IMG_3811.webp?v=1a5d9bbb",
+          "full": "photos/loop/IMG_3811.webp?v=7878aac6",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -137,16 +119,13 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         },
         {
           "id": "IMG_3812",
-          "thumbnail": "thumbnails/loop/IMG_3812.jpg?v=e753ba88",
-          "full": "photos/loop/IMG_3812.jpg?v=27154836",
+          "thumbnail": "thumbnails/loop/IMG_3812.webp?v=2489b6e0",
+          "full": "photos/loop/IMG_3812.webp?v=2fc593d4",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -154,16 +133,13 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         },
         {
           "id": "IMG_3813",
-          "thumbnail": "thumbnails/loop/IMG_3813.jpg?v=557e54d3",
-          "full": "photos/loop/IMG_3813.jpg?v=3490110f",
+          "thumbnail": "thumbnails/loop/IMG_3813.webp?v=6f665834",
+          "full": "photos/loop/IMG_3813.webp?v=e721d749",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -171,16 +147,13 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         },
         {
           "id": "IMG_3814",
-          "thumbnail": "thumbnails/loop/IMG_3814.jpg?v=f9876d3c",
-          "full": "photos/loop/IMG_3814.jpg?v=b57686c7",
+          "thumbnail": "thumbnails/loop/IMG_3814.webp?v=9e39405e",
+          "full": "photos/loop/IMG_3814.webp?v=75b05f31",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -188,16 +161,13 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         },
         {
           "id": "IMG_3815",
-          "thumbnail": "thumbnails/loop/IMG_3815.jpg?v=3c9889ed",
-          "full": "photos/loop/IMG_3815.jpg?v=a0c620c7",
+          "thumbnail": "thumbnails/loop/IMG_3815.webp?v=73b5a464",
+          "full": "photos/loop/IMG_3815.webp?v=5a0cef68",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -205,16 +175,13 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         },
         {
           "id": "IMG_3816",
-          "thumbnail": "thumbnails/loop/IMG_3816.jpg?v=619c5047",
-          "full": "photos/loop/IMG_3816.jpg?v=89a98f79",
+          "thumbnail": "thumbnails/loop/IMG_3816.webp?v=f424ffd1",
+          "full": "photos/loop/IMG_3816.webp?v=a564b997",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -222,16 +189,13 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         },
         {
           "id": "IMG_3817",
-          "thumbnail": "thumbnails/loop/IMG_3817.jpg?v=af0e8320",
-          "full": "photos/loop/IMG_3817.jpg?v=1c26dac1",
+          "thumbnail": "thumbnails/loop/IMG_3817.webp?v=548d9c98",
+          "full": "photos/loop/IMG_3817.webp?v=2da77d62",
           "width": 2400,
           "height": 1600,
           "title": "Departing Billy Bishop",
@@ -239,10 +203,7 @@ window.PHOTOSITE_MANIFEST = {
             "aperture": "f/9",
             "iso": "ISO 4000",
             "shutter": "1/1000s",
-            "focal": "660mm",
-            "camera": "Canon EOS R10",
-            "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015 +1.4x",
-            "date": "2026-06-29"
+            "focal": "660mm"
           }
         }
       ]
@@ -252,18 +213,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Red-tailed Hawk",
-      "thumbnail": "thumbnails/IMG_3287.jpg?v=e281be6d",
-      "full": "photos/IMG_3287.jpg?v=6fdab974",
+      "thumbnail": "thumbnails/IMG_3287.webp?v=788bea79",
+      "full": "photos/IMG_3287.webp?v=bb8fdc54",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/5.6",
         "iso": "ISO 1250",
         "shutter": "1/400s",
-        "focal": "238mm",
-        "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "focal": "238mm"
       }
     },
     {
@@ -271,18 +229,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Pileated Woodpecker",
-      "thumbnail": "thumbnails/IMG_1033.jpg?v=eeac6f44",
-      "full": "photos/IMG_1033.jpg?v=94cba442",
+      "thumbnail": "thumbnails/IMG_1033.webp?v=94c9937d",
+      "full": "photos/IMG_1033.webp?v=2dddfca2",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/7.1",
         "iso": "ISO 6400",
         "shutter": "1/250s",
-        "focal": "248mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-06-01"
+        "focal": "248mm"
       }
     },
     {
@@ -290,18 +245,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Lawrencetown Beach",
-      "thumbnail": "thumbnails/IMG_2060.jpg?v=63121fc1",
-      "full": "photos/IMG_2060.jpg?v=e5b4e757",
+      "thumbnail": "thumbnails/IMG_2060.webp?v=73c3a335",
+      "full": "photos/IMG_2060.webp?v=c7da26c3",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 1000",
         "shutter": "1/640s",
-        "focal": "335mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-02-19"
+        "focal": "335mm"
       }
     },
     {
@@ -309,18 +261,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Eastern Chipmunk",
-      "thumbnail": "thumbnails/IMG_2414.jpg?v=859a589e",
-      "full": "photos/IMG_2414.jpg?v=27e64918",
+      "thumbnail": "thumbnails/IMG_2414.webp?v=28bd4f93",
+      "full": "photos/IMG_2414.webp?v=9a1c7d0d",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 5000",
         "shutter": "1/500s",
-        "focal": "270mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "focal": "270mm"
       }
     },
     {
@@ -328,18 +277,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "American Lady",
-      "thumbnail": "thumbnails/IMG_8055.jpg?v=2a9da0fb",
-      "full": "photos/IMG_8055.jpg?v=51a68146",
+      "thumbnail": "thumbnails/IMG_8055.webp?v=9a5c5302",
+      "full": "photos/IMG_8055.webp?v=517c0c00",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 250",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-27"
+        "focal": "400mm"
       }
     },
     {
@@ -347,18 +293,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Paragliding in Lawrencetown",
-      "thumbnail": "thumbnails/IMG_8340.jpg?v=96b21113",
-      "full": "photos/IMG_8340.jpg?v=12c25b77",
+      "thumbnail": "thumbnails/IMG_8340.webp?v=e48a76b3",
+      "full": "photos/IMG_8340.webp?v=7fc1e309",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/7.1",
         "iso": "ISO 100",
         "shutter": "1/250s",
-        "focal": "100mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-31"
+        "focal": "100mm"
       }
     },
     {
@@ -366,18 +309,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Garter Snake",
-      "thumbnail": "thumbnails/IMG_0961.jpg?v=631f8c4a",
-      "full": "photos/IMG_0961.jpg?v=a2e9c77d",
+      "thumbnail": "thumbnails/IMG_0961.webp?v=2d1378b6",
+      "full": "photos/IMG_0961.webp?v=09965e68",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 1000",
         "shutter": "1/500s",
-        "focal": "300mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-06-01"
+        "focal": "300mm"
       }
     },
     {
@@ -385,18 +325,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Lightning",
-      "thumbnail": "thumbnails/IMG_1329.jpg?v=e3d2f1ec",
-      "full": "photos/IMG_1329.jpg?v=b069462e",
+      "thumbnail": "thumbnails/IMG_1329.webp?v=29aa6064",
+      "full": "photos/IMG_1329.webp?v=683c2068",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/5.6",
         "iso": "ISO 2500",
         "shutter": "1/10s",
-        "focal": "100mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-09-21"
+        "focal": "100mm"
       }
     },
     {
@@ -404,18 +341,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Red-tailed Hawks",
-      "thumbnail": "thumbnails/IMG_3231.jpg?v=df4b1d51",
-      "full": "photos/IMG_3231.jpg?v=33fdec78",
+      "thumbnail": "thumbnails/IMG_3231.webp?v=10981bda",
+      "full": "photos/IMG_3231.webp?v=cf3b6023",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/6.3",
         "iso": "ISO 500",
         "shutter": "1/500s",
-        "focal": "313mm",
-        "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "focal": "313mm"
       }
     },
     {
@@ -423,18 +357,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Dunlin",
-      "thumbnail": "thumbnails/IMG_1998.jpg?v=21aa76a1",
-      "full": "photos/IMG_1998.jpg?v=16e74e69",
+      "thumbnail": "thumbnails/IMG_1998.webp?v=63a60678",
+      "full": "photos/IMG_1998.webp?v=62ba0b89",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 1250",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-02-19"
+        "focal": "400mm"
       }
     },
     {
@@ -442,18 +373,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Pine-Roosted Turkey",
-      "thumbnail": "thumbnails/IMG_3328.jpg?v=b3540c03",
-      "full": "photos/IMG_3328.jpg?v=b9ef0849",
+      "thumbnail": "thumbnails/IMG_3328.webp?v=d316d7d8",
+      "full": "photos/IMG_3328.webp?v=7da5a3bc",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/5.6",
         "iso": "ISO 100",
         "shutter": "1/100s",
-        "focal": "283mm",
-        "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-28"
+        "focal": "283mm"
       }
     },
     {
@@ -461,18 +389,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Halifax Harbour",
-      "thumbnail": "thumbnails/IMG_6008.jpg?v=9be19716",
-      "full": "photos/IMG_6008.jpg?v=9e988228",
+      "thumbnail": "thumbnails/IMG_6008.webp?v=5e2e52cc",
+      "full": "photos/IMG_6008.webp?v=1b55fcf8",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/5.6",
         "iso": "ISO 640",
         "shutter": "1/160s",
-        "focal": "100mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-12-16"
+        "focal": "100mm"
       }
     },
     {
@@ -488,18 +413,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Baltimore Oriole",
-      "thumbnail": "thumbnails/IMG_2214.jpg?v=41dd7139",
-      "full": "photos/IMG_2214.jpg?v=f9d4c79c",
+      "thumbnail": "thumbnails/IMG_2214.webp?v=fd670876",
+      "full": "photos/IMG_2214.webp?v=5d9c600c",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 800",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-01"
+        "focal": "400mm"
       }
     },
     {
@@ -507,18 +429,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Sunset in Ecum Secum",
-      "thumbnail": "thumbnails/IMG_8173.jpg?v=e95e6614",
-      "full": "photos/IMG_8173.jpg?v=e73166e8",
+      "thumbnail": "thumbnails/IMG_8173.webp?v=9f3f2710",
+      "full": "photos/IMG_8173.webp?v=792d8f53",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 200",
         "shutter": "1/400s",
-        "focal": "236mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-24"
+        "focal": "236mm"
       }
     },
     {
@@ -526,18 +445,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Mute Swan",
-      "thumbnail": "thumbnails/IMG_2378.jpg?v=4ed36c34",
-      "full": "photos/IMG_2378.jpg?v=5bca4744",
+      "thumbnail": "thumbnails/IMG_2378.webp?v=f7bd549d",
+      "full": "photos/IMG_2378.webp?v=813cd1d8",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 640",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-01"
+        "focal": "400mm"
       }
     },
     {
@@ -545,18 +461,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Bald Eagle",
-      "thumbnail": "thumbnails/IMG_7746.jpg?v=d6e917fd",
-      "full": "photos/IMG_7746.jpg?v=5be9e287",
+      "thumbnail": "thumbnails/IMG_7746.webp?v=15bfade7",
+      "full": "photos/IMG_7746.webp?v=0f944b3e",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 1000",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-13"
+        "focal": "400mm"
       }
     },
     {
@@ -564,18 +477,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Northern Lights",
-      "thumbnail": "thumbnails/IMG_7379.jpg?v=04c7ad95",
-      "full": "photos/IMG_7379.jpg?v=13c97689",
+      "thumbnail": "thumbnails/IMG_7379.webp?v=fa295d02",
+      "full": "photos/IMG_7379.webp?v=208a5c16",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/4.5",
         "iso": "ISO 1600",
         "shutter": "30s",
-        "focal": "18mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
-        "date": "2024-05-12"
+        "focal": "18mm"
       }
     },
     {
@@ -583,18 +493,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "747-400 Departing YYZ RWY05",
-      "thumbnail": "thumbnails/IMG_3714.jpg?v=cf30711a",
-      "full": "photos/IMG_3714.jpg?v=88148787",
+      "thumbnail": "thumbnails/IMG_3714.webp?v=3400d223",
+      "full": "photos/IMG_3714.webp?v=438221c7",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/10",
         "iso": "ISO 200",
         "shutter": "1/800s",
-        "focal": "324mm",
-        "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-28"
+        "focal": "324mm"
       }
     },
     {
@@ -602,18 +509,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Yellow Warbler",
-      "thumbnail": "thumbnails/IMG_3623.jpg?v=c49c5860",
-      "full": "photos/IMG_3623.jpg?v=1c95623a",
+      "thumbnail": "thumbnails/IMG_3623.webp?v=d5de77dc",
+      "full": "photos/IMG_3623.webp?v=7cd6fda4",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 250",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-05-27"
+        "focal": "400mm"
       }
     },
     {
@@ -621,18 +525,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Alder Flycatcher",
-      "thumbnail": "thumbnails/IMG_0920.jpg?v=06d5067a",
-      "full": "photos/IMG_0920.jpg?v=23bd7391",
+      "thumbnail": "thumbnails/IMG_0920.webp?v=4ef68eb9",
+      "full": "photos/IMG_0920.webp?v=da2f73e2",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 200",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-06-01"
+        "focal": "400mm"
       }
     },
     {
@@ -640,18 +541,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Northwest Arm",
-      "thumbnail": "thumbnails/IMG_8127.jpg?v=6b1ca1ce",
-      "full": "photos/IMG_8127.jpg?v=82fc33ca",
+      "thumbnail": "thumbnails/IMG_8127.webp?v=0a110c2a",
+      "full": "photos/IMG_8127.webp?v=5fb8e1b6",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/7.1",
         "iso": "ISO 500",
         "shutter": "1/320s",
-        "focal": "200mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-23"
+        "focal": "200mm"
       }
     },
     {
@@ -659,18 +557,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Two-striped Grasshopper",
-      "thumbnail": "thumbnails/IMG_7824.jpg?v=a50eed15",
-      "full": "photos/IMG_7824.jpg?v=93395e29",
+      "thumbnail": "thumbnails/IMG_7824.webp?v=c9b6732b",
+      "full": "photos/IMG_7824.webp?v=3e6b6388",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 3200",
         "shutter": "1/640s",
-        "focal": "359mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-27"
+        "focal": "359mm"
       }
     },
     {
@@ -678,18 +573,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Red-winged Blackbird",
-      "thumbnail": "thumbnails/IMG_2301.jpg?v=d97569da",
-      "full": "photos/IMG_2301.jpg?v=23801a99",
+      "thumbnail": "thumbnails/IMG_2301.webp?v=f46456ea",
+      "full": "photos/IMG_2301.webp?v=22e1d4cf",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 6400",
         "shutter": "1/400s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-01"
+        "focal": "400mm"
       }
     },
     {
@@ -705,18 +597,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Cowling",
-      "thumbnail": "thumbnails/IMG_7163.jpg?v=43a6448e",
-      "full": "photos/IMG_7163.jpg?v=842bdaef",
+      "thumbnail": "thumbnails/IMG_7163.webp?v=e57a8a4a",
+      "full": "photos/IMG_7163.webp?v=23ea36a7",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 100",
         "shutter": "1/320s",
-        "focal": "100mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-05-05"
+        "focal": "100mm"
       }
     },
     {
@@ -724,18 +613,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Cape Enrage Lighthouse",
-      "thumbnail": "thumbnails/IMG_1867.jpg?v=801ba820",
-      "full": "photos/IMG_1867.jpg?v=50454216",
+      "thumbnail": "thumbnails/IMG_1867.webp?v=a0a63f6a",
+      "full": "photos/IMG_1867.webp?v=ea7f0ade",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 200",
         "shutter": "1/500s",
-        "focal": "300mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-02-16"
+        "focal": "300mm"
       }
     },
     {
@@ -743,18 +629,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Song Sparrow",
-      "thumbnail": "thumbnails/IMG_2757.jpg?v=51480056",
-      "full": "photos/IMG_2757.jpg?v=2ee0df13",
+      "thumbnail": "thumbnails/IMG_2757.webp?v=104ade9b",
+      "full": "photos/IMG_2757.webp?v=ab386168",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 1000",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-04-11"
+        "focal": "400mm"
       }
     },
     {
@@ -762,18 +645,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Bombardier CL-215",
-      "thumbnail": "thumbnails/IMG_3782.jpg?v=c4bba580",
-      "full": "photos/IMG_3782.jpg?v=4039a42d",
+      "thumbnail": "thumbnails/IMG_3782.webp?v=4fa1ce23",
+      "full": "photos/IMG_3782.webp?v=a7ff8732",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/7.1",
         "iso": "ISO 640",
         "shutter": "1/320s",
-        "focal": "174mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-05-28"
+        "focal": "174mm"
       }
     },
     {
@@ -781,18 +661,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "House Sparrow",
-      "thumbnail": "thumbnails/IMG_7533.jpg?v=b0e7f825",
-      "full": "photos/IMG_7533.jpg?v=b246582e",
+      "thumbnail": "thumbnails/IMG_7533.webp?v=d69e860f",
+      "full": "photos/IMG_7533.webp?v=f31fef79",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 400",
         "shutter": "1/500s",
-        "focal": "300mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-06-16"
+        "focal": "300mm"
       }
     },
     {
@@ -800,18 +677,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Downy Woodpecker",
-      "thumbnail": "thumbnails/IMG_3012.jpg?v=94cc3dff",
-      "full": "photos/IMG_3012.jpg?v=345feb61",
+      "thumbnail": "thumbnails/IMG_3012.webp?v=449c009f",
+      "full": "photos/IMG_3012.webp?v=7204755b",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/5.6",
         "iso": "ISO 12800",
         "shutter": "1/400s",
-        "focal": "324mm",
-        "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "focal": "324mm"
       }
     },
     {
@@ -819,18 +693,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Canadian Flag",
-      "thumbnail": "thumbnails/IMG_8098.jpg?v=6e6016fc",
-      "full": "photos/IMG_8098.jpg?v=4eb116fb",
+      "thumbnail": "thumbnails/IMG_8098.webp?v=06f9cea1",
+      "full": "photos/IMG_8098.webp?v=1e1f8a7d",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 320",
         "shutter": "1/640s",
-        "focal": "335mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-08-23"
+        "focal": "335mm"
       }
     },
     {
@@ -838,18 +709,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Widow Skimmer",
-      "thumbnail": "thumbnails/IMG_7985.jpg?v=7999864d",
-      "full": "photos/IMG_7985.jpg?v=bdf41abe",
+      "thumbnail": "thumbnails/IMG_7985.webp?v=f99af859",
+      "full": "photos/IMG_7985.webp?v=b49f9918",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 640",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-27"
+        "focal": "400mm"
       }
     },
     {
@@ -857,18 +725,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "White-breasted Nuthatch",
-      "thumbnail": "thumbnails/IMG_2400.jpg?v=a6acea91",
-      "full": "photos/IMG_2400.jpg?v=ab452e1f",
+      "thumbnail": "thumbnails/IMG_2400.webp?v=13e37e29",
+      "full": "photos/IMG_2400.webp?v=b22073e9",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/6.3",
         "iso": "ISO 1250",
         "shutter": "1/250s",
-        "focal": "123mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "focal": "123mm"
       }
     },
     {
@@ -876,18 +741,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Big G's",
-      "thumbnail": "thumbnails/IMG_0686.jpg?v=f65c3cb3",
-      "full": "photos/IMG_0686.jpg?v=cff3a686",
+      "thumbnail": "thumbnails/IMG_0686.webp?v=35563015",
+      "full": "photos/IMG_0686.webp?v=daa95e49",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/5",
         "iso": "ISO 2000",
         "shutter": "1/80s",
-        "focal": "25mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF-S18-45mm F4.5-6.3 IS STM",
-        "date": "2023-02-06"
+        "focal": "25mm"
       }
     },
     {
@@ -895,18 +757,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "MacKay Bridge",
-      "thumbnail": "thumbnails/IMG_4210.jpg?v=3250be79",
-      "full": "photos/IMG_4210.jpg?v=eb5077d8",
+      "thumbnail": "thumbnails/IMG_4210.webp?v=fe89d088",
+      "full": "photos/IMG_4210.webp?v=09a8e803",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/6.3",
         "iso": "ISO 100",
         "shutter": "1/200s",
-        "focal": "100mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-07-02"
+        "focal": "100mm"
       }
     },
     {
@@ -914,18 +773,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Mallard",
-      "thumbnail": "thumbnails/IMG_3045.jpg?v=dc02ab1d",
-      "full": "photos/IMG_3045.jpg?v=b85ae60c",
+      "thumbnail": "thumbnails/IMG_3045.webp?v=a19ee43f",
+      "full": "photos/IMG_3045.webp?v=eafdc0e2",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/5.6",
         "iso": "ISO 500",
         "shutter": "1/640s",
-        "focal": "335mm",
-        "camera": "Canon EOS R10",
-        "lens": "150-600mm F5-6.3 DG OS HSM | Contemporary 015",
-        "date": "2026-06-27"
+        "focal": "335mm"
       }
     },
     {
@@ -941,18 +797,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "American Robin",
-      "thumbnail": "thumbnails/IMG_0642.jpg?v=aeb38d6c",
-      "full": "photos/IMG_0642.jpg?v=7152ff1c",
+      "thumbnail": "thumbnails/IMG_0642.webp?v=a622b54a",
+      "full": "photos/IMG_0642.webp?v=44e02751",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 200",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-04-18"
+        "focal": "400mm"
       }
     },
     {
@@ -960,18 +813,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Landing at Stanfield",
-      "thumbnail": "thumbnails/IMG_4289.jpg?v=62cdc04a",
-      "full": "photos/IMG_4289.jpg?v=57412954",
+      "thumbnail": "thumbnails/IMG_4289.webp?v=09404be5",
+      "full": "photos/IMG_4289.webp?v=f3bdec9d",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 125",
         "shutter": "1/200s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-07-03"
+        "focal": "400mm"
       }
     },
     {
@@ -979,18 +829,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Pacific Sea Nettle",
-      "thumbnail": "thumbnails/IMG_1637.jpg?v=b3eef95a",
-      "full": "photos/IMG_1637.jpg?v=66987058",
+      "thumbnail": "thumbnails/IMG_1637.webp?v=29e52d4c",
+      "full": "photos/IMG_1637.webp?v=0d5f947d",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 6400",
         "shutter": "1/100s",
-        "focal": "259mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2025-12-29"
+        "focal": "259mm"
       }
     },
     {
@@ -998,18 +845,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Black-capped Chickadee",
-      "thumbnail": "thumbnails/IMG_7178.jpg?v=f6d15643",
-      "full": "photos/IMG_7178.jpg?v=dcd61ac2",
+      "thumbnail": "thumbnails/IMG_7178.webp?v=16510d37",
+      "full": "photos/IMG_7178.webp?v=dd7f8e9a",
       "width": 1600,
       "height": 2400,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 125",
         "shutter": "1/1250s",
-        "focal": "373mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-05-05"
+        "focal": "373mm"
       }
     },
     {
@@ -1017,18 +861,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Coleus",
-      "thumbnail": "thumbnails/IMG_4154.jpg?v=64b199c0",
-      "full": "photos/IMG_4154.jpg?v=186df5df",
+      "thumbnail": "thumbnails/IMG_4154.webp?v=b6ebfbb9",
+      "full": "photos/IMG_4154.webp?v=75213d76",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 4000",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-06-30"
+        "focal": "400mm"
       }
     },
     {
@@ -1036,18 +877,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Red Head Shore",
-      "thumbnail": "thumbnails/IMG_1831.jpg?v=db14fc39",
-      "full": "photos/IMG_1831.jpg?v=1eaa1879",
+      "thumbnail": "thumbnails/IMG_1831.webp?v=b9b2d44e",
+      "full": "photos/IMG_1831.webp?v=6ab60f47",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 100",
         "shutter": "1/320s",
-        "focal": "100mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-02-16"
+        "focal": "100mm"
       }
     },
     {
@@ -1055,8 +893,8 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Wood Duck",
-      "thumbnail": "thumbnails/IMG_2468.jpg?v=c40f8cae",
-      "full": "photos/IMG_2468.jpg?v=a1845b2d",
+      "thumbnail": "thumbnails/IMG_2468.webp?v=85db5c84",
+      "full": "photos/IMG_2468.webp?v=c5ea6c34",
       "width": 2400,
       "height": 1600,
       "exif": {
@@ -1064,9 +902,7 @@ window.PHOTOSITE_MANIFEST = {
         "iso": "ISO 1600",
         "shutter": "1/640s",
         "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2026-05-02"
+        "lens": "RF100-400mm F5.6-8 IS USM"
       }
     },
     {
@@ -1074,18 +910,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "COMING SOON",
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "thumbnail": "thumbnails/IMG_0000.webp?v=43b31624",
+      "full": "photos/IMG_0000.webp?v=9d9279a9",
       "width": 680,
       "height": 1021,
       "exif": {
         "aperture": null,
         "iso": null,
         "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "focal": null
       }
     },
     {
@@ -1093,18 +926,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "COMING SOON",
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "thumbnail": "thumbnails/IMG_0000.webp?v=43b31624",
+      "full": "photos/IMG_0000.webp?v=9d9279a9",
       "width": 680,
       "height": 1021,
       "exif": {
         "aperture": null,
         "iso": null,
         "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "focal": null
       }
     },
     {
@@ -1112,18 +942,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Rainbow Haven Beach",
-      "thumbnail": "thumbnails/IMG_1851.jpg?v=206440c5",
-      "full": "photos/IMG_1851.jpg?v=d9350aab",
+      "thumbnail": "thumbnails/IMG_1851.webp?v=8c00d0f0",
+      "full": "photos/IMG_1851.webp?v=3c6dc2cf",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 200",
         "shutter": "1/400s",
-        "focal": "225mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-02-19"
+        "focal": "225mm"
       }
     },
     {
@@ -1131,18 +958,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Monarch",
-      "thumbnail": "thumbnails/IMG_7812.jpg?v=f36b846f",
-      "full": "photos/IMG_7812.jpg?v=d5a0a832",
+      "thumbnail": "thumbnails/IMG_7812.webp?v=1c79e9b0",
+      "full": "photos/IMG_7812.webp?v=449a6aaa",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 320",
         "shutter": "1/500s",
-        "focal": "281mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-07-27"
+        "focal": "281mm"
       }
     },
     {
@@ -1150,18 +974,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Blue Jay",
-      "thumbnail": "thumbnails/IMG_5767.jpg?v=0a3bb63e",
-      "full": "photos/IMG_5767.jpg?v=531ee672",
+      "thumbnail": "thumbnails/IMG_5767.webp?v=6fa64658",
+      "full": "photos/IMG_5767.webp?v=c88a12ad",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 640",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-11-06"
+        "focal": "400mm"
       }
     },
     {
@@ -1169,18 +990,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "COMING SOON",
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "thumbnail": "thumbnails/IMG_0000.webp?v=43b31624",
+      "full": "photos/IMG_0000.webp?v=9d9279a9",
       "width": 680,
       "height": 1021,
       "exif": {
         "aperture": null,
         "iso": null,
         "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "focal": null
       }
     },
     {
@@ -1188,18 +1006,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "COMING SOON",
-      "thumbnail": "thumbnails/IMG_0000.jpg?v=9e1ac3b8",
-      "full": "photos/IMG_0000.jpg?v=54a3c5f0",
+      "thumbnail": "thumbnails/IMG_0000.webp?v=43b31624",
+      "full": "photos/IMG_0000.webp?v=9d9279a9",
       "width": 680,
       "height": 1021,
       "exif": {
         "aperture": null,
         "iso": null,
         "shutter": null,
-        "focal": null,
-        "camera": null,
-        "lens": null,
-        "date": null
+        "focal": null
       }
     },
     {
@@ -1207,18 +1022,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 1,
       "title": "Black-capped Chickadee",
-      "thumbnail": "thumbnails/IMG_4670.jpg?v=2c947b5c",
-      "full": "photos/IMG_4670.jpg?v=45388585",
+      "thumbnail": "thumbnails/IMG_4670.webp?v=d2306828",
+      "full": "photos/IMG_4670.webp?v=6559eca1",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/9",
         "iso": "ISO 3200",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2023-08-07"
+        "focal": "400mm"
       }
     },
     {
@@ -1226,18 +1038,15 @@ window.PHOTOSITE_MANIFEST = {
       "type": "photo",
       "span": 2,
       "title": "Black-capped Chickadee",
-      "thumbnail": "thumbnails/IMG_8502.jpg?v=4c839b5a",
-      "full": "photos/IMG_8502.jpg?v=f96ca022",
+      "thumbnail": "thumbnails/IMG_8502.webp?v=5ce9bfaa",
+      "full": "photos/IMG_8502.webp?v=11e3df60",
       "width": 2400,
       "height": 1600,
       "exif": {
         "aperture": "f/8",
         "iso": "ISO 6400",
         "shutter": "1/640s",
-        "focal": "400mm",
-        "camera": "Canon EOS R10",
-        "lens": "RF100-400mm F5.6-8 IS USM",
-        "date": "2024-09-11"
+        "focal": "400mm"
       }
     }
   ]
