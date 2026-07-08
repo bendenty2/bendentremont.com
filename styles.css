@@ -40,14 +40,20 @@ html, body {
   top: 0;
   left: 0;
   right: 0;
-  height: var(--topbar-height);
+  /* Grow to cover the top safe area (notch / Dynamic Island) so the black bar
+     runs edge-to-edge, then pad the content clear of it. env() is 0 wherever
+     there's no safe area (desktop), so this is a no-op there. */
+  height: calc(var(--topbar-height) + env(safe-area-inset-top));
   background: var(--topbar-bg);
   color: var(--topbar-fg);
   z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 clamp(20px, 4vw, 48px);
+  padding: env(safe-area-inset-top)
+           max(clamp(20px, 4vw, 48px), env(safe-area-inset-right))
+           0
+           max(clamp(20px, 4vw, 48px), env(safe-area-inset-left));
 }
 
 .topbar-brand {
@@ -96,9 +102,9 @@ html, body {
 /* ---------- Main page area (push down below the fixed topbar) ---------- */
 
 .page {
-  padding-top: var(--topbar-height);
+  padding-top: calc(var(--topbar-height) + env(safe-area-inset-top));
   /* Reserve space so content can scroll clear of the fixed footer. */
-  padding-bottom: var(--footer-height);
+  padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom));
 }
 
 /* ---------- View switching (pics / about) ---------- */
@@ -261,11 +267,15 @@ html, body {
   right: 0;
   bottom: 0;
   z-index: 50;
-  min-height: var(--footer-height);
+  /* Grow to cover the bottom safe area (home indicator); content padded clear. */
+  min-height: calc(var(--footer-height) + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding: 6px clamp(18px, 5vw, 64px);
+  justify-content: space-between;
+  padding: 6px
+           max(clamp(18px, 5vw, 64px), env(safe-area-inset-right))
+           calc(6px + env(safe-area-inset-bottom))
+           max(clamp(18px, 5vw, 64px), env(safe-area-inset-left));
   background: var(--topbar-bg);
   text-align: center;
   color: rgba(255, 255, 255, 0.7);
@@ -273,12 +283,8 @@ html, body {
   letter-spacing: 0.06em;
 }
 
-/* Version tag pinned to the left edge; the copyright stays centred. */
+/* Version tag on the left, copyright on the right (flex space-between above). */
 .footer-version {
-  position: absolute;
-  left: clamp(18px, 5vw, 64px);
-  top: 50%;
-  transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.5);
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -299,7 +305,6 @@ html, body {
 .hero-slideshow {
   position: relative;
   line-height: 0;       /* collapse any inline whitespace between images */
-  overflow: hidden;
   cursor: zoom-in;      /* click to open the hero in the lightbox */
 }
 
@@ -311,8 +316,9 @@ html, body {
   transition: opacity 700ms ease, transform 220ms ease;
 }
 
-/* Hover swell — same subtle scale as the grid tiles, applied to the visible
-   slide (overflow:hidden on the slideshow makes it a gentle zoom-in). */
+/* Hover swell — the visible slide physically grows the same subtle amount as the
+   grid tiles (no overflow clip on the slideshow, so it expands past its frame
+   rather than zooming in place). */
 .hero-slideshow:hover .hero-img.is-active {
   transform: scale(1.012);
 }
@@ -631,7 +637,10 @@ html, body {
   /* The hero ignores the grid margins and runs nearly full-width. */
   .hero-section { padding: 0 16px; }
 
-  .topbar { padding: 0 16px; }
+  .topbar {
+    padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right))
+             0 max(16px, env(safe-area-inset-left));
+  }
   .topbar-brand { font-size: 13px; }
   .nav-link { padding: 5px 9px; font-size: 13.5px; }
 

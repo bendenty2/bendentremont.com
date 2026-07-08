@@ -469,7 +469,8 @@
   const zoomable = () => lightboxImg.style.display !== "none";  // photos + loop, not video
 
   lightbox.addEventListener("touchstart", (e) => {
-    if (window.innerWidth > 700) return;
+    // No width gate: touch events only fire on touch devices, and we want the
+    // gestures in landscape too (an iPhone in landscape is >700px wide).
     lbSwiped = false; gMoved = false;
     gNatW = lightboxImg.offsetWidth; gNatH = lightboxImg.offsetHeight;
     if (e.touches.length === 2 && zoomable()) {
@@ -489,7 +490,6 @@
   }, { passive: true });
 
   lightbox.addEventListener("touchmove", (e) => {
-    if (window.innerWidth > 700) return;
     if (gMode === "pinch" && e.touches.length >= 2) {
       e.preventDefault();
       const [a, b] = e.touches;
@@ -513,7 +513,6 @@
   }, { passive: false });
 
   lightbox.addEventListener("touchend", (e) => {
-    if (window.innerWidth > 700) return;
     if (gMode === "pinch") {
       if (zScale <= 1.02) resetZoom(true);
       lbSwiped = true; gMode = null; return;
