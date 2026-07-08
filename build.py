@@ -448,6 +448,18 @@ def _exif_fields(exif: dict) -> dict:
     }
 
 
+def _find_media_subdir(name: str) -> Path | None:
+    """Locate a special media subfolder (loop/gear) wherever it now lives under
+    MEDIA_DIR — the owner nests these freely (e.g. photos/landscape/loop,
+    about/gear). Returns the first directory of that name, or None."""
+    if not MEDIA_DIR.exists():
+        return None
+    for p in sorted(MEDIA_DIR.rglob(name)):
+        if p.is_dir():
+            return p
+    return None
+
+
 def process_loop(loop_dir: Path, titles: dict | None = None, span: int = 1) -> dict | None:
     # Build one "loop" manifest item from every image in media/loop/. Each frame
     # is resized + watermarked like a normal still (into photos/loop/ +
@@ -667,10 +679,10 @@ def main() -> int:
             tag   = " ".join(parts[1:]).lower()
             # `loop` is the media/loop/ folder rendered as one cycling tile.
             if name.lower() == LOOP_DIRNAME:
-                loop_dir = MEDIA_DIR / LOOP_DIRNAME
-                if not loop_dir.is_dir():
+                loop_dir = _find_media_subdir(LOOP_DIRNAME)
+                if not loop_dir:
                     print(f"  ! layout.txt line {lineno}: no '{LOOP_DIRNAME}/' "
-                          f"folder in {MEDIA_DIR.name}/")
+                          f"folder found under {MEDIA_DIR.name}/")
                     continue
                 if tag == "medium":
                     role = "medium"
@@ -780,11 +792,12 @@ def main() -> int:
     PHOTOS_DIR.mkdir(exist_ok=True)
     VIDEOS_DIR.mkdir(exist_ok=True)
 
-    # Gear clips: the "About" page plays media/gear/*.mp4 from the site's gear/
+    # Gear clips: the "About" page plays the gear/*.mp4 (found wherever the gear/
+    # folder now lives under media/, e.g. media/about/gear/) from the site's gear/
     # folder (referenced directly in index.html). They're product renders, not
     # photos, so just copy any that changed — no resize/watermark/manifest.
-    gear_src = MEDIA_DIR / "gear"
-    if gear_src.is_dir():
+    gear_src = _find_media_subdir("gear")
+    if gear_src:
         import shutil
         gear_out = SITE_DIR / "gear"
         gear_out.mkdir(exist_ok=True)
