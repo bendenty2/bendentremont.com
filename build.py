@@ -37,17 +37,26 @@ except ImportError:
 # CONFIG
 # --------------------------------------------------------------------------
 
-# Source folder — where the originals live.
-# Override at runtime by setting the PHOTOSITE_SOURCE environment variable.
-SOURCE_DIR = Path(
-    os.environ.get(
-        "PHOTOSITE_SOURCE",
-        str(Path.home() / "Documents" / "PhotositeCatalogue"),
-    )
-)
-
 # Where this script lives — site output goes alongside it.
 SITE_DIR = Path(__file__).resolve().parent
+
+
+# Source folder — where the originals live. Resolution order:
+#   1. PHOTOSITE_SOURCE env var (explicit override)
+#   2. PhotositeCatalogue/ next to this script (the catalogue now lives in-repo;
+#      it's .gitignore'd so the originals are never committed)
+#   3. ~/Documents/PhotositeCatalogue (the legacy standalone location)
+def _resolve_source_dir() -> Path:
+    env = os.environ.get("PHOTOSITE_SOURCE")
+    if env:
+        return Path(env)
+    in_repo = SITE_DIR / "PhotositeCatalogue"
+    if in_repo.exists():
+        return in_repo
+    return Path.home() / "Documents" / "PhotositeCatalogue"
+
+
+SOURCE_DIR = _resolve_source_dir()
 
 # Output subfolders inside the site directory.
 THUMBS_DIR = SITE_DIR / "thumbnails"   # used in the masonry grid

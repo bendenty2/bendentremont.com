@@ -1,5 +1,11 @@
 build.log
 dev-layout.html
+
+# The source catalogue (originals, layout.txt, sidecars). Now lives inside the
+# repo folder but must NEVER be committed — it's ~700 MB of UNWATERMARKED full-res
+# originals; committing would publish them publicly and break the deploy.
+PhotositeCatalogue/
+
 __pycache__/
 *.pyc
 .DS_Store
