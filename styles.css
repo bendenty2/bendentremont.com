@@ -292,11 +292,20 @@ html, body {
     linear-gradient(to bottom, transparent 0, #000 3%, #000 97%, transparent 100%);
   mask-composite: intersect;
 }
-.gear-col--r10 .gear-photo { width: 64%; }
 /* Lift the R10 caption+still up off the shared baseline a little, and open up
-   more breathing room between the R10 caption and its photo. */
+   more breathing room between the R10 caption and its photo. The per-element
+   transforms below then fine-tune each piece against the px ruler. */
 .gear-col--r10 { transform: translateY(-22px); }
-.gear-col--r10 .gear-device { margin-bottom: 26px; }
+.gear-col--r10 .gear-photo {
+  width: 64%;
+  transform: translateY(15px) scale(0.85);   /* camera: down 15px, 15% smaller */
+}
+.gear-col--r10 .gear-device {
+  margin-bottom: 26px;
+  transform: translateY(30px);                /* R10 caption: down 30px */
+}
+.gear-col--sigma .gear-device { transform: translateY(-15px); }  /* Sigma caption: up 15px */
+.gear-col--sigma .gear-photo  { transform: scale(1.05); }        /* Sigma still: 5% larger */
 
 .about-link {
   color: var(--fg);
@@ -679,6 +688,11 @@ html, body {
   .gear-col--sigma { order: 1; }
   .gear-col--r10   { order: 2; transform: none; }   /* no desktop lift when stacked */
   .gear-col--r10 .gear-device { margin-bottom: 6px; }
+  /* Drop the desktop fine-tune transforms when the gear stacks on mobile. */
+  .gear-col--r10 .gear-device,
+  .gear-col--sigma .gear-device,
+  .gear-col--r10 .gear-photo,
+  .gear-col--sigma .gear-photo { transform: none; }
   /* Keep the intro column centred (no right nudge) on narrow screens. */
   .about-block--intro { transform: none; }
 
