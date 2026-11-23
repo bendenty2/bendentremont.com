@@ -184,6 +184,14 @@ html, body {
 .about-block { margin: 0; }
 .about-block:last-child { margin-bottom: 0; }
 
+/* Intro copy: a thin, centred column so the lines wrap instead of running the
+   full panel width. Text stays left-aligned within that narrower column. */
+.about-block--intro {
+  max-width: 300px;
+  margin: 0 auto;
+  text-align: left;
+}
+
 /* Contact section: centred label + content (blurb and email). */
 .about-block--contact { text-align: center; }
 
@@ -241,12 +249,13 @@ html, body {
 .gear-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 10px;
   margin: 0 auto 24px;
-  max-width: 470px;          /* pull the two entries in toward each other
-                                (wide enough that the Sigma caption stays 2 lines
-                                so both stills top-align) */
-  align-items: start;
+  max-width: 430px;          /* pull the two entries in toward each other */
+  /* Bottom-align the two columns so the camera and lens sit on one baseline
+     (the shorter camera no longer floats up above the longer lens). Each
+     caption then floats directly above its own still. */
+  align-items: end;
 }
 
 .gear-col { min-width: 0; text-align: center; }
@@ -258,21 +267,16 @@ html, body {
   letter-spacing: 0.01em;
   color: var(--fg);
   margin: 0 0 8px;
-  /* Reserve two lines so the single-line (R10) and two-line (Sigma) device
-     names align, and the two product photos below them start at the same y. */
-  min-height: 2.8em;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
 }
 
 /* Gear product still under a device heading. Normalised by HEIGHT (not width)
    so the landscape camera body and the square lens sit balanced and centred,
    with the edges feathered so each melts into the white page. */
-/* The two product stills are scaled to each other by real-world size (camera
-   ~123 mm vs lens ~265 mm): the lens fills its column, the camera shows ~46% as
-   wide. The build trims each shot tight to its subject so the proportions read
-   true. Edges are feathered so each melts into the white page. */
+/* The two product stills are scaled to each other: the lens fills its column,
+   the camera shows a little under two-thirds as wide, and the columns are
+   bottom-aligned so both sit on one baseline. The build trims each shot tight
+   to its subject so the proportions read true; edges are feathered so each
+   melts into the white page. */
 .gear-photo {
   display: block;
   width: 100%;
@@ -287,7 +291,7 @@ html, body {
     linear-gradient(to bottom, transparent 0, #000 3%, #000 97%, transparent 100%);
   mask-composite: intersect;
 }
-.gear-col--r10 .gear-photo { width: 46%; }
+.gear-col--r10 .gear-photo { width: 64%; }
 
 .about-link {
   color: var(--fg);
