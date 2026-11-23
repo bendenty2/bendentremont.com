@@ -190,6 +190,7 @@ html, body {
   max-width: 300px;
   margin: 0 auto;
   text-align: left;
+  transform: translateX(26px);   /* nudge the thin column a touch right of centre */
 }
 
 /* Contact section: centred label + content (blurb and email). */
@@ -292,6 +293,10 @@ html, body {
   mask-composite: intersect;
 }
 .gear-col--r10 .gear-photo { width: 64%; }
+/* Lift the R10 caption+still up off the shared baseline a little, and open up
+   more breathing room between the R10 caption and its photo. */
+.gear-col--r10 { transform: translateY(-22px); }
+.gear-col--r10 .gear-device { margin-bottom: 26px; }
 
 .about-link {
   color: var(--fg);
@@ -672,7 +677,10 @@ html, body {
 
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
-  .gear-col--r10   { order: 2; }
+  .gear-col--r10   { order: 2; transform: none; }   /* no desktop lift when stacked */
+  .gear-col--r10 .gear-device { margin-bottom: 6px; }
+  /* Keep the intro column centred (no right nudge) on narrow screens. */
+  .about-block--intro { transform: none; }
 
   /* Hero divider: pull in slightly so it's just a touch longer than the hero
      photo (not edge-to-edge), and sit a bit closer to the grid below. */
