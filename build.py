@@ -25,7 +25,7 @@ from datetime import datetime
 from pathlib import Path
 
 try:
-    from PIL import Image, ExifTags, ImageOps, ImageDraw, ImageFont
+    from PIL import Image, ExifTags, ImageOps, ImageDraw, ImageFont, ImageChops
 except ImportError:
     sys.stderr.write(
         "Pillow is required. Install with:\n    pip install Pillow\n"
@@ -236,6 +236,26 @@ def _resize_long_edge(img: Image.Image, long_edge: int) -> Image.Image:
         new_h = long_edge
         new_w = round(w * long_edge / h)
     return img.resize((new_w, new_h), Image.LANCZOS)
+
+
+def _trim_white_border(img: Image.Image, thresh: int = 12,
+                       margin: float = 0.04) -> Image.Image:
+    """Crop the near-white border off a product shot so the subject fills the
+    frame — lets the gear stills be scaled to each other cleanly (a square shot
+    of a long lens is mostly empty space otherwise). Keeps a small uniform
+    margin so the edge-feather mask fades blank space, not the product."""
+    rgb  = img.convert("RGB")
+    bg   = Image.new("RGB", rgb.size, (255, 255, 255))
+    mask = ImageChops.difference(rgb, bg).convert("L").point(
+        lambda p: 255 if p > thresh else 0)
+    bbox = mask.getbbox()
+    if not bbox:
+        return img
+    sw, sh = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    mx, my = int(sw * margin), int(sh * margin)
+    W, H   = img.size
+    return img.crop((max(0, bbox[0] - mx), max(0, bbox[1] - my),
+                     min(W, bbox[2] + mx), min(H, bbox[3] + my)))
 
 
 def _save_image(img: Image.Image, path: Path, quality: int,
@@ -819,6 +839,7 @@ def main() -> int:
                 continue
             try:
                 gi = ImageOps.exif_transpose(Image.open(g))
+                gi = _trim_white_border(gi)        # tight crop so stills scale cleanly
                 gi = _resize_long_edge(gi, GEAR_LONG_EDGE)
                 _save_image(gi, gear_out / f"{g.stem}.{IMAGE_EXT}", GEAR_QUALITY)
                 print(f"  [gear] {g.stem}.{IMAGE_EXT}")
