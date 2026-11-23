@@ -29,15 +29,17 @@
     sidebarLinks.forEach(b => {
       b.classList.toggle("is-active", b.dataset.view === name);
     });
-    // Gear videos live in the About section, which starts hidden — kick them
-    // into playing once it's actually shown (muted autoplay can be deferred
-    // while display:none).
-    if (name === "about") {
-      document.querySelectorAll(".gear-video").forEach(v => {
+    // The Videos tab's clips only play while that tab is visible. They're
+    // preload="none", so this is also when they first start downloading —
+    // nothing is fetched for the tab until the viewer actually opens it.
+    document.querySelectorAll("#grid-videos video").forEach(v => {
+      if (name === "videos") {
         const p = v.play();
         if (p && p.catch) p.catch(() => {});
-      });
-    }
+      } else {
+        v.pause();
+      }
+    });
   }
 
   sidebarLinks.forEach(b => {
@@ -68,6 +70,7 @@
 
   const heroSection       = document.getElementById("hero-section");
   const grid              = document.getElementById("grid");
+  const videoGrid         = document.getElementById("grid-videos");
   const lightbox          = document.getElementById("lightbox");
   const lightboxImg       = document.getElementById("lightbox-img");
   const lightboxVideo     = document.getElementById("lightbox-video");
@@ -78,18 +81,22 @@
   const lightboxPrev      = lightbox.querySelector(".lightbox-nav--prev");
   const lightboxNext      = lightbox.querySelector(".lightbox-nav--next");
 
-  // The full item array we're navigating through, in VISUAL order — used by
-  // the lightbox for prev/next. renderGrid() rewrites this to match the order
-  // tiles actually appear on screen.
-  // The lightbox order is [heroes…, grid…]: the 4 hero photos are items 0–3,
-  // the catalogue follows from index heroItems.length onward.
+  // The item array the lightbox is currently navigating (prev/next), in VISUAL
+  // order. openFrom() points it at the clicked grid's set: the Photos set is
+  // [heroes…, grid photos…] (heroes are items 0–3, photos follow); the Videos
+  // set is just the clips.
   let items = [];
-  // The complete, unmodified item set (every photo + video). renderGrid() is
-  // always fed from this so re-renders (resize) never lose tiles, even though
-  // `items` above gets shrunk to the rendered subset.
+  // The Photos grid's items (photos + the loop tile), fed to renderPhotos() so
+  // re-renders (resize) never lose tiles.
   let allItems = [];
   // The hero/slideshow photos, prepended to `items` so they're clickable too.
   let heroItems = [];
+  // The Videos-tab clips (manifest.videos), rendered into their own grid.
+  let videoItems = [];
+  // `items` is the ACTIVE lightbox list; it's swapped to the clicked grid's set
+  // so the Photos and Videos grids navigate independently. photoLbList is the
+  // Photos set (heroes + grid photos); videoItems is the Videos set.
+  let photoLbList = [];
   // Index of the currently-displayed item when the lightbox is open. -1 when closed.
   let currentIndex = -1;
   // setInterval id when a loop item is cycling in the lightbox; null otherwise.
@@ -126,7 +133,7 @@
 
   // ---------- Tiles ----------
 
-  function buildPhotoTile(item, index) {
+  function buildPhotoTile(item, index, lbList) {
     const tile = document.createElement("figure");
     tile.className = "tile";
     tile.dataset.id = item.id;
@@ -142,12 +149,12 @@
 
     tile.appendChild(img);
 
-    tile.addEventListener("click", () => openLightboxAt(index));
+    tile.addEventListener("click", () => openFrom(lbList, index));
     tile.addEventListener("mouseenter", () => preloadFull(item), { once: true });
     return tile;
   }
 
-  function buildVideoTile(item, index) {
+  function buildVideoTile(item, index, lbList) {
     const tile = document.createElement("figure");
     tile.className = "tile tile--video";
     tile.dataset.id = item.id;
@@ -158,9 +165,9 @@
     video.loop = true;
     video.muted = true;
     video.playsInline = true;
-    // Load metadata only so we know dimensions/duration without pulling the
-    // entire file — the browser will buffer the rest for autoplay.
-    video.preload = "metadata";
+    // The Videos tab is hidden by default, so fetch nothing until it's opened —
+    // setActiveView("videos") calls play(), which triggers the load then.
+    video.preload = "none";
 
     // Wrap the video so CSS can crop the pillarbox bars via overflow:hidden.
     const cropWrap = document.createElement("div");
@@ -169,7 +176,7 @@
 
     tile.appendChild(cropWrap);
 
-    tile.addEventListener("click", () => openLightboxAt(index));
+    tile.addEventListener("click", () => openFrom(lbList, index));
     return tile;
   }
 
@@ -177,7 +184,7 @@
   // (no fade) every item.intervalMs, ascending and wrapping. Timers are tracked
   // in loopTimers so renderGrid can clear them before rebuilding the grid.
   const loopTimers = [];
-  function buildLoopTile(item, index) {
+  function buildLoopTile(item, index, lbList) {
     const tile = document.createElement("figure");
     tile.className = "tile tile--loop";
     tile.dataset.id = item.id;
@@ -224,14 +231,14 @@
     }
 
     tile.appendChild(wrap);
-    tile.addEventListener("click", () => openLightboxAt(index));
+    tile.addEventListener("click", () => openFrom(lbList, index));
     return tile;
   }
 
-  function buildTile(item, index) {
-    if (item.type === "video") return buildVideoTile(item, index);
-    if (item.type === "loop")  return buildLoopTile(item, index);
-    return buildPhotoTile(item, index);
+  function buildTile(item, index, lbList) {
+    if (item.type === "video") return buildVideoTile(item, index, lbList);
+    if (item.type === "loop")  return buildLoopTile(item, index, lbList);
+    return buildPhotoTile(item, index, lbList);
   }
 
   // ---------- Grid layout ----------
@@ -249,35 +256,31 @@
 
   const VIDEO_CROP_RATIO = 1.5;  // 3:2 — matches .video-crop-wrapper's aspect-ratio
 
-  function getGridMetrics(cols) {
-    const style  = getComputedStyle(grid);
+  function getGridMetrics(gridEl, cols) {
+    const style  = getComputedStyle(gridEl);
     const padL   = parseFloat(style.paddingLeft)  || 0;
     const padR   = parseFloat(style.paddingRight) || 0;
     const colGap = parseFloat(style.columnGap)    || 16;
-    const inner  = (grid.clientWidth || window.innerWidth) - padL - padR;
+    const inner  = (gridEl.clientWidth || window.innerWidth) - padL - padR;
     const colW   = (inner - colGap * (cols - 1)) / cols;
     return { colW, colGap };
   }
 
-  function renderGrid(list) {
-    // Stop loop timers from the previous render before dropping their tiles.
-    loopTimers.forEach(clearInterval);
-    loopTimers.length = 0;
-    grid.innerHTML = "";
-    grid.style.setProperty("--cols", 2);
-    grid.dataset.cols = 2;
+  // Core renderer: paint `list` into `gridEl`, wiring each tile to open `lbList`
+  // (the lightbox set this grid belongs to) at offset+i. Shared by both grids.
+  function renderGridInto(list, gridEl, lbList, offset) {
+    gridEl.innerHTML = "";
+    gridEl.style.setProperty("--cols", 2);
+    gridEl.dataset.cols = 2;
 
-    const { colW, colGap } = getGridMetrics(2);
+    const { colW, colGap } = getGridMetrics(gridEl, 2);
     // Vertical gap below each image = the column gap, so the grid gutters are
     // equal horizontally and vertically. (grid-auto-rows is 1px, so a row-span ≈
     // a pixel height; the same reserve on every tile balances the two columns.)
     const reserve = colGap;
 
-    // Heroes are lightbox items 0..N-1; the grid follows in this exact order.
-    items = heroItems.concat(list);
-
     list.forEach((item, i) => {
-      const tile  = buildTile(item, heroItems.length + i);
+      const tile  = buildTile(item, offset + i, lbList);
       const span2 = item.span === 2;                 // medium → full-width band
       tile.style.gridColumn = span2 ? "span 2" : "span 1";
 
@@ -288,8 +291,22 @@
       else                                imgH = dispW;                      // unknown aspect
       tile.style.gridRowEnd = `span ${Math.max(1, Math.ceil(imgH + reserve))}`;
 
-      grid.appendChild(tile);
+      gridEl.appendChild(tile);
     });
+  }
+
+  // The Photos grid: heroes are lightbox items 0..N-1, the grid photos follow.
+  function renderPhotos() {
+    loopTimers.forEach(clearInterval);   // stop loop timers before dropping tiles
+    loopTimers.length = 0;
+    photoLbList = heroItems.concat(allItems);
+    renderGridInto(allItems, grid, photoLbList, heroItems.length);
+  }
+
+  // The Videos grid: same engine, its own lightbox set (just the clips).
+  function renderVideos() {
+    if (!videoGrid) return;
+    renderGridInto(videoItems, videoGrid, videoItems, 0);
   }
 
   let resizeTimer = null;
@@ -302,7 +319,7 @@
     lastWidth = window.innerWidth;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      requestAnimationFrame(() => renderGrid(allItems));
+      requestAnimationFrame(() => { renderPhotos(); renderVideos(); });
     }, 120);
   }
   window.addEventListener("resize", onResize);
@@ -390,6 +407,13 @@
   function updateNavArrows() {
     lightboxPrev.classList.toggle("is-hidden", currentIndex <= 0);
     lightboxNext.classList.toggle("is-hidden", currentIndex >= items.length - 1);
+  }
+
+  // Open the lightbox against a specific list (Photos vs Videos), making it the
+  // active navigation set first so prev/next stay within that grid.
+  function openFrom(list, index) {
+    items = list;
+    openLightboxAt(index);
   }
 
   function openLightboxAt(index) {
@@ -716,7 +740,7 @@
     }, { passive: true });
 
     slideshow.addEventListener("click", () => {
-      if (!didSwipe) openLightboxAt(heroActiveIdx);
+      if (!didSwipe) openFrom(photoLbList, heroActiveIdx);
     });
 
     const dotsEl = document.createElement("div");
@@ -778,11 +802,12 @@
     buildHeroSlideshow(heroList);
 
     allItems = manifest.photos || [];
+    videoItems = manifest.videos || [];
     items = heroItems.concat(allItems);
 
-    // Defer one frame so the grid has been laid out by the browser and
-    // grid.clientWidth returns an accurate value for the row-span maths.
-    requestAnimationFrame(() => renderGrid(allItems));
+    // Defer one frame so the grids have been laid out by the browser and
+    // clientWidth returns an accurate value for the row-span maths.
+    requestAnimationFrame(() => { renderPhotos(); renderVideos(); });
   }
 
 })();

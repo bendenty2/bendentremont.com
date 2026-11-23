@@ -240,14 +240,13 @@ html, body {
    Collapses to a single column on narrow viewports (see mobile media query). */
 .gear-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
   margin-bottom: 24px;
+  align-items: start;
 }
 
 .gear-col { min-width: 0; text-align: center; }
-/* Titles stay aligned across columns (top of the cell); only the videos are
-   nudged (below) so the clips sit at matched heights. */
 
 .gear-device {
   font-family: var(--font-sans);
@@ -255,17 +254,25 @@ html, body {
   font-weight: 400;
   letter-spacing: 0.01em;
   color: var(--fg);
-  margin: 0 0 2px;       /* sit close above its video */
+  margin: 0 0 8px;
+  /* Reserve two lines so the single-line (R10) and two-line (Sigma) device
+     names align, and the two product photos below them start at the same y. */
+  min-height: 2.8em;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
-/* Looping gear demo video (e.g. the spinning lens) under a device heading.
-   The clip's backdrop is whitened in the file itself; this feathers the four
-   edges so the frame melts fully into the white page with no visible rectangle. */
-.gear-video {
+/* Gear product still under a device heading. Normalised by HEIGHT (not width)
+   so the landscape camera body and the square lens sit balanced and centred,
+   with the edges feathered so each melts into the white page. */
+.gear-photo {
   display: block;
-  width: 100%;
+  width: auto;
   height: auto;
-  margin: 4px auto 0;    /* centred, tight under its title */
+  max-width: 100%;
+  max-height: 220px;
+  margin: 0 auto;
   -webkit-mask-image:
     linear-gradient(to right,  transparent 0, #000 3%, #000 97%, transparent 100%),
     linear-gradient(to bottom, transparent 0, #000 3%, #000 97%, transparent 100%);
@@ -275,16 +282,6 @@ html, body {
     linear-gradient(to bottom, transparent 0, #000 3%, #000 97%, transparent 100%);
   mask-composite: intersect;
 }
-
-/* The square camera-body clips display smaller (centred) so their height
-   roughly matches the widescreen lens clip, each nudged down slightly. */
-.gear-video--r10 { width: 55%; transform: translateY(5px); }
-.gear-video--scl { width: 60%; transform: translateY(20px); }
-
-/* Lower the single-line camera-body titles so they sit level with the middle
-   of the Sigma entry's two-line title. */
-.gear-col--r10 .gear-device,
-.gear-col--scl .gear-device { transform: translateY(13px); }
 
 .about-link {
   color: var(--fg);
@@ -647,30 +644,16 @@ html, body {
   .topbar-brand { font-size: 13px; }
   .nav-link { padding: 5px 9px; font-size: 13.5px; }
 
-  /* Collapse the three-column gear grid to a single stack on narrow screens. */
+  /* Collapse the two-column gear grid to a single stack on narrow screens. */
   .gear-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
     margin-bottom: 14px;   /* tighter gap to the divider below the gear stack */
   }
 
-  /* Gear clips in the stack; drop the desktop nudges. The square camera-body
-     clips are narrower than the widescreen Sigma so they don't tower over it. */
-  .gear-video { width: 72%; transform: none; }
-  .gear-video--r10,
-  .gear-video--scl { width: 52%; transform: none; }
-  .gear-col--r10 .gear-device,
-  .gear-col--scl .gear-device { transform: none; }
-
-  /* Stack-spacing tweaks: more room above the R10 entry, and tighten the R10
-     label-to-clip gap. The R10 clip has ~33% empty white space on top (camera
-     sits low in frame), so we clip that top region away and pull the clip up by
-     the same proportion — the camera rises toward its label, while the cropped
-     (transparent) top no longer covers the label. Proportional units so it
-     holds as the clip scales with screen width. */
-  .gear-col--r10 { margin-top: 5px; }
-  .gear-video--r10 { margin-top: -13%; clip-path: inset(30% 0 0 0); }
-  .gear-video--scl { margin-top: -1px; }   /* nudge the SCL clip up toward its title */
+  /* Stacked: no 2-line title reserve needed; give the stills a touch more size. */
+  .gear-device { min-height: 0; margin-bottom: 6px; }
+  .gear-photo { max-height: 240px; }
 
   /* GEAR / CONTACT labels: match the gear-title size and sit closer to the
      divider above them. */
@@ -679,7 +662,6 @@ html, body {
   /* About: show the Sigma lens first in the single-column stack, then the R10. */
   .gear-col--sigma { order: 1; }
   .gear-col--r10   { order: 2; }
-  .gear-col--scl   { order: 3; }
 
   /* Hero divider: pull in slightly so it's just a touch longer than the hero
      photo (not edge-to-edge), and sit a bit closer to the grid below. */

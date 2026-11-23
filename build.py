@@ -98,6 +98,11 @@ FULL_QUALITY = 88
 # (pixels) and EXIF Copyright/Artist tags. Switch back to "jpg" here to revert.
 IMAGE_EXT = "webp"
 
+# Gear stills (About-page product shots). Processed to WebP like photos but NOT
+# watermarked — they're illustrative product renders, not Ben's photography.
+GEAR_LONG_EDGE = 1200
+GEAR_QUALITY = 85
+
 # File extensions we'll try to ingest.
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".webp"}
 
@@ -735,16 +740,19 @@ def main() -> int:
     grid_roles: dict[str, str] = {}  # stem -> declared role, for a sanity check
 
     grid_entries: list[tuple] = []   # (src, role, item_type, name) in file order
+    video_layout: list[tuple] = []   # (src, name) in layout order → the Videos tab
     if LAYOUT_FILE.exists():
         for src, role, item_type, name in _read_layout():
             if role == "hero":
                 hero_sources.append(src)
+            elif item_type == "video":
+                video_layout.append((src, name))   # videos → Videos tab, not the grid
             else:
                 grid_entries.append((src, role, item_type, name))
 
     def _bucket(e):
         _src, role, item_type, _name = e
-        if item_type in ("video", "loop") or role == "small_landscape":
+        if item_type == "loop" or role == "small_landscape":
             return "L"
         if role == "small_portrait":
             return "P"
@@ -782,7 +790,7 @@ def main() -> int:
 
     grid_desc         = f"layout.txt + {MEDIA_DIR.name}/"
     photo_work        = [(src, span, lbl) for src, span, t, lbl in work_items if t == "photo"]
-    video_work        = [(src, lbl)       for src, span, t, lbl in work_items if t == "video"]
+    video_work        = video_layout      # (src, name) — videos render on the Videos tab
     all_photo_sources = hero_sources + [src for src, *_ in photo_work]
     all_video_sources = [src for src, _ in video_work]
 
@@ -797,21 +805,25 @@ def main() -> int:
     PHOTOS_DIR.mkdir(exist_ok=True)
     VIDEOS_DIR.mkdir(exist_ok=True)
 
-    # Gear clips: the "About" page plays the gear/*.mp4 (found wherever the gear/
-    # folder now lives under media/, e.g. media/about/gear/) from the site's gear/
-    # folder (referenced directly in index.html). They're product renders, not
-    # photos, so just copy any that changed — no resize/watermark/manifest.
+    # Gear stills: the "About" page shows gear/<name>.webp (referenced directly in
+    # index.html). Process any stills under the gear/ folder (e.g.
+    # media/about/gear/gearPhotos/) into web-sized WebP — resized for the web but
+    # NOT watermarked (product shots, not Ben's photography). Any videos under
+    # gear/ (e.g. gearVideos/) are ignored; the gear section is stills now.
     gear_src = _find_media_subdir("gear")
     if gear_src:
-        import shutil
         gear_out = SITE_DIR / "gear"
         gear_out.mkdir(exist_ok=True)
-        for g in sorted(gear_src.iterdir()):
-            if g.is_file() and g.suffix.lower() in VIDEO_EXTS:
-                dest = gear_out / g.name
-                if not dest.exists() or g.stat().st_mtime > dest.stat().st_mtime:
-                    shutil.copy2(g, dest)
-                    print(f"  [gear] {g.name}")
+        for g in sorted(gear_src.rglob("*")):
+            if not (g.is_file() and g.suffix.lower() in SUPPORTED_EXTS):
+                continue
+            try:
+                gi = ImageOps.exif_transpose(Image.open(g))
+                gi = _resize_long_edge(gi, GEAR_LONG_EDGE)
+                _save_image(gi, gear_out / f"{g.stem}.{IMAGE_EXT}", GEAR_QUALITY)
+                print(f"  [gear] {g.stem}.{IMAGE_EXT}")
+            except Exception as e:
+                print(f"  ! gear skip {g.name}: {e}")
 
     # ---- Titles sidecar --------------------------------------------------------
 
@@ -876,7 +888,8 @@ def main() -> int:
                       f"'{role.replace('_', ' ')}' but the image is {actual} "
                       f"— rendered as {actual}")
 
-    # Re-assemble in tile order, inserting videos inline.
+    # Re-assemble the grid in tile order (photos + the loop tile). Videos are a
+    # separate tab, built below.
     entries: list[dict] = []
     for src, span, item_type, lbl in work_items:
         if item_type == "photo":
@@ -887,11 +900,14 @@ def main() -> int:
             entry = process_loop(src, titles=titles, span=span)
             if entry:
                 entries.append(entry)
-        else:
-            print(f"  [vid] {lbl} -- {src.name}")
-            entry = process_video(src, titles=titles)
-            if entry:
-                entries.append(entry)
+
+    # ---- Videos (the Videos tab, separate from the photo grid) -----------------
+    video_entries: list[dict] = []
+    for src, lbl in video_work:
+        print(f"  [vid] {lbl} -- {src.name}")
+        entry = process_video(src, titles=titles)
+        if entry:
+            video_entries.append(entry)
 
     # ---- EXIF overrides --------------------------------------------------------
     # Fill spec fields a source file is missing (e.g. DxO drops aperture/shutter/
@@ -919,12 +935,15 @@ def main() -> int:
     heroes_public = [dict(e) for e in hero_entries]
     hero_public = heroes_public[0] if heroes_public else None
 
+    videos_public = [dict(e) for e in video_entries]
+
     manifest = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "hero":         hero_public,
         "heroes":       heroes_public,
         "count":        len(public),
         "photos":       public,
+        "videos":       videos_public,
     }
     js = "window.PHOTOSITE_MANIFEST = " + json.dumps(manifest, indent=2) + ";\n"
     MANIFEST_PATH.write_text(js, encoding="utf-8")
